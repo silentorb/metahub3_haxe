@@ -1,0 +1,5 @@
+-cp metahub
+-lib nodejs
+-D nodejs
+-js output/nodejs/metahub.js
+-main metahub.Main

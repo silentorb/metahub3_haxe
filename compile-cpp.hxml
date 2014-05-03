@@ -1,0 +1,4 @@
+-cp metahub
+-cpp output/cpp
+-debug
+-main Main

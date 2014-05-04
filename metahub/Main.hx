@@ -1,9 +1,9 @@
 package metahub;
-import metahub.schema.*;
+import metahub.engine.Hub;
 
 class Main {
 
-  public var property:Property;
+  public var hub:Hub;
 
   public static function main() {
 

@@ -1,0 +1,30 @@
+{
+  "trellises": {
+    "Character": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "is_alive": {
+          "type": "bool",
+          "default": true
+        },
+        "items": {
+          "type": "list",
+          "trellis": "Item"
+        }
+      }
+    },
+    "Item": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "reference",
+          "trellis": "Character"
+        }
+      }
+    }
+  }
+}

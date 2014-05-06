@@ -5,7 +5,9 @@
     "grunt": "~0.4.4",
     "grunt-haxe": "~0.1.12"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "source-map-support": "^0.2.6"
+  },
   "author": "Christopher W. Johnson <service@silentorb.com> (http://silentorb.com/)",
   "license": "MIT"
 }

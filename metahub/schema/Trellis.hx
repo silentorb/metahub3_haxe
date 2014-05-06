@@ -1,6 +1,5 @@
-package metahub.schema;
-import metahub.engine.Hub;
-import metahub.schema.Property;
+package schema;
+import schema.Property;
 
 typedef ITrellis_Source = {
   var name:String;
@@ -10,14 +9,14 @@ typedef ITrellis_Source = {
 
 class Trellis {
   public var name:String;
-  public var hub:Hub;
+  public var schema:Schema;
   public var properties:Array<Property> = new Array<Property>();
   var property_keys:Map<String, Property> = new Map<String, Property>();
   var parent:Trellis;
 
-  public function new(name:String, hub:Hub) {
+  public function new(name:String, schema:Schema) {
     this.name = name;
-    this.hub = hub;
+    this.schema = schema;
   }
 
   public function add_property(name:String, source:IProperty_Source):Property {
@@ -53,7 +52,7 @@ class Trellis {
 
     do {
       tree.unshift(trellis);
-      trellis == trellis.parent;
+      trellis = trellis.parent;
     }
     while (trellis != null);
 
@@ -61,22 +60,22 @@ class Trellis {
   }
 
   public function load_properties(source:ITrellis_Source) {
-    for (name in source.properties.keys()) {
-      add_property(name, source.properties[name]);
+    for (name in Reflect.fields(source.properties)) {
+      add_property(name, Reflect.field(source.properties, name));
     }
   }
 
   public function initialize(source:ITrellis_Source) {
-    var trellises = this.hub.trellises;
+    var trellises = this.schema.trellises;
     if (source.parent != null) {
-      var trellis = this.hub.get_trellis(source.parent);
+      var trellis = this.schema.get_trellis(source.parent);
       this.set_parent(trellis);
     }
 
     if (source.properties != null) {
-      for (j in source.properties.keys()) {
+      for (j in Reflect.fields(source.properties)) {
         var property:Property = this.get_property(j);
-        property.initialize_links(source.properties[j]);
+        property.initialize_link(Reflect.field(source.properties, j));
       }
     }
   }

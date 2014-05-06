@@ -1,18 +1,16 @@
-package metahub.engine;
-import metahub.schema.Trellis;
-import metahub.schema.Property;
+package schema;
 
-class Hub {
+import schema.Property;
+import schema.Trellis;
+
+class Schema {
   public var trellises:Array<Trellis> = new Array<Trellis>();
   public var trellis_keys:Map<String, Trellis> = new Map<String, Trellis>();
 
-  public function new() {
-
-  }
-
-  function add_trellis(name:String, trellis:Trellis) {
+  function add_trellis(name:String, trellis:Trellis):Trellis {
     trellis_keys[name] = trellis;
     trellises.push(trellis);
+    return trellis;
   }
 
   public function load_trellises(trellises:Map<String, ITrellis_Source>) {
@@ -20,18 +18,21 @@ class Hub {
 
 // First load the core trellises
     var trellis:Trellis, source:ITrellis_Source, name:String;
-    for (name in trellises.keys()) {
-      source = trellises[name];
+    for (name in Reflect.fields(trellises)) {
+//      trace(Reflect.field(trellises, name));
+//    for (name in trellises.keys()) {
+//    source = trellises[name];
+      source = Reflect.field(trellises, name);
       trellis = this.trellis_keys[name];
       if (trellis == null)
-        add_trellis(name, new Trellis(name, this));
+        trellis = add_trellis(name, new Trellis(name, this));
 
       trellis.load_properties(source);
     }
 
 // Connect everything together
-    for (name in trellises.keys()) {
-      source = trellises[name];
+    for (name in Reflect.fields(trellises)) {
+      source = Reflect.field(trellises, name);
       trellis = this.trellis_keys[name];
       trellis.initialize(source);
     }

@@ -1,0 +1,22 @@
+package code;
+import schema.Trellis;
+
+class Expression_Create_Node implements Expression {
+  public var trellis:Trellis;
+  public var assignments = new Map<Int, Expression>();
+  public var type:Type_Reference;
+
+  public function new(trellis:Trellis) {
+    this.trellis = trellis;
+  }
+
+  public function resolve(scope:Scope):Dynamic {
+    var node = scope.hub.create_node(trellis);
+    for (i in assignments.keys()) {
+      var expression = assignments[i];
+      node.set_value(i, expression.resolve(scope));
+    }
+
+    return node;
+  }
+}

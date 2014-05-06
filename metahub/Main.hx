@@ -1,5 +1,5 @@
 package metahub;
-import metahub.engine.Hub;
+import Hub;
 
 class Main {
 

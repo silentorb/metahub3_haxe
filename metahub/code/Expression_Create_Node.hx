@@ -1,5 +1,6 @@
 package code;
 import schema.Trellis;
+import schema.Property;
 
 class Expression_Create_Node implements Expression {
   public var trellis:Trellis;
@@ -8,6 +9,7 @@ class Expression_Create_Node implements Expression {
 
   public function new(trellis:Trellis) {
     this.trellis = trellis;
+    type = new Type_Reference(Property_Type.reference, trellis);
   }
 
   public function resolve(scope:Scope):Dynamic {
@@ -17,6 +19,6 @@ class Expression_Create_Node implements Expression {
       node.set_value(i, expression.resolve(scope));
     }
 
-    return node;
+    return node.id;
   }
 }

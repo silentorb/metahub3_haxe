@@ -1,15 +1,17 @@
 package code;
+import haxe.ds.Vector;
 
 class Scope {
   public var hub:Hub;
   public var definition:Scope_Definition;
-  var values = new Array<Dynamic>();
+  var values:Vector<Dynamic>;
   var parent:Scope;
 
   public function new(hub:Hub, definition:Scope_Definition, parent:Scope = null) {
     this.hub = hub;
     this.definition = definition;
     this.parent = parent;
+    values = new Vector<Dynamic>(definition.size());
   }
 
   public function resolve_symbol(symbol:Symbol):Dynamic {
@@ -20,5 +22,9 @@ class Scope {
       throw "Could not find scope for symbol: " + symbol.name + ".";
 
     return parent.resolve_symbol(symbol);
+  }
+
+  public function set_value(index:Int, value:Dynamic) {
+    values[index] = value;
   }
 }

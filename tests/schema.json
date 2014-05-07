@@ -12,6 +12,9 @@
         "items": {
           "type": "list",
           "trellis": "Item"
+        },
+        "x": {
+          "type": "int"
         }
       }
     },
@@ -23,6 +26,9 @@
         "owner": {
           "type": "reference",
           "trellis": "Character"
+        },
+        "y": {
+          "type": "int"
         }
       }
     }

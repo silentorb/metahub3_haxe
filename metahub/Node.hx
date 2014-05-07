@@ -4,10 +4,15 @@ import schema.Property;
 
 typedef Identity = UInt;
 
-class Node {
+interface INode {
+  function get_value(index:Int):Dynamic;
+  function set_value(index:Int, value:Dynamic):Void;
+}
+
+class Node implements INode {
   var hub:Hub;
   var values = new Array<Dynamic>();
-  var id:Identity;
+  public var id:Identity;
   var trellis:Trellis;
 
   public function new(hub:Hub, id:Identity, trellis:Trellis) {

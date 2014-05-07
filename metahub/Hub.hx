@@ -16,9 +16,11 @@ import code.Scope;
     nodes.push(null);
     root_scope_definition = new Scope_Definition();
     root_scope = new Scope(this, root_scope_definition);
+    schema = new Schema();
+    create_functions();
   }
 
- public function create_node(trellis:Trellis):Node {
+  public function create_node(trellis:Trellis):Node {
     var node = new Node(this, nodes.length, trellis);
     nodes.push(node);
     return node;
@@ -30,7 +32,6 @@ import code.Scope;
 
   public function load_schema_from_file(url:String) {
     var data = Utility.load_json(url);
-    schema = new Schema();
     schema.load_trellises(data.trellises);
   }
 
@@ -39,5 +40,34 @@ import code.Scope;
 
     var expression = coder.convert(source, root_scope_definition);
     expression.resolve(root_scope);
+  }
+//
+//  public function create_function(name:String, inputs, outputs, action) {
+//    var trellis = new Trellis(name, schema);
+//    schema.add_trellis(trellis);
+//    return trellis;
+//  }
+
+  public function create_functions() {
+    var functions = '
+{
+  "trellises": {
+    "sum": {
+      "properties": {
+        "input": {
+          "type": "int",
+          "multiple": "true"
+        },
+        "output": {
+          "type": "int"
+        }
+      }
+    }
+  }
+}
+';
+
+    var data = haxe.Json.parse(functions);
+    schema.load_trellises(data.trellises);
   }
 }

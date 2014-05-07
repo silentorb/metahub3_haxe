@@ -14,6 +14,8 @@ class Coder {
     switch(source.type) {
       case 'block':
         return create_block(source, scope_definition);
+      case 'create_constraint':
+        return create_constraint(source, scope_definition);
       case 'create_node':
         return create_node(source, scope_definition);
       case 'create_symbol':
@@ -25,6 +27,10 @@ class Coder {
     }
 
     throw "Invalid block: " + source.type;
+  }
+
+  function create_constraint(source:Dynamic, scope_definition:Scope_Definition):Expression {
+    return null;
   }
 
   function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -64,8 +70,8 @@ class Coder {
 
   function create_symbol(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var expression = convert(source.expression, scope_definition);
-    scope_definition.add_symbol(source.name, expression.type);
-    return new Expression_Create_Symbol(source.name, expression);
+    var symbol = scope_definition.add_symbol(source.name, expression.type);
+    return new Expression_Create_Symbol(symbol, expression);
   }
 
   static function get_type(value:Dynamic):Property_Type {

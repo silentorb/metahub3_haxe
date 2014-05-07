@@ -1,0 +1,15 @@
+{
+  "trellises": {
+    "sum": {
+      "properties": {
+        "input": {
+          "type": "int",
+          "multiple": "true"
+        },
+        "output": {
+          "type": "int"
+        }
+      }
+    }
+  }
+}

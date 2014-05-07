@@ -28,6 +28,7 @@ type:String,
   public var id:Int;
   public var other_trellis:Trellis;
   public var other_property:Property;
+  public var multiple:Bool = false;
 
   public function new(name:String, source:IProperty_Source, trellis:Trellis) {
     this.type = Type.createEnum(Property_Type, source.type);

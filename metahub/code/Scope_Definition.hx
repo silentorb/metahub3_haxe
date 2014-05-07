@@ -12,10 +12,11 @@ class Scope_Definition {
       this.depth = parent.depth + 1;
   }
 
-  public function add_symbol(name:String, type:Type_Reference) {
+  public function add_symbol(name:String, type:Type_Reference):Symbol {
     var symbol = new Symbol(type, this, this.types.length, name);
     this.types.push(symbol);
     this.symbols[name] = symbol;
+    return symbol;
   }
 
   public function find(name:String):Symbol {
@@ -34,5 +35,9 @@ class Scope_Definition {
 
   public function get_symbol_by_index(index:Int):Symbol {
     return this.types[index];
+  }
+
+  public function size():Int {
+    return types.length;
   }
 }

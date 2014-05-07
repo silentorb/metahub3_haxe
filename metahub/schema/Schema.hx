@@ -19,9 +19,7 @@ class Schema {
 // First load the core trellises
     var trellis:Trellis, source:ITrellis_Source, name:String;
     for (name in Reflect.fields(trellises)) {
-//      trace(Reflect.field(trellises, name));
-//    for (name in trellises.keys()) {
-//    source = trellises[name];
+
       source = Reflect.field(trellises, name);
       trellis = this.trellis_keys[name];
       if (trellis == null)

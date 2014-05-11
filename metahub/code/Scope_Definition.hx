@@ -24,7 +24,7 @@ class Scope_Definition {
       return symbols[name];
 
     if (parent == null)
-      throw "Could not find symbol: " + name + ".";
+      throw new Exception("Could not find symbol: " + name + ".");
 
     return parent.find(name);
   }

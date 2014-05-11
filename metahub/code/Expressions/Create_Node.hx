@@ -1,8 +1,9 @@
-package code;
+package code.expressions;
 import schema.Trellis;
 import schema.Property;
+import engine.IPort;
 
-class Expression_Create_Node implements Expression {
+class Create_Node implements Expression {
   public var trellis:Trellis;
   public var assignments = new Map<Int, Expression>();
   public var type:Type_Reference;
@@ -20,5 +21,9 @@ class Expression_Create_Node implements Expression {
     }
 
     return node.id;
+  }
+
+  public function to_port(scope:Scope):IPort {
+    return null;
   }
 }

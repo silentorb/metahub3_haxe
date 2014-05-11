@@ -11,7 +11,7 @@ class Utility {
 #if nodejs
   json = Nodejs.fs.readFileSync(url, { encoding: 'ascii' });
 #else
-    throw { message: "load_json() not supported for this compilation target." };
+    throw new Exception("load_json() not supported for this compilation target.");
 #end
 
     return Json.parse(json);

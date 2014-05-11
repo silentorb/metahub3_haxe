@@ -1,6 +1,7 @@
 package code;
 import Hub;
 import schema.Property;
+import code.expressions.Expression;
 
 class Coder {
   var hub:Hub;
@@ -24,18 +25,24 @@ class Coder {
         return create_literal(source, scope_definition);
       case 'reference':
         return create_reference(source, scope_definition);
+      case 'function':
+        return function_expression(source, scope_definition);
+      case 'set':
+        return set(source, scope_definition);
     }
 
-    throw "Invalid block: " + source.type;
+    throw new Exception("Invalid block: " + source.type);
   }
 
   function create_constraint(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    return null;
+    var expression = convert(source.expression, scope_definition);
+    var reference = Symbol_Reference.create(source.path, scope_definition);
+    return new code.expressions.Create_Constraint(reference, expression);
   }
 
   function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var new_scope_definition = new Scope_Definition(scope_definition);
-    var block = new Expression_Block(new_scope_definition);
+    var block = new code.expressions.Block(new_scope_definition);
 
     for (e in Reflect.fields(source.expressions)) {
       var child = Reflect.field(source.expressions, e);
@@ -47,12 +54,12 @@ class Coder {
 
   function create_literal(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var type = get_type(source.value);
-    return new Expression_Literal(source.value, new Type_Reference(type));
+    return new code.expressions.Literal(source.value, new Type_Reference(type));
   }
 
   function create_node(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var trellis = hub.schema.get_trellis(source.trellis);
-    var result = new Expression_Create_Node(trellis);
+    var result = new code.expressions.Create_Node(trellis);
 
     if (source.set != null) {
       for (key in Reflect.fields(source.set)) {
@@ -64,14 +71,14 @@ class Coder {
   }
 
   function create_reference(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var symbol = scope_definition.find(source.path);
-    return new Expression_Reference(symbol);
+    var reference = Symbol_Reference.create(source.path, scope_definition);
+    return new code.expressions.Expression_Reference(reference);
   }
 
   function create_symbol(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var expression = convert(source.expression, scope_definition);
     var symbol = scope_definition.add_symbol(source.name, expression.type);
-    return new Expression_Create_Symbol(symbol, expression);
+    return new code.expressions.Create_Symbol(symbol, expression);
   }
 
   static function get_type(value:Dynamic):Property_Type {
@@ -87,6 +94,27 @@ class Coder {
     if (Std.is(value, String))
       return Property_Type.string;
 
-    throw "Could not find type.";
+    throw new Exception("Could not find type.");
   }
+
+  function function_expression(source:Dynamic, scope_definition:Scope_Definition):Expression {
+    var trellis = this.hub.schema.get_trellis(source.name);
+    var expressions:Array<Dynamic> = source.inputs;
+    var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert(e, scope_definition)));
+    return new code.expressions.Function_Call(trellis, inputs);
+  }
+
+  function set(source:Dynamic, scope_definition:Scope_Definition):Expression {
+    var reference = Symbol_Reference.create(source.path, scope_definition);
+    var trellis =reference.symbol.type.trellis;
+
+    var result = new code.expressions.Set(reference);
+    for (e in Reflect.fields(source.assignments)) {
+      var assignment = Reflect.field(source.assignments, e);
+      var property =trellis.get_property(assignment.property);
+      result.add_assignment(property.id, convert(assignment.expression, scope_definition));
+    }
+    return result;
+  }
+
 }

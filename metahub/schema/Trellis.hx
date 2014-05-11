@@ -41,7 +41,7 @@ class Trellis {
   public function get_property(name:String) {
     var properties = this.get_all_properties();
     if (!properties.exists(name))
-      throw this.name + ' does not contain a property named ' + name + '.';
+      throw new Exception(this.name + ' does not contain a property named ' + name + '.');
 
     return properties[name];
   }
@@ -84,7 +84,7 @@ class Trellis {
     this.parent = parent;
 
 //    if (!parent.identity)
-//      throw new Error(parent.name + ' needs a primary key when being inherited by ' + this.name + '.');
+//      throw new Exception(new Error(parent.name + ' needs a primary key when being inherited by ' + this.name + '.'));
 //
 //    this.identity = parent.identity.map((x) => x.clone(this))
   }

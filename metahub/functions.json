@@ -1,13 +1,29 @@
 {
   "trellises": {
+    "string":{
+      "properties":{
+        "output":{
+          "type":"string"
+        }
+      }
+    },
+    "int":{
+      "properties":{
+        "output":{
+          "type":"int"
+        }
+      }
+    },
+    "function": { },
     "sum": {
+      "parent":"function",
       "properties": {
+        "output": {
+          "type": "int"
+        },
         "input": {
           "type": "int",
           "multiple": "true"
-        },
-        "output": {
-          "type": "int"
         }
       }
     }

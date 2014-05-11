@@ -38,7 +38,7 @@ class Schema {
 
   public function get_trellis(name:String):Trellis {
     if (!this.trellis_keys.exists(name))
-      throw 'Could not find trellis named: ' + name + '.';
+      throw new Exception('Could not find trellis named: ' + name + '.');
 
     return this.trellis_keys[name];
   }

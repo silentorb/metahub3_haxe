@@ -1,7 +1,8 @@
-package code;
+package code.expressions;
 import schema.Property;
+import engine.IPort;
 
-class Expression_Block implements Expression {
+class Block implements Expression {
 
   public var expressions:Array<Expression> = new Array<Expression>();
   public var type:Type_Reference = new Type_Reference(Property_Type.void);
@@ -17,6 +18,10 @@ class Expression_Block implements Expression {
     for (e in expressions) {
       e.resolve(scope);
     }
+    return null;
+  }
+
+  public function to_port(scope:Scope):IPort {
     return null;
   }
 }

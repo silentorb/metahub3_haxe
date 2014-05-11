@@ -75,10 +75,10 @@ type:String,
       this.other_property = other_trellis.get_property(source.other_property);
     else {
       var other_properties = Lambda.filter(this.other_trellis.properties, function(p) { return p.other_trellis == this.trellis; });
-//        throw 'Could not find other property for ' + this.trellis.name + '.' + this.name + '.';
+//        throw new Exception('Could not find other property for ' + this.trellis.name + '.' + this.name + '.');
 
       if (other_properties.length > 1) {
-        throw 'Multiple ambiguous other properties for ' + this.trellis.name + '.' + this.name + '.';
+        throw new Exception('Multiple ambiguous other properties for ' + this.trellis.name + '.' + this.name + '.');
 //        var direct = Lambda.filter(other_properties, function(p) { return p.other_property})
       }
       else if (other_properties.length == 1) {

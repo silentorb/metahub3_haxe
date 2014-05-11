@@ -1,6 +1,7 @@
-package code;
+package code.expressions;
+import engine.IPort;
 
-class Expression_Create_Symbol implements Expression {
+class Create_Symbol implements Expression {
   public var symbol:Symbol;
   public var expression:Expression;
   public var type:Type_Reference;
@@ -15,5 +16,9 @@ class Expression_Create_Symbol implements Expression {
     var value = expression.resolve(scope);
     scope.set_value(symbol.index, value);
     return value;
+  }
+
+  public function to_port(scope:Scope):IPort {
+   return null;
   }
 }

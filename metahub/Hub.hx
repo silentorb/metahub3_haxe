@@ -5,6 +5,7 @@ import schema.Property;
 import code.Coder;
 import code.Scope_Definition;
 import code.Scope;
+import engine.Node;
 
 @:expose class Hub {
   public var nodes:Array<Node>= new Array<Node>();
@@ -35,6 +36,12 @@ import code.Scope;
     schema.load_trellises(data.trellises);
   }
 
+  public function parse(source:String):Dynamic {
+    var definition = new parser.Definition();
+    var parser = new parser.Parser(definition);
+    return parser.parse();
+  }
+
   public function run(source:Dynamic) {
     var coder = new Coder(this);
 
@@ -52,13 +59,29 @@ import code.Scope;
     var functions = '
 {
   "trellises": {
+    "string":{
+      "properties":{
+        "output":{
+          "type":"string"
+        }
+      }
+    },
+    "int":{
+      "properties":{
+        "output":{
+          "type":"int"
+        }
+      }
+    },
+    "function": {},
     "sum": {
+      "parent":"function",
       "properties": {
-        "input": {
+        "output": {
           "type": "int",
           "multiple": "true"
         },
-        "output": {
+        "input": {
           "type": "int"
         }
       }

@@ -1,11 +1,12 @@
 package code;
 import haxe.ds.Vector;
+import engine.Node;
 
 class Scope {
   public var hub:Hub;
   public var definition:Scope_Definition;
-  var values:Vector<Dynamic>;
-  var parent:Scope;
+  public var values:Vector<Dynamic>;
+  public var parent:Scope;
 
   public function new(hub:Hub, definition:Scope_Definition, parent:Scope = null) {
     this.hub = hub;
@@ -14,14 +15,18 @@ class Scope {
     values = new Vector<Dynamic>(definition.size());
   }
 
-  public function resolve_symbol(symbol:Symbol):Dynamic {
-    if (symbol.scope_definition.depth == definition.depth)
-      return values[symbol.index];
+  public function create_reference(reference:Symbol_Reference):Reference {
+    if (reference.symbol.scope_definition.depth == definition.depth) {
+      var id = values[reference.symbol.index];
+      var node = hub.nodes[id];
+      var result = new Reference(node);
+      return result;
+    }
 
     if (parent == null)
-      throw "Could not find scope for symbol: " + symbol.name + ".";
+      throw new Exception("Could not find scope for symbol: " + reference.symbol.name + ".");
 
-    return parent.resolve_symbol(symbol);
+    return parent.create_reference(reference);
   }
 
   public function set_value(index:Int, value:Dynamic) {

@@ -1,0 +1,151 @@
+{
+  "start": {
+    "type": "repetition",
+    "action": "start",
+    "pattern": {
+      "type": "reference",
+      "name": "rule"
+    },
+    "divider": {
+      "type": "reference",
+      "name": "whitespace"
+    }
+  },
+
+  "id": {
+    "type": "regex",
+    "text": "[a-zA-Z0-9_]+"
+  },
+
+  "whitespace": {
+    "type": "regex",
+    "text": "\\s+"
+  },
+
+  "trim": {
+    "type": "regex",
+    "text": "\\s*"
+  },
+
+  "comma": {
+    "type": "regex",
+    "text": "[ \\r\\n]*,[ \\r\\n]*"
+  },
+
+  "semicolon": {
+    "type": "regex",
+    "text": "[ \\r\\n]*;[ \\r\\n]*"
+  },
+
+  "literal": {
+    "type": "and",
+    "action": "literal",
+    "patterns": [
+      "\"",
+      {
+        "type": "regex",
+        "text": "([^\"]|\\\\\")+"
+      },
+      "\""
+    ]
+  },
+
+  "regex": {
+    "type": "and",
+    "action": "regex",
+    "patterns": [
+      "/",
+      {
+        "type": "regex",
+        "text": "([^/]|\\\\/)+"
+      },
+      "/"
+    ]
+  },
+
+  "reference": {
+    "type": "reference",
+    "name": "id",
+    "action": "reference"
+  },
+
+  "repetition": {
+    "type": "and",
+    "action": "repetition",
+    "patterns": [
+      "rep(",
+      {
+        "type": "repetition",
+        "pattern": {
+          "type": "reference",
+          "name": "id"
+        },
+        "divider": {
+          "type": "reference",
+          "name": "comma"
+        }
+      },
+      ")"
+    ]
+  },
+
+  "rule": {
+    "type": "and",
+    "action": "rule",
+    "backtrack": true,
+    "patterns": [
+      {
+        "type": "reference",
+        "name": "id"
+      },
+      {
+        "type": "reference",
+        "name": "trim"
+      },
+      "=",
+      {
+        "type": "reference",
+        "name": "trim"
+      },
+      {
+        "type": "reference",
+        "name": "patterns"
+      }
+    ]
+  },
+
+  "patterns": {
+    "type": "repetition",
+    "action": "pattern",
+    "pattern": {
+      "type": "reference",
+      "name": "pattern"
+    },
+    "divider": {
+      "type": "reference",
+      "name": "whitespace"
+    }
+  },
+
+  "pattern": {
+    "type": "or",
+    "patterns": [
+      {
+        "type": "reference",
+        "name": "repetition"
+      },
+      {
+        "type": "reference",
+        "name": "reference"
+      },
+      {
+        "type": "reference",
+        "name": "literal"
+      },
+      {
+        "type": "reference",
+        "name": "regex"
+      }
+    ]
+  }
+}

@@ -12,6 +12,7 @@ import engine.Node;
   public var schema:Schema;
   public var root_scope:Scope;
   public var root_scope_definition:Scope_Definition;
+  public var parser_definition:parser.Definition;
 
   public function new() {
     nodes.push(null);
@@ -19,6 +20,17 @@ import engine.Node;
     root_scope = new Scope(this, root_scope_definition);
     schema = new Schema();
     create_functions();
+
+    initialize_parser();
+  }
+
+  private function initialize_parser() {
+    var boot_definition = new parser.Definition();
+    boot_definition.load_parser_schema();
+    var context = new parser.Bootstrap(parser_definition);
+    var data = context.parse("");
+    parser_definition = new parser.Definition();
+    parser_definition.load(data);
   }
 
   public function create_node(trellis:Trellis):Node {
@@ -37,9 +49,8 @@ import engine.Node;
   }
 
   public function parse(source:String):Dynamic {
-    var definition = new parser.Definition();
-    var parser = new parser.Parser(definition);
-    return parser.parse();
+    var parser = new parser.MetaHub_Context(parser_definition);
+    return parser.parse(source);
   }
 
   public function run(source:Dynamic) {

@@ -1,0 +1,33 @@
+start = rep(rule, reference)
+
+id = /[a-zA-Z0-9_]+/
+whitespace = /\\s+/
+trim = /\\s*/
+comma = /[ \\r\\n]*,[ \\r\\n]*/
+literal = "\"" /([^\"]|\\\\\")+/ "\""
+regex = "/" /([^/]|\\/)+/ "/"
+
+reference = id { reference }
+
+repetition = "rep(" rep(id, comma) ")"
+
+rule = id trim "=" trim pattern
+
+patterns = rep(pattern, whitespace)
+
+pattern =
+     repetition
+  |  reference
+  |  literal
+  |  regex
+
+
+start ->
+rule -> id ->
+pattern ->
+patterns -> reference -> reference ->
+start ->
+rule -> !id
+
+patterns -> rule.id
+

@@ -1,0 +1,12 @@
+start = rep(expression, newlines, 1, 0)
+
+ws = /\s+/
+trim = /\s*/
+newlines = /\s*\n\s*/
+
+id = /[a-zA-Z0-9_]+/
+
+expression =
+  assignment
+
+assignment = "var" ws id trim "=" trim expression

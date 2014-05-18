@@ -1,6 +1,5 @@
 package parser;
 
-class Group implements Pattern {
-  var patterns:Array<Pattern>;
-
+class Group extends Pattern {
+  public var patterns = new Array<Pattern>();
 }

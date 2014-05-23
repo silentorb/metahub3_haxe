@@ -24,17 +24,15 @@ class Repetition extends Pattern {
       var result = pattern.test(position, depth + 1);
       info_items.push(result);
       if (!result.success) {
-        if (matches.length == 0 || step < min)
-          return failure(start, info_items);
-        else {
           break;
-        }
       }
       var match:Match = cast result;
       position = match.start.move(match.length);
 //      match.length += last_divider_length;
       length += match.length + last_divider_length;
       matches.push(match);
+
+      ++step;
 
 // Divider
       result = divider.test(position, depth + 1);
@@ -45,24 +43,32 @@ class Repetition extends Pattern {
       match = cast result;
       last_divider_length = match.length;
       position = position.move(match.length);
-      ++step;
     }
     while (max < 1 || step < max);
+
+    if (step < min)
+      return failure(start, info_items);
 
     return success(start, length, info_items, matches);
   }
 
-  override function rewind(match:Match, messages:Array<String>):Position {
-    if (match.matches.length > min) {
-      var previous = match.matches.pop();
-      messages.push('rewinding ' + name + ' ' + previous.start.get_coordinate_string());
-      match.children.pop();
-      return previous.start;
-    }
-
-    messages.push('cannot rewind ' + name);
-    return null;
-  }
+//  override function rewind(match:Match, messages:Array<String>):Position {
+//    if (match.matches.length > min) {
+//      var previous = match.matches.pop();
+//      messages.push('rewinding ' + name + ' ' + previous.start.get_coordinate_string());
+//      match.children.pop();
+//      return previous.start;
+//    }
+//
+//    var previous = match.last_success;
+//    if (previous == null) {
+//      messages.push('cannot rewind ' + name + ", No other rewind options.");
+//      return null;
+//    }
+//
+//    messages.push('cannot rewind ' + name + ", looking for earlier repetition.");
+//    return previous.pattern.rewind(previous, messages);
+//  }
 
   override function get_data(match:Match):Dynamic {
     var result = new Array<Dynamic>();

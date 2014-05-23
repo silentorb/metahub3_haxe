@@ -2,9 +2,9 @@ package parser;
 
 class Match extends Result {
   public var length:Int;
-//  public var data:Dynamic;
   public var matches:Array<Match>;
   public var last_success:Match;
+  public var parent:Match;
 
   public function new(pattern:Pattern, start:Position, length:Int = 0,
                       children:Array<Result> = null, matches:Array<Match> = null) {
@@ -13,16 +13,24 @@ class Match extends Result {
     this.length = length;
     success = true;
 
-    last_success = start.context.last_success;
-    start.context.last_success = this;
+    if (pattern.type == 'regex' || pattern.type == 'literal') {
+      last_success = start.context.last_success;
+      start.context.last_success = this;
+    }
 
     this.children = children != null
     ? children
     : new Array<Result>();
 
-    this.matches = matches != null
-    ? matches
-    : new Array<Match>();
+    if (matches != null) {
+      this.matches = matches;
+      for (match in matches) {
+        match.parent = this;
+      }
+    }
+    else {
+      this.matches = new Array<Match>();
+    }
   }
 
   override public function debug_info():String {
@@ -35,4 +43,20 @@ class Match extends Result {
     ? start.context.perform_action(pattern.action, data, this)
     : data;
   }
+
+
+  public function get_repetition(messages:Array<String>):Match {
+    if (parent == null) {
+      messages.push('Parent of ' + pattern.name + " is null.");
+      return null;
+    }
+    if (parent.pattern.type == "repetition") {
+      return parent;
+    }
+
+    messages.push('Trying parent of ' + pattern.name + ".");
+    return parent.get_repetition(messages);
+  }
+
+
 }

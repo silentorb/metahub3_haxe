@@ -9,12 +9,15 @@ class Pattern {
   public function test(position:Position, depth:Int):Result {
     var result = __test__(position, depth);
     if (!result.success && backtrack) {
-    var previous = position.context.last_success;
+      var previous = position.context.last_success;
       var messages = new Array<String>();
-      var new_position = rewind(previous, messages);
+      var new_position = previous.start.context.rewind(messages);
       previous.messages = previous.messages != null
       ? previous.messages.concat(messages)
       : messages;
+      if (new_position == null)
+        return result;
+
       return __test__(new_position, depth);
     }
 
@@ -37,14 +40,15 @@ class Pattern {
     return new Match(this, position, length, children, matches);
   }
 
-  function rewind(match:Match, messages:Array<String>):Position {
-    messages.push('rewind ' + type + ' ' + name + ' ' + match.start.get_coordinate_string());
-    var previous = match.last_success;
-    if (previous == null)
-      return null;
 
-    return previous.pattern.rewind(previous, messages);
-  }
+//  function rewind(match:Match, messages:Array<String>):Position {
+//    messages.push('rewind ' + type + ' ' + name + ' ' + match.start.get_coordinate_string());
+//    var previous = match.last_success;
+//    if (previous == null)
+//      return null;
+//
+//    return previous.pattern.rewind(previous, messages);
+//  }
 
   public function get_data(match:Match):Dynamic {
     return null;

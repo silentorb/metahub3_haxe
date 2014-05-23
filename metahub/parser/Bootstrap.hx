@@ -9,6 +9,8 @@ package parser;
 
       case "and_group":
         return and_group(data);
+      case "or":
+        return or_group(data);
       case "literal":
         return literal(data);
       case "pattern":
@@ -52,6 +54,13 @@ package parser;
   function and_group(data:Dynamic):Dynamic {
     return {
     type: "and",
+    patterns: data
+    };
+  }
+
+  function or_group(data:Dynamic):Dynamic {
+    return {
+    type: "or",
     patterns: data
     };
   }

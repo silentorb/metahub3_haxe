@@ -6,7 +6,17 @@ newlines = /\s*\n\s*/
 
 id = /[a-zA-Z0-9_]+/
 
-expression =
+statement =
   assignment
 
-assignment = "var" ws id trim "=" trim expression
+assignment = "let" ws id trim "=" trim expression
+
+expression =
+      value
+
+string = ('"' /[^"]*/ '"') | ("'" /[^']*/ "'")
+bool = "true" | "false"
+int = /-?[0-9]+/
+float = /-?([0-9]*\.)?[0-9]+f?/
+
+value = string | bool | int | float

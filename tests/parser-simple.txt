@@ -1,2 +1,3 @@
-a = b
-c = d
+a = b | c | "bird"
+b = ("frog" "gy") | "dog" 
+c = "cat"

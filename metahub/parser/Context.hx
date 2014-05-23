@@ -32,16 +32,40 @@ package parser;
     return null;
   }
 
-//  function rewind(start:Int):Match {
-//    var i = history.length - 1;
-//    while(i >= 0 && history[i].start >= start) {
-//      --i;
-//    }
-//    if (i < amount)
-//      return null;
-//
-//
-//
-//  }
+  public function rewind(messages:Array<String>) {
+    var previous = last_success;
+    if (previous == null) {
+      messages.push('Could not find previous text match.');
+      return null;
+    }
+    var repetition = previous.get_repetition(messages);
+    var i = 0;
+    while (repetition == null) {
+      previous = previous.last_success;
+      if (previous == null) {
+        messages.push('Could not find previous text match with repetition.');
+        return null;
+      }
+      repetition = previous.get_repetition(messages);
+      if (i++ > 20)
+        throw new Exception("Infinite loop looking for previous repetition.");
+    }
 
+    var pattern:Repetition = cast repetition.pattern;
+    if (repetition.matches.length > pattern.min) {
+      repetition.matches.pop();
+      messages.push('rewinding ' + pattern.name + ' ' + previous.start.get_coordinate_string());
+      repetition.children.pop();
+      return previous.start;
+    }
+
+//    var previous = match.last_success;
+//    if (previous == null) {
+      messages.push('cannot rewind ' + pattern.name + ", No other rewind options.");
+      return null;
+//    }
+
+//    messages.push('cannot rewind ' + pattern.name + ", looking for earlier repetition.");
+//    return previous.pattern.rewind(previous, messages);
+  }
 }

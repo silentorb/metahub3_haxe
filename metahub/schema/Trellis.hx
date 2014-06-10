@@ -1,4 +1,7 @@
 package schema;
+import engine.INode;
+import engine.IPort;
+import engine.Node.Identity;
 import schema.Property;
 
 typedef ITrellis_Source = {
@@ -13,6 +16,7 @@ class Trellis {
   public var properties:Array<Property> = new Array<Property>();
   var property_keys:Map<String, Property> = new Map<String, Property>();
   var parent:Trellis;
+  public var id:Identity;
 
   public function new(name:String, schema:Schema) {
     this.name = name;
@@ -45,6 +49,14 @@ class Trellis {
 
     return properties[name];
   }
+
+  public function get_value(index:Int):Dynamic {
+		throw new Exception("Cannot get value of a trellis property.");
+	}
+
+  public function set_value(index:Int, value:Dynamic):Void {
+		throw new Exception("Cannot set value of a trellis property.");
+	}
 
   public function get_tree():Array<Trellis> {
     var trellis = this;

@@ -1,0 +1,5 @@
+let boy = new Character { name: 'James' }
+let sword = new Item { name: 'Vorpal Sword', owner: boy }
+Item (y = owner.x - 1)
+set boy { x: 6 }
+# assert sword.y = 5

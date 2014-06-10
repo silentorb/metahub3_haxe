@@ -5,7 +5,7 @@ var MetaHub = require('../output/nodejs/metahub.js')
 
 function create_hub() {
   var hub = new MetaHub.Hub()
-  hub.load_schema_from_file('tests/schema.json')
+  hub.load_schema_from_file('test/schema.json')
   return hub
 }
 create_hub();
@@ -18,9 +18,9 @@ buster.testCase("Hub", {
   },
   "node defaults": function () {
     var hub = create_hub()
-    hub.run(
+    hub.run_data(
       {
-        "type": "create_node",
+        "type": "node",
         "trellis": "Character",
         "set": {
           "name": {
@@ -35,14 +35,14 @@ buster.testCase("Hub", {
   },
   "constraints": function () {
     var hub = create_hub()
-    hub.run({
+    hub.run_data({
       "type": "block",
       "expressions": [
         {
-          "type": "create_symbol",
+          "type": "symbol",
           "name": "boy",
           "expression": {
-            "type": "create_node",
+            "type": "node",
             "trellis": "Character",
             "set": {
               "name": {
@@ -53,10 +53,10 @@ buster.testCase("Hub", {
           }
         },
         {
-          "type": "create_symbol",
+          "type": "symbol",
           "name": "sword",
           "expression": {
-            "type": "create_node",
+            "type": "node",
             "trellis": "Item",
             "set": {
               "name": {
@@ -71,7 +71,7 @@ buster.testCase("Hub", {
           }
         },
         {
-          "type": "create_constraint",
+          "type": "constraint",
           "path": [ "boy", "x" ],
           "expression": {
             "type": "reference",
@@ -81,15 +81,12 @@ buster.testCase("Hub", {
         {
           "type": "set",
           "path": [ "sword"],
-          "assignments": [
-            {
-              "property": "y",
-              "expression": {
-                "type": "literal",
-                "value": 5
-              }
+          "assignments": {
+            "y": {
+              "type": "literal",
+              "value": 5
             }
-          ]
+          }
         }
       ]
     })
@@ -102,16 +99,16 @@ buster.testCase("Hub", {
     assert.equals(boy.get_value_by_name('x'), 5)
   },
 
-  "=>advanced constraints": function () {
+  "advanced constraints": function () {
     var hub = create_hub()
-    hub.run({
+    hub.run_data({
       "type": "block",
       "expressions": [
         {
-          "type": "create_symbol",
+          "type": "symbol",
           "name": "boy",
           "expression": {
-            "type": "create_node",
+            "type": "node",
             "trellis": "Character",
             "set": {
               "name": {
@@ -122,10 +119,10 @@ buster.testCase("Hub", {
           }
         },
         {
-          "type": "create_symbol",
+          "type": "symbol",
           "name": "sword",
           "expression": {
-            "type": "create_node",
+            "type": "node",
             "trellis": "Item",
             "set": {
               "name": {
@@ -140,7 +137,7 @@ buster.testCase("Hub", {
           }
         },
         {
-          "type": "create_constraint",
+          "type": "constraint",
           "path": [ "boy", "x" ],
           "expression": {
             "type": "function",
@@ -160,15 +157,12 @@ buster.testCase("Hub", {
         {
           "type": "set",
           "path": [ "sword"],
-          "assignments": [
-            {
-              "property": "y",
-              "expression": {
-                "type": "literal",
-                "value": 5
-              }
+          "assignments": {
+            "y": {
+              "type": "literal",
+              "value": 5
             }
-          ]
+          }
         }
       ]
     })

@@ -1,22 +1,23 @@
 package engine;
 import schema.Trellis;
 import schema.Property;
+import schema.Property_Chain;
+import schema.Types;
 
 typedef Identity = UInt;
 
-interface INode {
-  function get_value(index:Int):Dynamic;
-  function set_value(index:Int, value:Dynamic):Void;
-}
-
 class Node implements INode {
-  var hub:Hub;
+  public var hub:Hub;
   var values = new Array<Dynamic>();
   var ports = new Array<IPort>();
   public var id:Identity;
   var trellis:Trellis;
 //  var dependencies = new Array<Dependency>();
 //  var dependents = new Array<Dependency>();
+	public var port_count(get, null):Int;
+	public function get_port_count():Int {
+		return ports.length;
+	}
 
   public function new(hub:Hub, id:Identity, trellis:Trellis) {
     this.hub = hub;
@@ -25,9 +26,9 @@ class Node implements INode {
 
     for (property in trellis.properties) {
       values.push(property.get_default());
-      var port = property.type == Property_Type.list
+      var port = property.type == Types.list
       ? new List_Port(this, property)
-      : new Port(this, property, property.get_default());
+      : new Port(this, hub, property, property.get_default());
       ports.push(port);
     }
   }
@@ -55,6 +56,31 @@ class Node implements INode {
     var property = trellis.get_property(name);
     return get_port(property.id);
   }
+
+	public function get_port_from_chain(chain:Property_Chain):IPort {
+		if (chain.length == 0)
+			throw new Exception("Cannot follow empty property chain.");
+
+		var current_node = this;
+		var i = 0;
+		for (link in chain) {
+			var port = current_node.get_port(link.id);
+			if (link.type == Types.reference) {
+				var reference:Port = cast port;
+				current_node = reference.get_other_node();
+			}
+			else {
+				if (i < chain.length - 1)
+					throw new Exception('Invalid chain. ' + link.fullname() + ' is not a reference.');
+
+				return current_node.get_port(link.id);
+			}
+
+			++i;
+		}
+
+		throw new Exception('Could not follow chain');
+	}
 
   public function get_value(index:Int):Dynamic {
     var port:Port = cast get_port(index);

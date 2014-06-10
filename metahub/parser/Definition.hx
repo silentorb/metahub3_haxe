@@ -1,5 +1,7 @@
 package parser;
 
+import haxe.Json;
+
 @:expose class Definition {
   public var patterns = new Array<Pattern>();
   public var pattern_keys = new Map<String, Pattern>();
@@ -10,7 +12,7 @@ package parser;
   public function load(source:Dynamic) {
 // First create all of the patterns
     for (key in Reflect.fields(source)) {
-      var pattern = create_pattern(Reflect.field(source, key));
+      var pattern = create_pattern(Reflect.field(source, key), true);
       pattern.name = key;
       pattern_keys[key] = pattern;
       patterns.push(pattern);
@@ -19,7 +21,7 @@ package parser;
 // Then finishing loading each one so that references can be resolved.
     for (key in Reflect.fields(source)) {
 //      trace(key);
-      initialize_pattern(Reflect.field(source, key), pattern_keys[key]);
+      initialize_pattern(Reflect.field(source, key), pattern_keys[key], true);
     }
   }
 
@@ -54,7 +56,10 @@ package parser;
     throw new Exception("Invalid parser pattern type: " + source.type + ".");
   }
 
-  public function create_pattern(source:Dynamic):Pattern {
+  public function create_pattern(source:Dynamic, root = false):Pattern {
+		if (root && source.type == 'reference')
+			return new Wrapper(null, null);
+
     var pattern = __create_pattern(source);
     if (pattern.type == null)
       pattern.type = source.type != null ? source.type : "literal";
@@ -65,7 +70,18 @@ package parser;
     return pattern;
   }
 
-  public function initialize_pattern(source:Dynamic, pattern:Pattern) {
+  public function initialize_pattern(source:Dynamic, pattern:Pattern, root = false) {
+		if (root && source.type == "reference") {
+			if (!pattern_keys.exists(source.name))
+				throw new Exception("There is no pattern named: " + source.name);
+
+			var wrapper:Wrapper = cast pattern;
+			wrapper.pattern = pattern_keys[source.name];
+			if (Reflect.hasField(source, "action"))
+				wrapper.action = source.action;
+
+			return;
+		}
     if (source.type == "and" || source.type == "or") {
       var group:Group = cast pattern;
       if (Reflect.hasField(source, "action"))
@@ -105,7 +121,10 @@ package parser;
   }
 
   public function load_parser_schema() {
-    var data = Utility.load_json("metahub/parser.json");
-    load(data);
+    //var data = Utility.load_json("metahub/parser.json");
+		//var data = macro File.getContent("metahub/parser.json");
+		var data = metahub.Macros.insert_file_as_string("metahub/parser.json");
+    load(Json.parse(data));
   }
+
 }

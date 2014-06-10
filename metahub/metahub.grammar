@@ -1,0 +1,60 @@
+start = trim @(statement, newlines, 0, 0) final_trim
+
+ws = /\s+/
+trim = /\s*(#[^\n]*)*\s*/
+final_trim = /\s*(#[^\n$]*)*\s*/
+newlines = /\s*((#[^\n]*)?\n)+\s*/
+comma_or_newline = /\s*((#.*?\n\s*|\n)+|,)\s*/
+dot = "."
+
+id = /[a-zA-Z0-9_]+/
+
+path = @(id, dot, 2, 0)
+
+path_or_id = @(id, dot, 1, 0)
+
+reference = path_or_id
+
+statement =
+    create_symbol
+  | set_values
+  | trellis_scope
+  | create_constraint
+
+create_symbol = "let" ws id trim "=" trim expression
+
+create_constraint = path trim "=" trim expression
+
+expression =
+    @(expression_part, operation_separator, 1, 0)
+
+operation_separator = trim operator trim
+
+expression_part =
+    value
+  | create_node
+  | reference
+
+string = ('"' /[^"]*/ '"') | ("'" /[^']*/ "'")
+bool = "true" | "false"
+int = /-?[0-9]+/
+float = /-?([0-9]*\.)?[0-9]+f?/
+operator = '+' | '-' | '/' | '*' | '%'
+
+value = string | bool | int | float
+
+dummy = "@&^%"
+
+create_node = "new" ws id trim @(set_property_block, dummy, 0, 1)
+
+set_property_block = "{" trim @(set_property, comma_or_newline, 1, 0) trim "}"
+
+set_property = id trim ":" trim expression
+
+set_values = "set" ws path_or_id trim set_property_block
+
+trellis_scope = id trim constraint_block
+
+constraint_block = "(" trim @(constraint, comma_or_newline, 1, 0) trim ")"
+
+constraint = id trim "=" trim expression

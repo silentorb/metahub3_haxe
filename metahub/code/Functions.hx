@@ -1,30 +1,33 @@
 package code;
 
-import engine.Node;
+import engine.INode;
 import engine.IPort;
 import engine.Port;
+import schema.Types;
 
 enum Functions {
   none;
   sum;
+  subtract;
 }
 
 class Function_Calls {
-  public static function call(id:Functions, node:Node) {
-    var output:Port = cast node.get_port(0);
+  public static function call(id:Functions, args:Iterable<Dynamic>, type:Types):Dynamic {
     switch (id) {
       case Functions.sum:
-        output.set_value(sum(node.get_port(1)));
+        return sum(args);
 
       default:
     }
+
+		throw new Exception("Invalid function id " + id + ".");
   }
 
-  static function sum(port:IPort):Dynamic {
+  static function sum(args:Iterable<Dynamic>):Dynamic {
     var total = 0;
-    for (other in port.dependencies) {
-    var o:Port = cast other;
-      total += o.get_value();
+    for (arg in args) {
+			var value:Int = cast arg;
+      total += value;
     }
 
     return total;

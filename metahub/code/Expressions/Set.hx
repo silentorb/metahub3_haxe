@@ -1,5 +1,5 @@
 package code.expressions;
-
+import code.symbols.Local_Symbol;
 import engine.Node;
 import engine.IPort;
 
@@ -19,10 +19,10 @@ class Assignment {
 
 class Set implements Expression {
   public var type:Type_Reference;
-  var reference:Symbol_Reference;
+  var reference:Local_Symbol;
   var assignments = new Array<Assignment>();
 
-  public function new(reference:Symbol_Reference) {
+  public function new(reference:Local_Symbol) {
     this.reference = reference;
   }
 

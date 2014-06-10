@@ -1,4 +1,5 @@
 import haxe.Json;
+import sys.io.File;
 
 #if nodejs
 import js.Node in Nodejs;
@@ -11,7 +12,8 @@ class Utility {
 #if nodejs
   json = Nodejs.fs.readFileSync(url, { encoding: 'ascii' });
 #else
-    throw new Exception("load_json() not supported for this compilation target.");
+    //throw new Exception("load_json() not supported for this compilation target.");
+		json = File.getContent(url);
 #end
 
     return Json.parse(json);

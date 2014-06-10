@@ -5,8 +5,13 @@ package parser;
 //  public function new() { }
 
   public override function perform_action(name:String, data:Dynamic, match:Match):Dynamic {
+    if (name == null)
+      return data;
+
     switch(name) {
 
+      case "group":
+        return group(data);
       case "and_group":
         return and_group(data);
       case "or":
@@ -56,6 +61,11 @@ package parser;
     type: "and",
     patterns: data
     };
+  }
+
+  function group(data:Dynamic):Dynamic {
+//  trace('group', data);
+    return data[2];
   }
 
   function or_group(data:Dynamic):Dynamic {

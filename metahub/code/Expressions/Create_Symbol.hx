@@ -1,12 +1,13 @@
 package code.expressions;
+import code.symbols.Local_Symbol;
 import engine.IPort;
 
 class Create_Symbol implements Expression {
-  public var symbol:Symbol;
+  public var symbol:Local_Symbol;
   public var expression:Expression;
   public var type:Type_Reference;
 
-  public function new(symbol:Symbol, expression:Expression) {
+  public function new(symbol:Local_Symbol, expression:Expression) {
     this.symbol = symbol;
     this.expression = expression;
     type = expression.type;

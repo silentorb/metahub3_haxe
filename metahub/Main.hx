@@ -1,4 +1,3 @@
-package metahub;
 import Hub;
 
 class Main {

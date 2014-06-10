@@ -15,14 +15,20 @@ package parser;
 
   public function parse(text:String, silent:Bool = true):Result {
     this.text = text;
+		if (definition.patterns.length == 0)
+			throw new Exception('Unable to parse; definition does not have any patterns.');
+
     var result = definition.patterns[0].test(new Position(this), 0);
     if(result.success){
       var match:Match = cast result;
       var offset = match.start.move(match.length);
-      if (!silent && offset.get_offset() < text.length)
-        throw new Exception("Could not find match at " + offset.get_coordinate_string()
-        + " [" + text.substr(offset.get_offset()) + "]");
-
+      if (offset.get_offset() < text.length) {
+				result.success = false;
+				if (!silent) {
+					throw new Exception("Could not find match at " + offset.get_coordinate_string()
+					+ " [" + text.substr(offset.get_offset()) + "]");
+				}
+			}
     }
 
     return result;

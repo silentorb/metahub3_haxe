@@ -9,11 +9,8 @@ class Literal extends Pattern {
   }
 
   override function __test__(start:Position, depth:Int):Result {
-    if (start.context.text.substr(start.get_offset(), text.length) == text) {
-//      trace(Position.pad(depth) + 'lit', text);
+    if (start.context.text.substr(start.get_offset(), text.length) == text)
       return success(start, text.length);
-    }
-//    trace(Position.pad(depth) + 'lit-fail', text);
 
     return failure(start);
   }

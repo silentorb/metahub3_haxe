@@ -1,0 +1,43 @@
+{
+  "trellises": {
+    "string":{
+      "properties":{
+        "output":{
+          "type":"string"
+        }
+      }
+    },
+    "int":{
+      "properties":{
+        "output":{
+          "type": "int"
+        }
+      }
+    },
+    "function": {},
+    "sum": {
+      "parent":"function",
+      "properties": {
+        "output": {
+          "type": "int",
+          "multiple": "true"
+        },
+        "input": {
+          "type": "int"
+        }
+      }
+    },
+		"subtract": {
+      "parent":"function",
+      "properties": {
+        "output": {
+          "type": "int",
+          "multiple": "true"
+        },
+        "input": {
+          "type": "int"
+        }
+      }
+    }
+  }
+}

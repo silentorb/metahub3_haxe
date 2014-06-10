@@ -39,9 +39,7 @@ class Match extends Result {
 
   public function get_data():Dynamic {
     var data = pattern.get_data(this);
-    return pattern.action != null
-    ? start.context.perform_action(pattern.action, data, this)
-    : data;
+    return start.context.perform_action(pattern.action, data, this);
   }
 
 

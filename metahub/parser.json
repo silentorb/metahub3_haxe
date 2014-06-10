@@ -86,7 +86,7 @@
     "type": "and",
     "action": "repetition",
     "patterns": [
-      "rep(",
+      "@(",
       {
         "type": "repetition",
         "pattern": {
@@ -244,6 +244,7 @@
 
   "group": {
     "type": "and",
+    "action": "group",
     "patterns": [
       "(",
       {

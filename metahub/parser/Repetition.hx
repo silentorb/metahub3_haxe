@@ -19,6 +19,7 @@ class Repetition extends Pattern {
     var last_divider_length = 0;
     var length = 0;
     var info_items = new Array<Result>();
+    var dividers = new Array<Match>();
 
     do {
       var result = pattern.test(position, depth + 1);
@@ -41,6 +42,7 @@ class Repetition extends Pattern {
         break;
 
       match = cast result;
+      dividers.push(match);
       last_divider_length = match.length;
       position = position.move(match.length);
     }
@@ -49,7 +51,9 @@ class Repetition extends Pattern {
     if (step < min)
       return failure(start, info_items);
 
-    return success(start, length, info_items, matches);
+    var final = new Repetition_Match(this, start, length, info_items, matches);
+    final.dividers = dividers;
+    return final;
   }
 
 //  override function rewind(match:Match, messages:Array<String>):Position {

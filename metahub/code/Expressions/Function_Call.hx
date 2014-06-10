@@ -17,7 +17,8 @@ class Function_Call implements Expression {
   }
 
   public function resolve(scope:Scope):Dynamic {
-    return to_port(scope).node.id;
+		throw new Exception("Code not written for imperative function calls.");
+    //return to_port(scope).parent.id;
   }
 
   public function to_port(scope:Scope):IPort {
@@ -28,7 +29,8 @@ class Function_Call implements Expression {
     while (i < inputs.length) {
       if (i < ports.length) {
         target = ports[i];
-        target.action = func;
+				trace("Warning: Not sure what to do with port actions.");
+        //target.action = func;
       }
 
       var source = inputs[i].to_port(scope);

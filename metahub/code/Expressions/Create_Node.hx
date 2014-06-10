@@ -2,6 +2,7 @@ package code.expressions;
 import schema.Trellis;
 import schema.Property;
 import engine.IPort;
+import schema.Types;
 
 class Create_Node implements Expression {
   public var trellis:Trellis;
@@ -10,7 +11,7 @@ class Create_Node implements Expression {
 
   public function new(trellis:Trellis) {
     this.trellis = trellis;
-    type = new Type_Reference(Property_Type.reference, trellis);
+    type = new Type_Reference(Types.reference, trellis);
   }
 
   public function resolve(scope:Scope):Dynamic {

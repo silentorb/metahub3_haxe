@@ -1,7 +1,7 @@
 package parser;
 
 class Wrapper extends Pattern {
-  var pattern:Pattern;
+  public var pattern:Pattern;
 
   public function new(pattern:Pattern, action:String) {
     this.pattern = pattern;

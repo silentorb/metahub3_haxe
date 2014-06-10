@@ -1,27 +1,20 @@
 package schema;
+import code.Functions;
+import engine.INode;
 import schema.Trellis;
-
-enum Property_Type {
-  void;
-  int;
-  string;
-  reference;
-  list;
-  float;
-  bool;
-}
+import engine.IPort;
 
 typedef IProperty_Source = {
-type:String,
+	type:String,
   ?default_value:Dynamic,
-?allow_null:Bool,
-?trellis:String,
+	?allow_null:Bool,
+	?trellis:String,
   ?other_property:String
 }
 
 @:expose class Property {
   public var name:String;
-  public var type:Property_Type;
+  public var type:Types;
   public var default_value:Dynamic;
   public var allow_null:Bool;
   public var trellis:Trellis;
@@ -29,9 +22,11 @@ type:String,
   public var other_trellis:Trellis;
   public var other_property:Property;
   public var multiple:Bool = false;
+  public var dependencies = new Array<Property_Port>();
+  public var dependents = new Array<Property_Port>();
 
   public function new(name:String, source:IProperty_Source, trellis:Trellis) {
-    this.type = Type.createEnum(Property_Type, source.type);
+    this.type = Type.createEnum(Types, source.type);
 
     if (source.default_value != null)
       this.default_value = source.default_value;
@@ -43,21 +38,30 @@ type:String,
     this.trellis = trellis;
   }
 
+  //public function add_dependency(other:Property_Reference):Void {
+		//this.dependencies.push(other);
+    ////other.dependents.push(new Property_Reference(this));
+	//}
+
+	public function fullname():String {
+		return trellis.name + '.' + name;
+	}
+
   public function get_default():Dynamic {
     if (default_value != null)
       return default_value;
 
     switch (type) {
-      case Property_Type.int:
+      case Types.int:
         return 0;
 
-      case Property_Type.float:
+      case Types.float:
         return 0;
 
-      case Property_Type.string:
+      case Types.string:
         return '';
 
-      case Property_Type.bool:
+      case Types.bool:
         return false;
 
       default:
@@ -88,5 +92,6 @@ type:String,
       }
     }
   }
+
 
 }

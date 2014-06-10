@@ -1,21 +1,38 @@
 package code.expressions;
 
+import code.references.Reference;
+import code.symbols.Property_Symbol;
 import engine.IPort;
+import code.reference.*;
 
-class Create_Constraint implements Expression {
+class Create_Constraint<S> implements Expression {
   public var type:Type_Reference;
-  var reference:Symbol_Reference;
+  var reference:Reference<S>;
   var expression:Expression;
 
-  public function new(reference:Symbol_Reference, expression:Expression) {
+  public function new(reference:Reference<S>, expression:Expression) {
     this.reference = reference;
     this.expression = expression;
+		trace('constraint1');
   }
 
   public function resolve(scope:Scope):Dynamic {
-    var port = reference.get_port(scope);
-    var other_port = expression.to_port(scope);
-    port.add_dependency(other_port);
+		trace('constraint', Type.getClassName(Type.getClass(reference)));
+		/*
+		if (Type.getClass(reference) == Property_Reference) {
+			var property_reference:Property_Reference = cast reference;
+			trace('constraint');
+			property_reference.get_port(scope);
+			//property_reference.resolve(
+
+		}
+		else {
+			//var port = reference.get_port(scope);
+			//var other_port = expression.to_port(scope);
+			//port.add_dependency(other_port);
+		}
+*/
+					throw new Exception("Not implemented yet.");
 
     return null;
   }

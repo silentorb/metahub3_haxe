@@ -1,5 +1,6 @@
 package code.expressions;
 
+import code.references.Property_Reference;
 import code.references.Reference;
 import code.symbols.Property_Symbol;
 import engine.IPort;
@@ -18,6 +19,7 @@ class Create_Constraint<S> implements Expression {
 
   public function resolve(scope:Scope):Dynamic {
 		trace('constraint', Type.getClassName(Type.getClass(reference)));
+		var other_port = expression.to_port(scope);
 		/*
 		if (Type.getClass(reference) == Property_Reference) {
 			var property_reference:Property_Reference = cast reference;
@@ -32,9 +34,17 @@ class Create_Constraint<S> implements Expression {
 			//port.add_dependency(other_port);
 		}
 */
-					throw new Exception("Not implemented yet.");
+		if (reference.get_layer() == Layer.schema) {
+			var property_reference:Property_Reference = cast reference;
+			var port = property_reference.get_port(scope);
+			port.add_dependency(other_port);
+			return null;
+		}
+		else {
 
-    return null;
+		}
+
+		throw new Exception("Not implemented yet.");
   }
 
   public function to_port(scope:Scope):IPort {

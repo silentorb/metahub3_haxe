@@ -8,12 +8,12 @@ class Function_Call implements Expression {
   public var type:Type_Reference;
   var inputs:Array<Expression>;
   var trellis:Trellis;
-  var func:Functions;
+  //var func:Functions;
 
   public function new(trellis:Trellis, inputs:Array<Expression>) {
     this.trellis = trellis;
     this.inputs = inputs;
-    func = Type.createEnum(Functions, trellis.name);
+    //func = Type.createEnum(Functions, trellis.name);
   }
 
   public function resolve(scope:Scope):Dynamic {
@@ -23,19 +23,16 @@ class Function_Call implements Expression {
 
   public function to_port(scope:Scope):IPort {
     var node = scope.hub.create_node(trellis);
+		var expressions = inputs;
     var ports = node.get_inputs();
-    var i = 0;
     var target:IPort = null;
-    while (i < inputs.length) {
+    for (i in 0...expressions.length) {
       if (i < ports.length) {
         target = ports[i];
-				trace("Warning: Not sure what to do with port actions.");
-        //target.action = func;
       }
 
-      var source = inputs[i].to_port(scope);
+      var source = expressions[i].to_port(scope);
       target.add_dependency(source);
-      ++i;
     }
 
     var output = node.get_port(0);

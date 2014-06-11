@@ -22,8 +22,7 @@ typedef IProperty_Source = {
   public var other_trellis:Trellis;
   public var other_property:Property;
   public var multiple:Bool = false;
-  public var dependencies = new Array<Property_Port>();
-  public var dependents = new Array<Property_Port>();
+  public var ports = new Array<Property_Port>();
 
   public function new(name:String, source:IProperty_Source, trellis:Trellis) {
     this.type = Type.createEnum(Types, source.type);

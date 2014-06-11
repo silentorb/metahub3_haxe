@@ -71,6 +71,20 @@ class Trellis {
     return tree;
   }
 
+  public function is_a(trellis:Trellis):Bool {
+    var current = this;
+
+    do {
+      if (current == trellis)
+        return true;
+
+      current = current.parent;
+    }
+    while (current != null);
+
+    return false;
+  }
+
   public function load_properties(source:ITrellis_Source) {
     for (name in Reflect.fields(source.properties)) {
       add_property(name, Reflect.field(source.properties, name));

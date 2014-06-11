@@ -13,13 +13,15 @@ class Port implements IPort {
   public var dependents = new Array<IPort>();
 	var hub:Hub;
 	var _action:Functions = Functions.none;
-  public var action(get, set):Functions;
-	public function get_action():Functions {
-		return _action;
-	}
-	public function set_action(value):Functions {
-		return _action = value;
-	}
+	public var on_change = new Array<Port->Dynamic->Void>();
+
+//  public var action(get, set):Functions;
+//	public function get_action():Functions {
+//		return _action;
+//	}
+//	public function set_action(value):Functions {
+//		return _action = value;
+//	}
 
   public function new(node:INode, hub:Hub, property:Property, value:Dynamic = null) {
     this.parent = node;
@@ -56,38 +58,40 @@ class Port implements IPort {
       update_dependents();
     }
 
-		if (property.dependents != null && this.dependents.length > 0) {
+		if (property.ports != null && property.ports.length > 0) {
 			update_property_dependents();
 		}
 
-    if (action != Functions.none) {
-			var output:Port = cast parent.get_port(0);
-			//parent.get_port(1)
-			var args = get_input_values(parent);
-      Function_Calls.call(action, args, Types.unknown);
+    //if (action != Functions.none) {
+			//var output:Port = cast parent.get_port(0);
+			////parent.get_port(1)
+			//var args = get_input_values(parent);
+      //Function_Calls.call(action, args, Types.unknown);
+		//}
+
+		if (on_change != null && on_change.length > 0) {
+			for (action in on_change) {
+				action(this, _value);
+			}
 		}
 
 		return _value;
   }
 
-	public static function get_input_values(node:INode):Iterable<Dynamic> {
-		var result = new Array<Dynamic>();
-		for (i in 1...2) {
-			var value = node.get_port(i).get_value();
-			result.push(value);
-		}
-		return result;
+	public function get_type():Types {
+		return property.type;
 	}
 
   function update_dependents() {
-    for (i in dependents) {
-      var other:Port = cast i;
+    for (other in dependents) {
       other.set_value(_value);
     }
   }
 
 	function update_property_dependents() {
-    for (i in property.dependents) {
+		trace('update_property_dependents');
+    for (i in property.ports) {
+		trace('a');
       //var other:Port = cast node.get_port_from_chain(i);
       var other:Port = cast i;
       other.set_value(_value);

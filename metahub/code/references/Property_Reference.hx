@@ -1,4 +1,5 @@
 package code.references;
+import code.symbols.Property_Symbol;
 import engine.IPort;
 import schema.Property_Port;
 import code.symbols.ISchema_Symbol;
@@ -15,13 +16,20 @@ class Property_Reference extends Reference<ISchema_Symbol> {
 		throw new Exception("Not implemented yet.");
 	}
 
-	public function get_port(scope:Scope):IPort {
+	override public function get_port(scope:Scope):IPort {
 		var property = get_property(scope);
-		return new Property_Port(property);
+		var port = new Property_Port(property);
+		property.ports.push(port);
+		return port;
 	}
 
 	public function get_property(scope:Scope):Property {
-		throw new Exception("Not implemented.");
+		if (chain.length == 0) {
+			var property_symbol:Property_Symbol = cast symbol;
+			return property_symbol.get_property();
+		}
+
+		return chain[chain.length - 1];
 		//var symbol.resolve(scope);
 	}
 

@@ -1,4 +1,5 @@
 package code.references;
+import engine.IPort;
 import engine.Node;
 import code.symbols.Local_Symbol;
 
@@ -8,6 +9,10 @@ import code.symbols.Local_Symbol;
  */
 
 class Node_Reference extends Reference<Local_Symbol> {
+
+	override public function get_port(scope:Scope):IPort {
+		throw new Exception("Not implemented yet.");
+	}
 
 	override public function resolve(scope:Scope):Dynamic {
 		return get_node(scope);

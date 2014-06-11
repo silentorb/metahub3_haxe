@@ -18,7 +18,8 @@ class Expression_Reference<S> implements Expression {
   }
 
   public function to_port(scope:Scope):IPort {
-		throw new Exception("Not supported");
-    //return reference.get_port(scope);
+		//if (reference.get_layer() ==
+		//throw new Exception("Not supported");
+    return reference.get_port(scope);
   }
 }

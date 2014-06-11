@@ -1,5 +1,7 @@
 package code.references;
+import code.Layer;
 import code.Scope;
+import engine.IPort;
 import schema.Property_Chain;
 import code.symbols.*;
 
@@ -15,6 +17,14 @@ class Reference<S : Symbol> {
 	public function new(symbol:S, chain:Property_Chain = null) {
 		this.symbol = symbol;
 		this.chain = chain;
+	}
+
+	public function get_port(scope:Scope):IPort {
+		throw new Exception("Abstract class.  Not implemented.");
+	}
+
+	public function get_layer():Layer {
+		return symbol.get_layer();
 	}
 
 	public function resolve(scope:Scope):Dynamic {

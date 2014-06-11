@@ -3,6 +3,7 @@ import schema.Trellis;
 import schema.Property;
 import schema.Property_Chain;
 import schema.Types;
+import code.Functions;
 
 typedef Identity = UInt;
 
@@ -31,7 +32,26 @@ class Node implements INode {
       : new Port(this, hub, property, property.get_default());
       ports.push(port);
     }
+
+    if (trellis.is_a(hub.schema.get_trellis("function"))) {
+			initialize_function();
+		}
   }
+
+	function initialize_function() {
+		var inputs = get_inputs();
+		for (i in inputs) {
+			var input:Port = cast i;
+			input.on_change.push(run_function);
+		}
+	}
+
+	function run_function(input:Port, value:Dynamic) {
+    var args = get_input_values();
+		var action = Type.createEnum(Functions, trellis.name);
+    var result = Function_Calls.call(action, args, ports[0].get_type());
+		ports[0].set_value(result);
+	}
 
   public function get_inputs():Array<IPort> {
     var result = new Array<IPort>();
@@ -97,6 +117,15 @@ class Node implements INode {
     var port:Port = cast ports[index];
     port.set_value(value);
   }
+
+	public function get_input_values():Iterable<Dynamic> {
+		var result = new Array<Dynamic>();
+		for (i in 1...ports.length) {
+			var value = get_port(i).get_value();
+			result.push(value);
+		}
+		return result;
+	}
 
   public function add_list_value(index:Int, value:Dynamic) {
     var port:List_Port = cast ports[index];

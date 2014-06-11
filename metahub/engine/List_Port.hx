@@ -3,6 +3,7 @@ package engine;
 import schema.Trellis;
 import schema.Property;
 import code.Functions;
+import schema.Types;
 
 class List_Port implements IPort {
   var values = new Array<Dynamic>();
@@ -24,6 +25,10 @@ class List_Port implements IPort {
     this.property = property;
   }
 
+	public function get_type():Types {
+		return property.type;
+	}
+
   public function get_value_at(index:Int):Dynamic {
     return values[index];
   }
@@ -32,8 +37,12 @@ class List_Port implements IPort {
     return values;
   }
 
-  public function set_value(new_value:Dynamic, index:Int) {
-    values[index] = new_value;
+  public function set_value(new_value:Dynamic):Dynamic {
+    return values = new_value;
+  }
+
+	public function set_value_at(new_value:Dynamic, index:Int):Dynamic {
+    return values[index] = new_value;
   }
 
   public function add_value(new_value:Dynamic) {

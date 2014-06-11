@@ -1,11 +1,11 @@
 package code.symbols;
 
-import code.references.Node_Reference;
-import code.references.Port_Reference;
+import code.references.*;
 import engine.IPort;
 import engine.Node;
 import schema.Trellis;
 import schema.Property_Chain;
+import schema.Types;
 import code.references.Reference;
 
 class Local_Symbol implements Symbol {
@@ -67,10 +67,19 @@ class Local_Symbol implements Symbol {
 	public function create_reference(path:Array<String>):Reference<Local_Symbol> {
 		var trellis = get_trellis();
 		var chain = Property_Chain_Helper.from_string(path, trellis);
-		var last_property = chain[chain.length - 1];
-		if (last_property.other_trellis == null)
-			return new Node_Reference(this, chain);
+		if (chain.length == 0) {
+			if (type.type == Types.reference)
+				return new Node_Reference(this, chain);
 
-		return new Port_Reference(this, chain);
+			return new Port_Reference(this, chain);
+		}
+		else {
+			trace(chain);
+			var last_property = chain[chain.length - 1];
+			if (last_property.other_trellis == null)
+				return new Node_Reference(this, chain);
+
+			return new Port_Reference(this, chain);
+		}
 	}
 }

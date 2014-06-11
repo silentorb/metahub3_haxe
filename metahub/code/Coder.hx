@@ -92,24 +92,21 @@ class Coder {
 
 	function path_to_engine_reference(path, scope_definition:Scope_Definition):Reference<Local_Symbol> {
 		var symbol:Local_Symbol = cast scope_definition.find(path[0]);
+		return symbol.create_reference(extract_path(path));
+	}
 
-		var path = new Array<String>();
+	function extract_path(path:Dynamic):Array<String> {
+		var result = new Array<String>();
 		for (i in 1...path.length) {
-			path.push(path[i]);
+			result.push(path[i]);
 		}
 
-		return symbol.create_reference(path);
+		return result;
 	}
 
 	function path_to_schema_reference(path, scope_definition:Scope_Definition):Reference<ISchema_Symbol> {
 		var symbol:ISchema_Symbol = cast scope_definition.find(path[0]);
-
-		var path = new Array<String>();
-		for (i in 1...path.length) {
-			path.push(path[i]);
-		}
-
-		return symbol.create_reference(path);
+		return symbol.create_reference(extract_path(path));
 	}
 
 	//function create_expression_with_reference(path, scope_definition:Scope_Definition, func:Reference<T>-> Expression):Expression {

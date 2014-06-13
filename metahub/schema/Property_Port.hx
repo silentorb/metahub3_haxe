@@ -1,4 +1,5 @@
 package schema;
+import engine.Context;
 import engine.IPort;
 
 /**
@@ -13,8 +14,9 @@ class Property_Port implements IPort {
 	public var dependencies = new Array<IPort>();
   public var dependents = new Array<IPort>();
 
-	public function new(property:Property) {
+	public function new(property:Property, origin:Property_Chain) {
 		this.property = property;
+    this.origin = origin;
 	}
 
   public function add_dependency(other:IPort) {
@@ -30,14 +32,28 @@ class Property_Port implements IPort {
 		throw new Exception("Not implemented.");
 	}
 
-	public function set_value(value:Dynamic):Dynamic {
-		update_dependents(value);
+	public function set_value(value:Dynamic, context:Context = null):Dynamic {
+		//update_dependents(value);
+		exit(value, context);
 		return value;
 	}
 
-	public function update_dependents(value:Dynamic) {
+	public function enter(value:Dynamic, context:Context = null) {
+		update_dependents(value, context);
+	}
+
+	public function exit(value:Dynamic, context:Context = null) {
+		if (context.entry_port.property.type == Types.list) {
+
+		}
+		else {
+			throw new Exception("Not implemented.");
+		}
+	}
+
+	public function update_dependents(value:Dynamic, context:Context) {
     for (other in dependents) {
-      other.set_value(value);
+      other.set_value(value, context);
     }
   }
 }

@@ -13,7 +13,7 @@ class Port implements IPort {
   public var dependents = new Array<IPort>();
 	var hub:Hub;
 	var _action:Functions = Functions.none;
-	public var on_change = new Array<Port->Dynamic->Void>();
+	public var on_change = new Array<Port->Dynamic->Context->Void>();
 
 //  public var action(get, set):Functions;
 //	public function get_action():Functions {
@@ -44,18 +44,18 @@ class Port implements IPort {
 		return hub.nodes[node_id];
 	}
 
-	public var value(get, set):Dynamic;
+	//public var value(get, set):Dynamic;
   public function get_value():Dynamic {
     return _value;
   }
 
-  public function set_value(new_value:Dynamic):Dynamic {
+  public function set_value(new_value:Dynamic, context:Context = null):Dynamic {
     if (_value == new_value)
       return _value;
 
     _value = new_value;
     if (this.dependents != null && this.dependents.length > 0) {
-      update_dependents();
+      update_dependents(context);
     }
 
 		if (property.ports != null && property.ports.length > 0) {
@@ -71,7 +71,7 @@ class Port implements IPort {
 
 		if (on_change != null && on_change.length > 0) {
 			for (action in on_change) {
-				action(this, _value);
+				action(this, _value, context);
 			}
 		}
 
@@ -82,19 +82,20 @@ class Port implements IPort {
 		return property.type;
 	}
 
-  function update_dependents() {
+  function update_dependents(context:Context) {
     for (other in dependents) {
-      other.set_value(_value);
+      other.set_value(_value, context);
     }
   }
 
 	function update_property_dependents() {
 		trace('update_property_dependents');
-    for (i in property.ports) {
+		var context = new Context(null);
+    for (port in property.ports) {
 		trace('a');
       //var other:Port = cast node.get_port_from_chain(i);
-      var other:Port = cast i;
-      other.set_value(_value);
+      //var other:Port = cast i;
+      port.enter(_value, context);
     }
   }
 }

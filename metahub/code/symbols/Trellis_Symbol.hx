@@ -19,6 +19,10 @@ class Trellis_Symbol implements ISchema_Symbol implements This  {
 		return trellis;
 	}
 
+  public function get_parent_trellis():Trellis {
+    return trellis;
+  }
+
 	public function get_port(scope:Scope, path:Property_Chain = null):IPort {
     throw new Exception("Not supported");
   }

@@ -37,7 +37,7 @@ class List_Port implements IPort {
     return values;
   }
 
-  public function set_value(new_value:Dynamic):Dynamic {
+  public function set_value(new_value:Dynamic, context:Context = null):Dynamic {
     return values = new_value;
   }
 

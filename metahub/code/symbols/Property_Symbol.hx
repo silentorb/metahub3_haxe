@@ -30,6 +30,10 @@ class Property_Symbol implements ISchema_Symbol {
 		return property.other_trellis;
 	}
 
+  public function get_parent_trellis():Trellis {
+    return property.trellis;
+  }
+
 	public function get_property():Property {
 		return property;
 	}

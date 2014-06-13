@@ -46,11 +46,11 @@ class Node implements INode {
 		}
 	}
 
-	function run_function(input:Port, value:Dynamic) {
+	function run_function(input:Port, value:Dynamic, context:Context) {
     var args = get_input_values();
 		var action = Type.createEnum(Functions, trellis.name);
     var result = Function_Calls.call(action, args, ports[0].get_type());
-		ports[0].set_value(result);
+		ports[0].set_value(result, context);
 	}
 
   public function get_inputs():Array<IPort> {

@@ -28,7 +28,7 @@ class Node implements INode {
     for (property in trellis.properties) {
       values.push(property.get_default());
       var port = property.type == Types.list
-      ? new List_Port(this, property)
+      ? new List_Port(this, hub, property)
       : new Port(this, hub, property, property.get_default());
       ports.push(port);
     }
@@ -46,8 +46,8 @@ class Node implements INode {
 		}
 	}
 
-	function run_function(input:Port, value:Dynamic, context:Context) {
-    var args = get_input_values();
+	function run_function<T>(input:Base_Port<T>, value:T, context:Context) {
+    var args = get_input_values(context);
 		var action = Type.createEnum(Functions, trellis.name);
     var result = Function_Calls.call(action, args, ports[0].get_type());
 		ports[0].set_value(result, context);
@@ -118,10 +118,12 @@ class Node implements INode {
     port.set_value(value);
   }
 
-	public function get_input_values():Iterable<Dynamic> {
-		var result = new Array<Dynamic>();
+	public function get_input_values(context:Context):List<Dynamic> {
+		var result = new List<Dynamic>();
 		for (i in 1...ports.length) {
-			var value = get_port(i).get_value();
+			var port = get_port(i);
+			var value = port.dependencies.map(function(d) { return d.get_value(context); });
+			//var value = get_port(i).get_value();
 			result.push(value);
 		}
 		return result;

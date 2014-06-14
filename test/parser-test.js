@@ -138,7 +138,9 @@ buster.testCase("Parser", {
 
     var boy = hub.nodes[1]
     var sword = hub.nodes[2]
+    var book = hub.nodes[4]
     assert.equals(boy.get_value_by_name('x'), 6)
     assert.equals(sword.get_value_by_name('y'), 5)
+    assert.equals(book.get_value_by_name('y'), 5)
   }
 })

@@ -38,6 +38,18 @@
           "type": "int"
         }
       }
+    },
+    "count": {
+      "parent":"function",
+      "properties": {
+        "output": {
+          "type": "int",
+          "multiple": "true"
+        },
+        "input": {
+          "type": "int"
+        }
+      }
     }
   }
 }

@@ -22,6 +22,9 @@ package parser;
       case "expression":
         return expression(data, match);
 
+      case "method":
+        return method(data);
+
       case "reference":
         return reference(data);
 
@@ -95,6 +98,14 @@ package parser;
     }
   }
 
+	static function method(data:Dynamic):Dynamic {
+		return {
+    type: "function",
+    "name": data[1],
+    "inputs": []
+    }
+	}
+
   static function create_constraint(data:Dynamic):Dynamic {
     return {
     type: "specific_constraint",
@@ -122,10 +133,20 @@ package parser;
 //  }
 
   static function reference(data:Dynamic):Dynamic {
-    return {
-    type: "reference",
-    path: data
-    };
+		var reference = {
+			type: "reference",
+			path: data[0]
+		};
+
+		var methods:Array<Dynamic> = cast data[1];
+		if (methods.length > 0) {
+			var method = methods[0];
+			method.inputs.unshift(reference);
+			return method;
+		}
+		else {
+			return reference;
+		}
   }
 
   static function set_property_block(data:Dynamic):Dynamic {
@@ -173,7 +194,7 @@ package parser;
 	static function constraint(data:Dynamic):Dynamic {
     return {
     type: "constraint",
-    path: data[0],
+    path: [ data[0] ],
     expression: data[4]
     };
   }

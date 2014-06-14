@@ -14,7 +14,7 @@ class Expression_Reference<S> implements Expression {
   }
 
   public function resolve(scope:Scope):Dynamic {
-    return reference.resolve(scope);
+    return reference.resolve(scope).id;
   }
 
   public function to_port(scope:Scope):IPort {

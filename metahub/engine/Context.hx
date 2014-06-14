@@ -1,5 +1,6 @@
 package engine;
 import schema.Property;
+import schema.Property_Port;
 
 /**
  * ...
@@ -7,10 +8,12 @@ import schema.Property;
  */
 
 class Context {
-	public var entry_port:Port;
+	public var property_port:Property_Port;
+	public var entry_node:INode;
 
-	public function new(entry_port:Port) {
-		this.entry_port = entry_port;
+	public function new(property_port:Property_Port, entry_node:INode) {
+		this.property_port = property_port;
+		this.entry_node = entry_node;
 	}
 
 }

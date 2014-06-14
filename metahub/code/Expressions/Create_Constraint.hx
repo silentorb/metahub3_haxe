@@ -14,7 +14,6 @@ class Create_Constraint<S> implements Expression {
   public function new(reference:Reference<S>, expression:Expression) {
     this.reference = reference;
     this.expression = expression;
-		trace('constraint1');
   }
 
   public function resolve(scope:Scope):Dynamic {

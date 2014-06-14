@@ -1,10 +1,11 @@
 start = trim @(statement, newlines, 0, 0) final_trim
 
+none = /&*/
 ws = /\s+/
-trim = /\s*(#[^\n]*)*\s*/
-final_trim = /\s*(#[^\n$]*)*\s*/
-newlines = /\s*((#[^\n]*)?\n)+\s*/
-comma_or_newline = /\s*((#.*?\n\s*|\n)+|,)\s*/
+trim = /\s*/
+final_trim = /\s*/
+newlines = /(\s*\n)+\s*/
+comma_or_newline = /\s*((\s*\n)+|,)\s*/
 dot = "."
 
 id = /[a-zA-Z0-9_]+/
@@ -13,7 +14,9 @@ path = @(id, dot, 2, 0)
 
 path_or_id = @(id, dot, 1, 0)
 
-reference = path_or_id
+reference = path_or_id @(method, none, 0, 0)
+
+method = ":" id
 
 statement =
     create_symbol

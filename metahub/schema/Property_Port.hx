@@ -1,6 +1,8 @@
 package schema;
 import engine.Context;
 import engine.IPort;
+import engine.Node;
+using schema.Property_Chain;
 
 /**
  * ...
@@ -28,8 +30,8 @@ class Property_Port implements IPort {
 		return property.type;
 	}
 
-	public function get_value():Dynamic {
-		throw new Exception("Not implemented.");
+	public function get_value(context:Context = null):Dynamic {
+		return context.entry_node.get_value(property.id);
 	}
 
 	public function set_value(value:Dynamic, context:Context = null):Dynamic {
@@ -43,12 +45,19 @@ class Property_Port implements IPort {
 	}
 
 	public function exit(value:Dynamic, context:Context = null) {
-		if (context.entry_port.property.type == Types.list) {
-
-		}
-		else {
+		if (context.property_port == null)
 			throw new Exception("Not implemented.");
-		}
+		var entry_node:Node = cast context.entry_node;
+		context.property_port.origin.perform(entry_node, function(node:Node) {
+			node.set_value(property.id, value);
+		});
+
+		//if (context.property_port.property.type == Types.list) {
+			//
+		//}
+		//else {
+			//throw new Exception("Not implemented.");
+		//}
 	}
 
 	public function update_dependents(value:Dynamic, context:Context) {

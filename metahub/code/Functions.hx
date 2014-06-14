@@ -12,7 +12,7 @@ enum Functions {
 }
 
 class Function_Calls {
-  public static function call(id:Functions, args:Iterable<Dynamic>, type:Types):Dynamic {
+  public static function call(id:Functions, args:List<Dynamic>, type:Types):Dynamic {
     switch (id) {
       case Functions.sum:
         return sum(args);
@@ -35,11 +35,11 @@ class Function_Calls {
     return total;
   }
 
-	static function subtract(args:Iterable<Dynamic>):Dynamic {
-		trace('subtract');
+	static function subtract(args:List<Dynamic>):Dynamic {
     var total:Int = 0;
+		var numbers:Iterable<Int> = args.first();
 		var i = 0;
-    for (arg in args) {
+    for (arg in numbers) {
 			var value:Int = cast arg;
 			if (i == 0) {
 				i = 1;

@@ -14,6 +14,7 @@ import engine.Node;
   public var root_scope:Scope;
   public var root_scope_definition:Scope_Definition;
   public var parser_definition:parser.Definition;
+	static var remove_comments = ~/#[^\n]*/g;
 
   public function new() {
     nodes.push(null);
@@ -38,6 +39,13 @@ import engine.Node;
     return node;
   }
 
+	public function get_node(id:Int):Node {
+		if (id < 0 || id >= nodes.length)
+			throw new Exception("There is no node with an id of " + id + ".");
+
+		return nodes[id];
+	}
+
   function get_node_count() {
     return nodes.length - 1;
   }
@@ -47,10 +55,12 @@ import engine.Node;
     schema.load_trellises(data.trellises);
   }
 
-  public function parse(source:String):Dynamic {
-    var parser = new parser.MetaHub_Context(parser_definition);
-    return parser.parse(source);
-  }
+  //public function parse(source:String):Dynamic {
+    //var parser = new parser.MetaHub_Context(parser_definition);
+		//var without_comments = remove_comments.replace(source, '');
+		//trace('without_comments', without_comments);
+    //return parser.parse(without_comments);
+  //}
 
   public function run_data(source:Dynamic) {
     var coder = new Coder(this);
@@ -70,7 +80,9 @@ import engine.Node;
 
 	public function parse_code(code:String) {
 		var context = new parser.MetaHub_Context(parser_definition);
-    return context.parse(code);
+		var without_comments = remove_comments.replace(code, '');
+		trace('without_comments', without_comments);
+    return context.parse(without_comments);
 	}
 
   public function create_functions() {

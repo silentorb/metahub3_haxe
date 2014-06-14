@@ -15,6 +15,9 @@
         },
         "x": {
           "type": "int"
+        },
+        "item_count": {
+          "type": "int"
         }
       }
     },

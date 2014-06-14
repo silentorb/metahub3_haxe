@@ -5,7 +5,40 @@ import schema.Property;
 import code.Functions;
 import schema.Types;
 
-class List_Port implements IPort {
+class List_Port extends Base_Port<Array<Dynamic>> {
+
+	public function new(node:INode, hub:Hub, property:Property, value:Dynamic = null) {
+		if (value == null)
+			value = new Array<Dynamic>();
+
+		super(node, hub, property, value);
+  }
+
+	public function get_array():Array<Dynamic> {
+    return _value;
+  }
+
+  public function get_value_at(index:Int):Dynamic {
+    return _value[index];
+  }
+
+	public function set_value_at(new_value:Dynamic, index:Int):Dynamic {
+    return _value[index] = new_value;
+  }
+
+  public function add_value(new_value:Dynamic) {
+    _value.push(new_value);
+  }
+
+	override public function get_value(context:Context = null):Dynamic {
+    throw new Exception("Not supported.");
+  }
+
+  override public function set_value(new_value:Dynamic, context:Context = null):Dynamic {
+    throw new Exception("Not supported.");
+  }
+
+	/*
   var values = new Array<Dynamic>();
   public var property:Property;
   public var parent:INode;
@@ -41,17 +74,9 @@ class List_Port implements IPort {
     return values = new_value;
   }
 
-	public function set_value_at(new_value:Dynamic, index:Int):Dynamic {
-    return values[index] = new_value;
-  }
-
-  public function add_value(new_value:Dynamic) {
-    values.push(new_value);
-  }
-
   public function add_dependency(other:IPort) {
     this.dependencies.push(other);
     other.dependents.push(this);
   }
-
+*/
 }

@@ -26,7 +26,7 @@ class Property_Port implements IPort {
     other.dependents.push(this);
   }
 
-	public function get_type():Types {
+	public function get_type():Kind {
 		return property.type;
 	}
 
@@ -52,7 +52,7 @@ class Property_Port implements IPort {
 			node.set_value(property.id, value);
 		});
 
-		//if (context.property_port.property.type == Types.list) {
+		//if (context.property_port.property.type == Kind.list) {
 			//
 		//}
 		//else {

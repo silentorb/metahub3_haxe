@@ -5,7 +5,7 @@ import engine.IPort;
 import engine.Node;
 import schema.Trellis;
 import schema.Property_Chain;
-import schema.Types;
+import schema.Kind;
 import code.references.Reference;
 
 class Local_Symbol implements Symbol {
@@ -68,7 +68,7 @@ class Local_Symbol implements Symbol {
 		var trellis = get_trellis();
 		var chain = Property_Chain_Helper.from_string(path, trellis);
 		if (chain.length == 0) {
-			if (type.type == Types.reference)
+			if (type.type == Kind.reference)
 				return new Node_Reference(this, chain);
 
 			return new Port_Reference(this, chain);

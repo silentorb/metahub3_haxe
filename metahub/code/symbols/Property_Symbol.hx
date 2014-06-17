@@ -42,7 +42,7 @@ class Property_Symbol implements ISchema_Symbol {
 		var trellis = get_trellis();
 		var chain = Property_Chain_Helper.from_string(path, trellis);
 		if (chain.length == 0) {
-			if (property.type == Types.reference)
+			if (property.type == Kind.reference)
 				return new Trellis_Reference(this, chain);
 
 			return new Property_Reference(this, chain);

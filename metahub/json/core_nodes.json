@@ -1,53 +1,56 @@
 {
   "trellises": {
-    "string":{
-      "properties":{
-        "output":{
-          "type":"string"
+    "string": {
+      "properties": {
+        "output": {
+          "type": "string"
         }
       }
     },
-    "int":{
-      "properties":{
-        "output":{
+    "int": {
+      "properties": {
+        "output": {
           "type": "int"
         }
       }
     },
     "function": {},
     "sum": {
-      "parent":"function",
+      "parent": "function",
       "properties": {
         "output": {
           "type": "int",
           "multiple": "true"
         },
         "input": {
-          "type": "int"
+          "type": "int",
+          "multiple": "true"
         }
       }
     },
-		"subtract": {
-      "parent":"function",
+    "subtract": {
+      "parent": "function",
       "properties": {
         "output": {
           "type": "int",
           "multiple": "true"
         },
         "input": {
-          "type": "int"
+          "type": "int",
+          "multiple": "true"
         }
       }
     },
     "count": {
-      "parent":"function",
+      "parent": "function",
       "properties": {
         "output": {
           "type": "int",
           "multiple": "true"
         },
         "input": {
-          "type": "int"
+          "type": "int",
+          "multiple": "true"
         }
       }
     }

@@ -2,7 +2,7 @@ package engine;
 import schema.Trellis;
 import schema.Property;
 import schema.Property_Chain;
-import schema.Types;
+import schema.Kind;
 import code.Functions;
 
 typedef Identity = UInt;
@@ -27,7 +27,7 @@ class Node implements INode {
 
     for (property in trellis.properties) {
       values.push(property.get_default());
-      var port = property.type == Types.list
+      var port = property.type == Kind.list
       ? new List_Port(this, hub, property)
       : new Port(this, hub, property, property.get_default());
       ports.push(port);
@@ -48,8 +48,8 @@ class Node implements INode {
 
 	function run_function<T>(input:Base_Port<T>, value:T, context:Context) {
     var args = get_input_values(context);
-		var action = Type.createEnum(Functions, trellis.name);
-    var result = Function_Calls.call(action, args, ports[0].get_type());
+		//var action = Type.createEnum(Functions, trellis.name);
+    var result = Function_Calls.call(trellis.name, args, ports[0].get_type());
 		ports[0].set_value(result, context);
 	}
 
@@ -85,7 +85,7 @@ class Node implements INode {
 		var i = 0;
 		for (link in chain) {
 			var port = current_node.get_port(link.id);
-			if (link.type == Types.reference) {
+			if (link.type == Kind.reference) {
 				var reference:Port = cast port;
 				current_node = reference.get_other_node();
 			}

@@ -9,12 +9,13 @@ typedef IProperty_Source = {
   ?default_value:Dynamic,
 	?allow_null:Bool,
 	?trellis:String,
-  ?other_property:String
+  ?other_property:String,
+	?multiple:Bool
 }
 
 @:expose class Property {
   public var name:String;
-  public var type:Types;
+  public var type:Kind;
   public var default_value:Dynamic;
   public var allow_null:Bool;
   public var trellis:Trellis;
@@ -25,13 +26,16 @@ typedef IProperty_Source = {
   public var ports = new Array<Property_Port>();
 
   public function new(name:String, source:IProperty_Source, trellis:Trellis) {
-    this.type = Type.createEnum(Types, source.type);
+    this.type = cast Reflect.field(Types, source.type);
 
     if (source.default_value != null)
       this.default_value = source.default_value;
 
     if (source.allow_null != null)
       this.allow_null = source.allow_null;
+
+		if (source.multiple != null)
+			multiple = source.multiple;
 
     this.name = name;
     this.trellis = trellis;
@@ -51,16 +55,16 @@ typedef IProperty_Source = {
       return default_value;
 
     switch (type) {
-      case Types.int:
+      case Kind.int:
         return 0;
 
-      case Types.float:
+      case Kind.float:
         return 0;
 
-      case Types.string:
+      case Kind.string:
         return '';
 
-      case Types.bool:
+      case Kind.bool:
         return false;
 
       default:

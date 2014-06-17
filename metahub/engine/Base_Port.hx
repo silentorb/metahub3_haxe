@@ -1,5 +1,6 @@
 package engine;
 
+import schema.Kind;
 import schema.Trellis;
 import schema.Property;
 import code.Functions;
@@ -46,13 +47,13 @@ class Base_Port<T> implements IPort {
   }
 
   public function set_value(new_value:Dynamic, context:Context = null):Dynamic {
-    if (_value == new_value)
+    if (!property.multiple && _value == new_value)
       return _value;
 
     _value = new_value;
 
-    if (property.type == Types.reference) {
-      if (property.other_property.type == Types.list) {
+    if (property.type == Kind.reference) {
+      if (property.other_property.type == Kind.list) {
         var other_node = get_other_node();
         var other_port:List_Port = cast other_node.get_port(property.other_property.id);
 				other_port.add_value(parent.id);
@@ -79,7 +80,7 @@ class Base_Port<T> implements IPort {
 		return _value;
   }
 
-	public function get_type():Types {
+	public function get_type():Kind {
 		return property.type;
 	}
 

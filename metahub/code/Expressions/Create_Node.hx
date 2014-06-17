@@ -2,7 +2,7 @@ package code.expressions;
 import schema.Trellis;
 import schema.Property;
 import engine.IPort;
-import schema.Types;
+import schema.Kind;
 
 class Create_Node implements Expression {
   public var trellis:Trellis;
@@ -11,10 +11,11 @@ class Create_Node implements Expression {
 
   public function new(trellis:Trellis) {
     this.trellis = trellis;
-    type = new Type_Reference(Types.reference, trellis);
+    type = new Type_Reference(Kind.reference, trellis);
   }
 
   public function resolve(scope:Scope):Dynamic {
+		trace('create node', trellis.name);
     var node = scope.hub.create_node(trellis);
     for (i in assignments.keys()) {
       var expression = assignments[i];

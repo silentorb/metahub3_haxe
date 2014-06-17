@@ -1,9 +1,10 @@
+Character (item_count = items:count)
+Item (y = owner.x - 1)
+
 let boy = new Character { name: 'James' }
 let sword = new Item { name: 'Vorpal Sword', owner: boy }
 #let book2 = Item:filter(name == 'Marloth'):first
-Character (item_count = items:count)
 let book = new Item { name: 'Marloth', owner: boy }
-Item (y = owner.x - 1)
 set boy { x: 6 }
 
 # assert: 

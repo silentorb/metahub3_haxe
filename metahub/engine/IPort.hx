@@ -1,6 +1,7 @@
 package engine;
 
 import code.Functions;
+import schema.Kind;
 import schema.Types;
 
 interface IPort {
@@ -11,5 +12,5 @@ interface IPort {
   //var action(get, set):Functions;
   function get_value(context:Context = null):Dynamic;
   function set_value(v:Dynamic, context:Context = null):Dynamic;
-	function get_type():Types;
+	function get_type():Kind;
 }

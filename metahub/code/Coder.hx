@@ -2,6 +2,7 @@ package code;
 import code.expressions.Trellis_Scope;
 import code.references.Reference;
 import Hub;
+import schema.Kind;
 import schema.Property;
 import code.expressions.*;
 import schema.Types;
@@ -135,18 +136,18 @@ class Coder {
     return new code.expressions.Create_Symbol(symbol, expression);
   }
 
-  static function get_type(value:Dynamic):Types {
+  static function get_type(value:Dynamic):Kind {
     if (Std.is(value, Int))
-      return Types.int;
+      return Kind.int;
 
     if (Std.is(value, Float))
-      return Types.float;
+      return Kind.float;
 
     if (Std.is(value, Bool))
-      return Types.bool;
+      return Kind.bool;
 
     if (Std.is(value, String))
-      return Types.string;
+      return Kind.string;
 
     throw new Exception("Could not find type.");
   }

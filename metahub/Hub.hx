@@ -81,7 +81,7 @@ import engine.Node;
 	public function parse_code(code:String) {
 		var context = new parser.MetaHub_Context(parser_definition);
 		var without_comments = remove_comments.replace(code, '');
-		trace('without_comments', without_comments);
+		//trace('without_comments', without_comments);
     return context.parse(without_comments);
 	}
 

@@ -1,6 +1,7 @@
 package code;
 import engine.Node;
 import code.symbols.*;
+import schema.Kind;
 
 class Scope_Definition {
   var parent:Scope_Definition;

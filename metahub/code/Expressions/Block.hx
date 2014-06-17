@@ -1,12 +1,12 @@
 package code.expressions;
 import schema.Property;
 import engine.IPort;
-import schema.Types;
+import schema.Kind;
 
 class Block implements Expression {
 
   public var expressions:Array<Expression> = new Array<Expression>();
-  public var type:Type_Reference = new Type_Reference(Types.void);
+  public var type:Type_Reference = new Type_Reference(Kind.void);
   var scope_definition:Scope_Definition;
 
   public function new(scope_definition:Scope_Definition) {

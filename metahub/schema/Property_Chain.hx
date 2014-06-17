@@ -45,7 +45,7 @@ class Property_Chain_Helper {
 	public static function perform(chain:Property_Chain, node:Node, action, start:Int = 0) {
 		for (i in start...chain.length) {
 			var link = chain[i];
-			if (link.type == Types.list) {
+			if (link.type == Kind.list) {
 				var list_port:List_Port = cast node.get_port(link.id);
 				var array = list_port.get_array();
 				for (j in array) {
@@ -53,7 +53,7 @@ class Property_Chain_Helper {
 				}
 				return;
 			}
-			else if (link.type == Types.reference) {
+			else if (link.type == Kind.reference) {
 				var id = node.get_value(link.id);
 				node = node.hub.nodes[id];
 			}

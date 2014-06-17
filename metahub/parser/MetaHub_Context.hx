@@ -182,7 +182,7 @@ package parser;
 	static function trellis_scope(data:Dynamic):Dynamic {
     return {
 			"type": "trellis_scope",
-			"path": data[0],
+			"path": [ data[0] ],
 			"statements": data[2]
 		};
   }

@@ -28,11 +28,18 @@ class Schema {
       trellis.load_properties(source);
     }
 
-// Connect everything together
+// Initialize parents
     for (name in Reflect.fields(trellises)) {
       source = Reflect.field(trellises, name);
       trellis = this.trellis_keys[name];
-      trellis.initialize(source);
+      trellis.initialize1(source);
+    }
+		
+		// Connect everything together
+    for (name in Reflect.fields(trellises)) {
+      source = Reflect.field(trellises, name);
+      trellis = this.trellis_keys[name];
+      trellis.initialize2(source);
     }
   }
 

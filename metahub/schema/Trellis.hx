@@ -91,13 +91,15 @@ class Trellis {
     }
   }
 
-  public function initialize(source:ITrellis_Source) {
+  public function initialize1(source:ITrellis_Source) {
     var trellises = this.schema.trellises;
     if (source.parent != null) {
       var trellis = this.schema.get_trellis(source.parent);
       this.set_parent(trellis);
     }
-
+  }
+	
+	  public function initialize2(source:ITrellis_Source) {
     if (source.properties != null) {
       for (j in Reflect.fields(source.properties)) {
         var property:Property = this.get_property(j);

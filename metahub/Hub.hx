@@ -1,4 +1,5 @@
 package;
+import haxe.ds.Vector;
 import haxe.xml.Parser;
 import schema.Schema;
 import schema.Trellis;
@@ -79,6 +80,9 @@ import engine.Node;
   }
 
 	public function parse_code(code:String) {
+		if (parser_definition == null) {
+			load_parser();
+		}
 		var context = new parser.MetaHub_Context(parser_definition);
 		var without_comments = remove_comments.replace(code, '');
 		//trace('without_comments', without_comments);

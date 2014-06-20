@@ -43,9 +43,9 @@
     <hidden path="obj" />
   </hiddenPaths>
   <!-- Executed before build -->
-  <preBuildCommand>$(CompilerPath)\haxe.exe $(ProjectDir)\compile-nodejs.hxml</preBuildCommand>
+  <preBuildCommand>$(ProjectDir)\compile.bat "$(CompilerPath)" "$(ProjectDir)"</preBuildCommand>
   <!-- Executed after build -->
-  <postBuildCommand alwaysRun="False">c:\windows\system32\cmd.exe /C copy "$(ProjectDir)\output\nodejs\metahub.js" E:\Websites\vineyard\node_modules\vineyard-metahub\metahub3.js</postBuildCommand>
+  <postBuildCommand alwaysRun="False">c:\windows\system32\cmd.exe /C "$(ProjectDir)\post_build.bat $(ProjectDir)</postBuildCommand>
   <!-- Other project options -->
   <options>
     <option showHiddenPaths="False" />

@@ -1,4 +1,4 @@
--cp metahub
+-cp src
 -cpp output/cpp
 -debug
 -main metahub.Main

@@ -31,7 +31,7 @@ import metahub.engine.Node;
     var boot_definition = new metahub.parser.Definition();
     boot_definition.load_parser_schema();
     var context = new metahub.parser.Bootstrap(boot_definition);
-    var result:Match = cast context.parse(metahub.Macros.insert_file_as_string("src/metahub.grammar"), false);
+    var result:Match = cast context.parse(metahub.Macros.insert_file_as_string("metahub.grammar"), false);
     parser_definition = new Definition();
     parser_definition.load(result.get_data());
   }
@@ -92,7 +92,7 @@ import metahub.engine.Node;
 	}
 
   public function create_functions() {
-		var functions = Macros.insert_file_as_string("src/json/core_nodes.json");
+		var functions = Macros.insert_file_as_string("json/core_nodes.json");
     var data = haxe.Json.parse(functions);
     schema.load_trellises(data.trellises);
   }

@@ -6,15 +6,11 @@ import haxe.macro.Context;
  * ...
  * @author Christopher W. Johnson
  */
-class Macros{
+class Macros {
 
 	macro static public function insert_file_as_string(path:String):Expr {
-    // I don't expect you to have a license file, so let's even create it if it
-    // does not exist yet:
-    //if (!sys.FileSystem.exists('license.txt'))
-      //sys.io.File.saveContent("license.txt", "LICENSE: Whatever license haxe.org manual has");
-
-    var now_str = sys.io.File.getContent(path);
+		var full_path = haxe.macro.Context.resolvePath(path);
+    var now_str = sys.io.File.getContent(full_path);
 
     // var result = Context.makeExpr(now_str, Context.currentPos());
     // shorter writing:

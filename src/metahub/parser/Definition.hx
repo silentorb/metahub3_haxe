@@ -123,7 +123,7 @@ import haxe.Json;
   public function load_parser_schema() {
     //var data = Utility.load_json("metahub/parser.json");
 		//var data = macro File.getContent("metahub/parser.json");
-		var data = metahub.Macros.insert_file_as_string("src/json/parser.json");
+		var data = metahub.Macros.insert_file_as_string("json/parser.json");
     load(Json.parse(data));
   }
 

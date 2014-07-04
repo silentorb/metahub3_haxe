@@ -6,9 +6,10 @@ import Exception;
 import metahub.schema.Property;
 
 typedef ITrellis_Source = {
-  var name:String;
-  var properties:Map<String, IProperty_Source>;
-  var parent:String;
+  name:String,
+  properties:Map<String, IProperty_Source>,
+  parent:String,
+	?primary_key:String
 }
 
 class Trellis {
@@ -106,6 +107,20 @@ class Trellis {
       var trellis = this.schema.get_trellis(source.parent);
       this.set_parent(trellis);
     }
+		if (source.primary_key != null) {
+			var primary_key = source.primary_key;
+			if (property_keys.exists(primary_key)) {
+				identity_property = property_keys[primary_key];
+			}
+		}
+		else {
+			if (parent != null) {
+				identity_property = parent.identity_property;
+			}
+			else if (property_keys.exists("id")) {
+				identity_property = property_keys["id"];
+			}
+		}
   }
 	
 	  public function initialize2(source:ITrellis_Source) {

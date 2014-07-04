@@ -1,1 +1,1 @@
-set TARGET=php
+set TARGET=cpp

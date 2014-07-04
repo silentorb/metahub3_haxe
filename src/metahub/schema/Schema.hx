@@ -13,15 +13,16 @@ class Schema {
     return trellis;
   }
 
-  public function load_trellises(trellises:Map<String, ITrellis_Source>) {
+  public function load_trellises(trellises:Dynamic) {
 // Due to cross referencing, loading trellises needs to be done in passes
-
+trace('t2',  Reflect.fields(trellises));
 // First load the core trellises
     var trellis:Trellis, source:ITrellis_Source, name:String;
     for (name in Reflect.fields(trellises)) {
 
       source = Reflect.field(trellises, name);
       trellis = this.trellis_keys[name];
+			trace('t', name);
       if (trellis == null)
         trellis = add_trellis(name, new Trellis(name, this));
 
@@ -34,7 +35,7 @@ class Schema {
       trellis = this.trellis_keys[name];
       trellis.initialize1(source);
     }
-		
+
 		// Connect everything together
     for (name in Reflect.fields(trellises)) {
       source = Reflect.field(trellises, name);

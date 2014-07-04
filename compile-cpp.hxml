@@ -1,4 +1,5 @@
 -cp src
--cpp output/cpp 
+-cpp output/cpp
+metahub.Main
 -debug
--main metahub.Main
+-v

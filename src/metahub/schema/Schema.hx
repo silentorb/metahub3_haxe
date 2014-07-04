@@ -15,14 +15,14 @@ class Schema {
 
   public function load_trellises(trellises:Dynamic) {
 // Due to cross referencing, loading trellises needs to be done in passes
-trace('t2',  Reflect.fields(trellises));
+//trace('t2',  Reflect.fields(trellises));
 // First load the core trellises
     var trellis:Trellis, source:ITrellis_Source, name:String;
     for (name in Reflect.fields(trellises)) {
 
       source = Reflect.field(trellises, name);
       trellis = this.trellis_keys[name];
-			trace('t', name);
+			//trace('t', name);
       if (trellis == null)
         trellis = add_trellis(name, new Trellis(name, this));
 

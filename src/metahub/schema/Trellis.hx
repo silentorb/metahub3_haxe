@@ -2,6 +2,7 @@ package metahub.schema;
 import metahub.engine.INode;
 import metahub.engine.IPort;
 import metahub.engine.Node.Identity;
+import Exception;
 import metahub.schema.Property;
 
 typedef ITrellis_Source = {
@@ -17,6 +18,7 @@ class Trellis {
   var property_keys:Map<String, Property> = new Map<String, Property>();
   var parent:Trellis;
   public var id:Identity;
+	public var identity_property:Property;
 
   public function new(name:String, schema:Schema) {
     this.name = name;
@@ -41,6 +43,13 @@ class Trellis {
     }
     return result;
   }
+	
+	public function get_identity(seed:Dynamic) {
+		if (identity_property == null)
+			throw new Exception("This trellis does not have an identity property set.");
+			
+		return Reflect.field(seed, identity_property.name);
+	}
 
   public function get_property(name:String) {
     var properties = this.get_all_properties();

@@ -1,4 +1,4 @@
-package metahub;
+package ;
 
 #if (nodejs || html5)
 

@@ -20,10 +20,13 @@ class Trellis {
   var parent:Trellis;
   public var id:Identity;
 	public var identity_property:Property;
+	public var namespace:Namespace;
 
-  public function new(name:String, schema:Schema) {
+  public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;
     this.schema = schema;
+		this.namespace = namespace;
+    namespace.trellises[name] = this;
   }
 
   public function add_property(name:String, source:IProperty_Source):Property {
@@ -101,10 +104,10 @@ class Trellis {
     }
   }
 
-  public function initialize1(source:ITrellis_Source) {
+  public function initialize1(source:ITrellis_Source, namespace:Namespace) {
     var trellises = this.schema.trellises;
     if (source.parent != null) {
-      var trellis = this.schema.get_trellis(source.parent);
+      var trellis = this.schema.get_trellis(source.parent, namespace);
       this.set_parent(trellis);
     }
 		if (source.primary_key != null) {

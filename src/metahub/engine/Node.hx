@@ -33,7 +33,7 @@ class Node implements INode {
       ports.push(port);
     }
 
-    if (trellis.is_a(hub.schema.get_trellis("function"))) {
+    if (trellis.is_a(hub.schema.get_trellis("function", hub.metahub_namespace))) {
 			initialize_function();
 		}
   }

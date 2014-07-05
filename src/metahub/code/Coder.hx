@@ -79,7 +79,7 @@ class Coder {
   }
 
   function create_node(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var trellis = hub.schema.get_trellis(source.trellis);
+    var trellis = hub.schema.get_trellis(source.trellis, hub.metahub_namespace);
     var result = new metahub.code.expressions.Create_Node(trellis);
 
     if (source.set != null) {
@@ -92,7 +92,7 @@ class Coder {
   }
 
 	function path_to_engine_reference(path, scope_definition:Scope_Definition):Reference<Local_Symbol> {
-		var symbol:Local_Symbol = cast scope_definition.find(path[0]);
+		var symbol:Local_Symbol = cast scope_definition.find(path[0], hub.metahub_namespace);
 		return symbol.create_reference(extract_path(path));
 	}
 
@@ -106,7 +106,7 @@ class Coder {
 	}
 
 	function path_to_schema_reference(path, scope_definition:Scope_Definition):Reference<ISchema_Symbol> {
-		var symbol:ISchema_Symbol = cast scope_definition.find(path[0]);
+		var symbol:ISchema_Symbol = cast scope_definition.find(path[0], hub.metahub_namespace);
 		return symbol.create_reference(extract_path(path));
 	}
 
@@ -153,14 +153,14 @@ class Coder {
   }
 
   function function_expression(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var trellis = this.hub.schema.get_trellis(source.name);
+    var trellis = this.hub.schema.get_trellis(source.name, hub.metahub_namespace);
     var expressions:Array<Dynamic> = source.inputs;
     var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert(e, scope_definition)));
     return new metahub.code.expressions.Function_Call(trellis, inputs);
   }
 
   function set(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var reference:Local_Symbol = cast scope_definition.find(source.path);
+    var reference:Local_Symbol = cast scope_definition.find(source.path, hub.metahub_namespace);
     var trellis = reference.get_trellis();
     //var trellis = reference.symbol.type.trellis;
 
@@ -175,7 +175,7 @@ class Coder {
 
 	function trellis_scope(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var new_scope_definition = new Scope_Definition(scope_definition);
-		var trellis = hub.schema.get_trellis(source.path);
+		var trellis = hub.schema.get_trellis(source.path, hub.metahub_namespace);
 		new_scope_definition._this = new Trellis_Symbol(trellis);
 		var statements = new Array<Expression>();
 		for (i in Reflect.fields(source.statements)) {

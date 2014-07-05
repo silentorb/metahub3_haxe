@@ -77,7 +77,7 @@ typedef IProperty_Source = {
     if (source.type != 'list' && source.type != 'reference')
       return;
 
-    this.other_trellis = this.trellis.schema.get_trellis(source.trellis);
+    this.other_trellis = this.trellis.schema.get_trellis(source.trellis, trellis.namespace);
     if (source.other_property != null)
       this.other_property = other_trellis.get_property(source.other_property);
     else {

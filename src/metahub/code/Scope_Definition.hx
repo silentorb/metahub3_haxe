@@ -2,6 +2,7 @@ package metahub.code;
 import metahub.engine.Node;
 import metahub.code.symbols.*;
 import metahub.schema.Kind;
+import metahub.schema.Namespace;
 
 class Scope_Definition {
   var parent:Scope_Definition;
@@ -40,7 +41,7 @@ class Scope_Definition {
     return parent._find(name);
   }
 
-	public function find(name:String):Symbol {
+	public function find(name:String, namespace:Namespace):Symbol {
     if (symbols.exists(name))
       return symbols[name];
 
@@ -54,8 +55,11 @@ class Scope_Definition {
 			}
 		}
 
-		if (result == null && hub.schema.trellis_keys.exists(name)) {
-			result = new Trellis_Symbol(hub.schema.trellis_keys[name]);
+		if (result == null) {
+			var trellis = hub.schema.get_trellis(name, namespace, false);
+			if (trellis != null) {
+				result = new Trellis_Symbol(trellis);
+			}
 		}
 
 		if (result == null)

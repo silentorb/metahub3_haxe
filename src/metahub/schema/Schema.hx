@@ -5,15 +5,23 @@ import metahub.schema.Trellis;
 
 class Schema {
   public var trellises:Array<Trellis> = new Array<Trellis>();
-  public var trellis_keys:Map<String, Trellis> = new Map<String, Trellis>();
+  var namespaces:Map<String, Namespace> = new Map<String, Namespace>();
+	
+	public function add_namespace(name:String):Namespace {
+		if (namespaces.exists(name))
+			return namespaces[name];
+		
+		var namespace = new Namespace(name, name);
+		this.namespaces[name] = namespace;
+		return namespace;
+	}
 
   function add_trellis(name:String, trellis:Trellis):Trellis {
-    trellis_keys[name] = trellis;
     trellises.push(trellis);
     return trellis;
   }
 
-  public function load_trellises(trellises:Dynamic) {
+  public function load_trellises(trellises:Dynamic, namespace:Namespace) {
 // Due to cross referencing, loading trellises needs to be done in passes
 //trace('t2',  Reflect.fields(trellises));
 // First load the core trellises
@@ -21,10 +29,10 @@ class Schema {
     for (name in Reflect.fields(trellises)) {
 
       source = Reflect.field(trellises, name);
-      trellis = this.trellis_keys[name];
+      trellis = namespace.trellises[name];
 			//trace('t', name);
       if (trellis == null)
-        trellis = add_trellis(name, new Trellis(name, this));
+        trellis = add_trellis(name, new Trellis(name, this, namespace));
 
       trellis.load_properties(source);
     }
@@ -32,23 +40,32 @@ class Schema {
 // Initialize parents
     for (name in Reflect.fields(trellises)) {
       source = Reflect.field(trellises, name);
-      trellis = this.trellis_keys[name];
-      trellis.initialize1(source);
+      trellis =  namespace.trellises[name];
+      trellis.initialize1(source, namespace);
     }
 
 		// Connect everything together
     for (name in Reflect.fields(trellises)) {
       source = Reflect.field(trellises, name);
-      trellis = this.trellis_keys[name];
+      trellis =  namespace.trellises[name];
       trellis.initialize2(source);
     }
   }
 
-  public function get_trellis(name:String):Trellis {
-    if (!this.trellis_keys.exists(name))
-      throw new Exception('Could not find trellis named: ' + name + '.');
+  public function get_trellis(name:String, namespace:Namespace, throw_exception_on_missing = false):Trellis {
+		if (name.indexOf('.') > -1)
+			throw new Exception('Namespace paths are not supported yet.');
 
-    return this.trellis_keys[name];
+		if (namespace == null)
+				throw new Exception('Could not find namespace for trellis: ' + name + '.');
+	
+		if (!namespace.trellises.exists(name)) {
+			if (!throw_exception_on_missing)
+				return null;
+				
+			throw new Exception('Could not find trellis named: ' + name + '.');
+		}
+		return namespace.trellises[name];
   }
 
 }

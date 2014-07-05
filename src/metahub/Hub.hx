@@ -3,6 +3,7 @@ import haxe.ds.Vector;
 import haxe.xml.Parser;
 import metahub.parser.Definition;
 import metahub.parser.Match;
+import metahub.schema.Namespace;
 import metahub.schema.Schema;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
@@ -18,12 +19,15 @@ import metahub.engine.Node;
   public var root_scope_definition:Scope_Definition;
   public var parser_definition:metahub.parser.Definition;
 	static var remove_comments = ~/#[^\n]*/g;
+	public var metahub_namespace:Namespace;
 
   public function new() {
     nodes.push(null);
+
     root_scope_definition = new Scope_Definition(this);
     root_scope = new Scope(this, root_scope_definition);
     schema = new Schema();
+		metahub_namespace = schema.add_namespace('metahub');
     create_functions();
   }
 
@@ -53,9 +57,9 @@ import metahub.engine.Node;
     return nodes.length - 1;
   }
 
-  public function load_schema_from_file(url:String) {
+  public function load_schema_from_file(url:String, namespace:Namespace) {
     var data = Utility.load_json(url);
-    schema.load_trellises(data.trellises);
+    schema.load_trellises(data.trellises, namespace);
   }
 
   //public function parse(source:String):Dynamic {
@@ -94,6 +98,6 @@ import metahub.engine.Node;
   public function create_functions() {
 		var functions = Macros.insert_file_as_string("json/core_nodes.json");
     var data = haxe.Json.parse(functions);
-    schema.load_trellises(data.trellises);
+    schema.load_trellises(data.trellises, metahub_namespace);
   }
 }

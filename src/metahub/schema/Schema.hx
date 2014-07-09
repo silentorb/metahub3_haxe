@@ -54,16 +54,16 @@ class Schema {
 
   public function get_trellis(name:String, namespace:Namespace, throw_exception_on_missing = false):Trellis {
 		if (name.indexOf('.') > -1)
-			throw new Exception('Namespace paths are not supported yet.');
+			throw new Exception('Namespace paths are not supported yet.', 400);
 
 		if (namespace == null)
-				throw new Exception('Could not find namespace for trellis: ' + name + '.');
+				throw new Exception('Could not find namespace for trellis: ' + name + '.', 400);
 	
 		if (!namespace.trellises.exists(name)) {
 			if (!throw_exception_on_missing)
 				return null;
 				
-			throw new Exception('Could not find trellis named: ' + name + '.');
+			throw new Exception('Could not find trellis named: ' + name + '.', 400);
 		}
 		return namespace.trellises[name];
   }

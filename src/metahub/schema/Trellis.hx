@@ -36,6 +36,11 @@ class Trellis {
     this.properties.push(property);
     return property;
   }
+	
+	public function copy_identity(source:Dynamic, target:Dynamic) {
+		var identity_key = identity_property.name;
+		Reflect.setField(target, identity_key, Reflect.field(source, identity_key));
+	}
 
   public function get_all_properties() {
     var result = new Map<String, Property>();

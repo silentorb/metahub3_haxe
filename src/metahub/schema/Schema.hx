@@ -21,7 +21,11 @@ class Schema {
     return trellis;
   }
 
-  public function load_trellises(trellises:Dynamic, namespace:Namespace) {
+  public function load_trellises(trellises:Dynamic, settings:Load_Settings) {
+		if (settings.namespace == null)
+			settings.namespace = root_namespace;
+			
+		var namespace = settings.namespace;
 // Due to cross referencing, loading trellises needs to be done in passes
 //trace('t2',  Reflect.fields(trellises));
 // First load the core trellises
@@ -33,8 +37,18 @@ class Schema {
 			//trace('t', name);
       if (trellis == null)
         trellis = add_trellis(name, new Trellis(name, this, namespace));
-
+				
       trellis.load_properties(source);
+			
+			if (settings.auto_identity && trellis.identity_property == null) {
+				var identity_property = trellis.get_property_or_null("id");
+				if (identity_property == null) {
+					identity_property = trellis.add_property("id", { type: "int" } );
+				}
+				
+				trellis.identity_property = identity_property;
+			}
+
     }
 
 // Initialize parents

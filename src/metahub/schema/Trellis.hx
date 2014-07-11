@@ -60,10 +60,18 @@ class Trellis {
 		return Reflect.field(seed, identity_property.name);
 	}
 
-  public function get_property(name:String) {
+  public function get_property(name:String):Property {
     var properties = this.get_all_properties();
     if (!properties.exists(name))
       throw new Exception(this.name + ' does not contain a property named ' + name + '.');
+
+    return properties[name];
+  }
+	
+	public function get_property_or_null(name:String):Property {
+    var properties = this.get_all_properties();
+    if (!properties.exists(name))
+      return null;
 
     return properties[name];
   }

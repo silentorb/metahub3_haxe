@@ -3,6 +3,7 @@ import haxe.ds.Vector;
 import haxe.xml.Parser;
 import metahub.parser.Definition;
 import metahub.parser.Match;
+import metahub.schema.Load_Settings;
 import metahub.schema.Namespace;
 import metahub.schema.Schema;
 import metahub.schema.Trellis;
@@ -72,14 +73,14 @@ import haxe.Json;
     return nodes.length - 1;
   }
 
-  public function load_schema_from_file(url:String, namespace:Namespace) {
+  public function load_schema_from_file(url:String, namespace:Namespace, auto_identity:Bool = false) {
     var data = Utility.load_json(url);
-    schema.load_trellises(data.trellises, namespace);
+    schema.load_trellises(data.trellises, new Load_Settings(namespace,auto_identity));
   }
 	
-	public function load_schema_from_string(json:String, namespace:Namespace) {
+	public function load_schema_from_string(json:String, namespace:Namespace, auto_identity:Bool = false) {
     var data = Json.parse(json);
-    schema.load_trellises(data.trellises, namespace);
+    schema.load_trellises(data.trellises, new Load_Settings(namespace,auto_identity));
   }
 
   //public function parse(source:String):Dynamic {
@@ -118,6 +119,6 @@ import haxe.Json;
   public function create_functions() {
 		var functions = Macros.insert_file_as_string("json/core_nodes.json");
     var data = haxe.Json.parse(functions);
-    schema.load_trellises(data.trellises, metahub_namespace);
+    schema.load_trellises(data.trellises, new Load_Settings(metahub_namespace));
   }
 }

@@ -11,6 +11,7 @@ import metahub.code.Coder;
 import metahub.code.Scope_Definition;
 import metahub.code.Scope;
 import metahub.engine.Node;
+import haxe.Json;
 
 @:expose class Hub {
   public var nodes:Array<Node>= new Array<Node>();
@@ -20,10 +21,15 @@ import metahub.engine.Node;
   public var parser_definition:metahub.parser.Definition;
 	static var remove_comments = ~/#[^\n]*/g;
 	public var metahub_namespace:Namespace;
+	public var node_factories = new Array<Hub->Int->Trellis->Node>();
 
   public function new() {
     nodes.push(null);
 
+		node_factories.push(function (hub, id, trellis) {
+			return new Node(hub, id, trellis);
+		});
+		
     root_scope_definition = new Scope_Definition(this);
     root_scope = new Scope(this, root_scope_definition);
     schema = new Schema();
@@ -41,7 +47,16 @@ import metahub.engine.Node;
   }
 
   public function create_node(trellis:Trellis):Node {
-    var node = new Node(this, nodes.length, trellis);
+		var node:Node = null;
+		for (factory in node_factories) {
+			node = factory(this, nodes.length, trellis);
+			if (node != null)
+				break;
+		}
+
+		if (node == null)
+			throw new Exception("Could not find valid factory to create node of type " + trellis.name + ".");
+			
     nodes.push(node);
     return node;
   }
@@ -59,6 +74,11 @@ import metahub.engine.Node;
 
   public function load_schema_from_file(url:String, namespace:Namespace) {
     var data = Utility.load_json(url);
+    schema.load_trellises(data.trellises, namespace);
+  }
+	
+	public function load_schema_from_string(json:String, namespace:Namespace) {
+    var data = Json.parse(json);
     schema.load_trellises(data.trellises, namespace);
   }
 

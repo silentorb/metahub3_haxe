@@ -1,8 +1,10 @@
 package metahub.schema;
+import metahub.engine.Constraint_Operator;
 import metahub.engine.Context;
 import metahub.engine.IPort;
 import metahub.engine.Node;
 using metahub.schema.Property_Chain;
+import metahub.engine.Relationship;
 
 /**
  * ...
@@ -13,17 +15,18 @@ class Property_Port implements IPort {
 	var property:Property;
 	var origin:Property_Chain;
 
-	public var dependencies = new Array<IPort>();
-  public var dependents = new Array<IPort>();
+	public var dependencies = new Array<Relationship>();
+  public var dependents = new Array<Relationship>();
 
 	public function new(property:Property, origin:Property_Chain) {
 		this.property = property;
     this.origin = origin;
 	}
 
-  public function add_dependency(other:IPort) {
-    this.dependencies.push(other);
-    other.dependents.push(this);
+  public function add_dependency(other:IPort, operator:Constraint_Operator) {
+		var relationship = new Relationship(this, operator, other);
+    this.dependencies.push(relationship);
+    other.dependents.push(relationship);
   }
 
 	public function get_type():Kind {

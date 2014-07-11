@@ -3,6 +3,7 @@ package metahub.code.expressions;
 import metahub.schema.Trellis;
 import metahub.engine.Node;
 import metahub.engine.IPort;
+import metahub.engine.Constraint_Operator;
 
 class Function_Call implements Expression {
   public var type:Type_Reference;
@@ -32,7 +33,7 @@ class Function_Call implements Expression {
       }
 
       var source = expressions[i].to_port(scope);
-      target.add_dependency(source);
+      target.add_dependency(source, Constraint_Operator.equals);
     }
 
     var output = node.get_port(0);

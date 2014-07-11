@@ -17,10 +17,10 @@ class Main {
   }');
 #end
 
-		var hub = new Hub();
-		hub.load_schema_from_file('test/schema.json');
-		var code = sys.io.File.getContent('test/general.mh');
-    var result:metahub.parser.Match = cast hub.parse_code(code);
-		var data = result.get_data();
+		//var hub = new Hub();
+		//hub.load_schema_from_file('test/schema.json');
+		//var code = sys.io.File.getContent('test/general.mh');
+    //var result:metahub.parser.Match = cast hub.parse_code(code);
+		//var data = result.get_data();
   }
 }

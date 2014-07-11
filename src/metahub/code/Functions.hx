@@ -19,8 +19,8 @@ class Function_Calls {
 			throw new Exception("Invalid function name " + id + ".");
 
 		var func = Reflect.field(Function_Calls, id);
-
-		return Reflect.callMethod(Function_Calls, func, [ args ]);
+		var kind:Dynamic = type;
+		return Reflect.callMethod(Function_Calls, func, [ args ].concat(kind));
     //switch (id) {
       //case Functions.sum:
         //return sum(args);
@@ -33,7 +33,7 @@ class Function_Calls {
 		//throw new Exception("Invalid function id " + id + ".");
   }
 
-  static function sum(args:Iterable<Dynamic>):Dynamic {
+  static function sum(args:Iterable<Dynamic>, type:Kind):Dynamic {
     var total = 0;
     for (arg in args) {
 			var value:Int = cast arg;
@@ -43,7 +43,7 @@ class Function_Calls {
     return total;
   }
 
-	static function subtract(args:List<Dynamic>):Dynamic {
+	static function subtract(args:List<Dynamic>, type:Kind):Dynamic {
     var total:Int = 0;
 		var numbers:Iterable<Int> = args.first();
 		var i = 0;
@@ -61,7 +61,7 @@ class Function_Calls {
     return total;
   }
 
-	static function count(args:List<Dynamic>):Dynamic {
+	static function count(args:List<Dynamic>, type:Kind):Dynamic {
 		var result = args.first()[0].length;
 		trace('count', result);
 		return result;

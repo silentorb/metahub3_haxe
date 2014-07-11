@@ -5,14 +5,14 @@ import metahub.schema.Trellis;
 
 class Schema {
   public var trellises:Array<Trellis> = new Array<Trellis>();
-  var namespaces:Map<String, Namespace> = new Map<String, Namespace>();
+  public var root_namespace = new Namespace("root", "root");
 	
 	public function add_namespace(name:String):Namespace {
-		if (namespaces.exists(name))
-			return namespaces[name];
+		if (root_namespace.children.exists(name))
+			return root_namespace.children[name];
 		
 		var namespace = new Namespace(name, name);
-		this.namespaces[name] = namespace;
+		root_namespace.children[name] = namespace;
 		return namespace;
 	}
 

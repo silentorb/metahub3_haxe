@@ -23,6 +23,7 @@ statement =
   | set_values
   | trellis_scope
   | create_constraint
+	| create_node
 
 create_symbol = "let" ws id trim "=" trim expression
 
@@ -43,12 +44,13 @@ bool = "true" | "false"
 int = /-?[0-9]+/
 float = /-?([0-9]*\.)?[0-9]+f?/
 operator = '+' | '-' | '/' | '*' | '%'
+constraint_operator = '=' | '<' | '>' | '<=' | '>='
 
 value = string | bool | int | float
 
 dummy = "@&^%"
 
-create_node = "new" ws id trim @(set_property_block, dummy, 0, 1)
+create_node = "new" ws path_or_id trim @(set_property_block, dummy, 0, 1)
 
 set_property_block = "{" trim @(set_property, comma_or_newline, 1, 0) trim "}"
 
@@ -56,8 +58,8 @@ set_property = id trim ":" trim expression
 
 set_values = "set" ws path_or_id trim set_property_block
 
-trellis_scope = id trim constraint_block
+trellis_scope = path_or_id trim constraint_block
 
 constraint_block = "(" trim @(constraint, comma_or_newline, 1, 0) trim ")"
 
-constraint = id trim "=" trim expression
+constraint = id trim constraint_operator trim expression

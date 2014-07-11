@@ -2,10 +2,20 @@ package ;
 
 #if (nodejs || html5)
 
-extern class Error {
-public function new(string:String);
+//extern class Error {
+//public function new(string:String);
+//}
+//typedef Exception = Error;
+
+class Exception extends js.Error {
+	public var code:Dynamic;
+	
+	public function new(message:String, code:Dynamic = null) {
+		super();
+		this.message = message;
+		this.code = code;
+	}
 }
-typedef Exception = Error;
 
 #elseif php
 
@@ -16,6 +26,14 @@ typedef Exception = php.HException;
 //
 #else
 
-typedef Exception  = String;
+class Exception {
+	public var message:String;
+	public var code:Dynamic;
+	
+	public function new(message:String, code:Dynamic = null) {
+		this.message = message;
+		this.code = code;
+	}
+}
 
 #end

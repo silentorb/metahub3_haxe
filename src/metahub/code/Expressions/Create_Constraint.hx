@@ -3,6 +3,7 @@ package metahub.code.expressions;
 import metahub.code.references.Property_Reference;
 import metahub.code.references.Reference;
 import metahub.code.symbols.Property_Symbol;
+import metahub.engine.Constraint_Operator;
 import metahub.engine.IPort;
 import metahub.code.reference.*;
 
@@ -10,9 +11,11 @@ class Create_Constraint<S> implements Expression {
   public var type:Type_Reference;
   var reference:Reference<S>;
   var expression:Expression;
+	var operator:Constraint_Operator;
 
-  public function new(reference:Reference<S>, expression:Expression) {
+  public function new(reference:Reference<S>, operator:Constraint_Operator, expression:Expression) {
     this.reference = reference;
+		this.operator = operator;
     this.expression = expression;
   }
 
@@ -36,7 +39,7 @@ class Create_Constraint<S> implements Expression {
 		if (reference.get_layer() == Layer.schema) {
 			var property_reference:Property_Reference = cast reference;
 			var port = property_reference.get_port(scope);
-			port.add_dependency(other_port);
+			port.add_dependency(other_port, operator);
 			return null;
 		}
 		else {

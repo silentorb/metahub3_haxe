@@ -1,8 +1,10 @@
 package metahub.code;
 import metahub.code.expressions.Trellis_Scope;
 import metahub.code.references.Reference;
+import metahub.engine.Constraint_Operator;
 import metahub.Hub;
 import metahub.schema.Kind;
+import metahub.schema.Namespace;
 import metahub.schema.Property;
 import metahub.code.expressions.*;
 import metahub.schema.Types;
@@ -44,14 +46,15 @@ class Coder {
 
   function constraint(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var expression = convert(source.expression, scope_definition);
+		var operator:Constraint_Operator = cast Constraint.operators.indexOf(source.operator);
     //var reference = scope_definition.find(source.path);
 		if (scope_definition._this.get_layer() == Layer.schema) {
 			var reference:Reference<ISchema_Symbol> = path_to_schema_reference(source.path, scope_definition);
-			return new metahub.code.expressions.Create_Constraint(reference, expression);
+			return new metahub.code.expressions.Create_Constraint(reference, operator, expression);
 		}
 		else {
 			var reference:Reference<Local_Symbol> = path_to_engine_reference(source.path, scope_definition);
-			return new metahub.code.expressions.Create_Constraint(reference, expression);
+			return new metahub.code.expressions.Create_Constraint(reference, operator, expression);
 		}
   }
 
@@ -77,9 +80,33 @@ class Coder {
     var type = get_type(source.value);
     return new metahub.code.expressions.Literal(source.value, new Type_Reference(type));
   }
+	
+	function get_namespace(path:Array<String>, start:Namespace):Namespace {
+		var current_namespace = start;
+		var i = 0;
+		for (token in path) {
+			if (current_namespace.children.exists(token)) {
+				current_namespace = current_namespace.children[token];
+			}
+			else if (current_namespace.trellises.exists(token) && i == path.length - 1) {
+				return current_namespace;
+			}
+			else {
+				return null;
+			}
+			++i;
+		}
+		
+		return current_namespace;
+	}
 
   function create_node(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var trellis = hub.schema.get_trellis(source.trellis, hub.metahub_namespace);
+		var path:Array<String> = source.trellis;
+		if (path.length == 0)
+			throw new Exception("Trellis path is empty for node creation.");
+		
+		var namespace = get_namespace(path, hub.schema.root_namespace);
+    var trellis = hub.schema.get_trellis(path[path.length - 1], namespace, true);
     var result = new metahub.code.expressions.Create_Node(trellis);
 
     if (source.set != null) {
@@ -92,7 +119,7 @@ class Coder {
   }
 
 	function path_to_engine_reference(path, scope_definition:Scope_Definition):Reference<Local_Symbol> {
-		var symbol:Local_Symbol = cast scope_definition.find(path[0], hub.metahub_namespace);
+		var symbol:Local_Symbol = cast scope_definition.find(path[0], hub.schema.root_namespace);
 		return symbol.create_reference(extract_path(path));
 	}
 
@@ -106,7 +133,7 @@ class Coder {
 	}
 
 	function path_to_schema_reference(path, scope_definition:Scope_Definition):Reference<ISchema_Symbol> {
-		var symbol:ISchema_Symbol = cast scope_definition.find(path[0], hub.metahub_namespace);
+		var symbol:ISchema_Symbol = cast scope_definition.find(path[0], hub.schema.root_namespace);
 		return symbol.create_reference(extract_path(path));
 	}
 
@@ -153,14 +180,14 @@ class Coder {
   }
 
   function function_expression(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var trellis = this.hub.schema.get_trellis(source.name, hub.metahub_namespace);
+    var trellis = this.hub.schema.get_trellis(source.name, hub.schema.root_namespace);
     var expressions:Array<Dynamic> = source.inputs;
     var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert(e, scope_definition)));
     return new metahub.code.expressions.Function_Call(trellis, inputs);
   }
 
   function set(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var reference:Local_Symbol = cast scope_definition.find(source.path, hub.metahub_namespace);
+    var reference:Local_Symbol = cast scope_definition.find(source.path, hub.schema.root_namespace);
     var trellis = reference.get_trellis();
     //var trellis = reference.symbol.type.trellis;
 
@@ -174,8 +201,14 @@ class Coder {
   }
 
 	function trellis_scope(source:Dynamic, scope_definition:Scope_Definition):Expression {
+		var path:Array<String> = source.path;
+		if (path.length == 0)
+			throw new Exception("Trellis path is empty for node creation.");
+		
+		var namespace = get_namespace(path, hub.schema.root_namespace);
+		
     var new_scope_definition = new Scope_Definition(scope_definition);
-		var trellis = hub.schema.get_trellis(source.path, hub.metahub_namespace);
+		var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
 		new_scope_definition._this = new Trellis_Symbol(trellis);
 		var statements = new Array<Expression>();
 		for (i in Reflect.fields(source.statements)) {

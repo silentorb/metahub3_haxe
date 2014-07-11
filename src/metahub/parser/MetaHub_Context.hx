@@ -182,7 +182,7 @@ package metahub.parser;
 	static function trellis_scope(data:Dynamic):Dynamic {
     return {
 			"type": "trellis_scope",
-			"path": [ data[0] ],
+			"path": data[0],
 			"statements": data[2]
 		};
   }
@@ -193,9 +193,10 @@ package metahub.parser;
 
 	static function constraint(data:Dynamic):Dynamic {
     return {
-    type: "constraint",
-    path: [ data[0] ],
-    expression: data[4]
+			type: "constraint",
+			path: [ data[0] ],
+			operator: data[2],
+			expression: data[4]
     };
   }
 }

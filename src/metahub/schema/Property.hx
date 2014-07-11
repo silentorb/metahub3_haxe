@@ -26,7 +26,7 @@ typedef IProperty_Source = {
   public var ports = new Array<Property_Port>();
 
   public function new(name:String, source:IProperty_Source, trellis:Trellis) {
-    this.type = cast Reflect.field(Types, source.type);
+    this.type = cast Reflect.field(Kind, source.type);
 
     if (source.default_value != null)
       this.default_value = source.default_value;

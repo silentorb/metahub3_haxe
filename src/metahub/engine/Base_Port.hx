@@ -6,6 +6,7 @@ import metahub.schema.Property;
 import metahub.code.Functions;
 import metahub.schema.Types;
 using metahub.schema.Property_Chain;
+import metahub.engine.Relationship;
 
 /**
  * ...
@@ -15,8 +16,8 @@ class Base_Port<T> implements IPort {
   var _value:T;
   public var property:Property;
   public var parent:INode;
-  public var dependencies = new Array<IPort>();
-  public var dependents = new Array<IPort>();
+  public var dependencies = new Array<Relationship>();
+  public var dependents = new Array<Relationship>();
 	var hub:Hub;
 	//var _action:Functions = Functions.none;
 	public var on_change = new Array<Base_Port<T>->T->Context->Void>();
@@ -28,9 +29,10 @@ class Base_Port<T> implements IPort {
     this._value = value;
   }
 
-  public function add_dependency(other:IPort) {
-    this.dependencies.push(other);
-    other.dependents.push(this);
+  public function add_dependency(other:IPort, operator:Constraint_Operator) {
+		var relationship = new Relationship(this, operator, other);
+    this.dependencies.push(relationship);
+    other.dependents.push(relationship);
   }
 
   public function get_index():Int {
@@ -48,6 +50,16 @@ class Base_Port<T> implements IPort {
 
   public function set_value(new_value:Dynamic, context:Context = null):Dynamic {
     if (!property.multiple && _value == new_value)
+      return _value;
+			
+		for (relationship in dependencies) {
+			new_value = relationship.check_value(new_value, context);
+		}
+		
+		new_value = check_property_dependencies(new_value, context);
+		
+		// Check again if the value is the same now that the value may have been modified by relationships.
+		if (!property.multiple && _value == new_value)
       return _value;
 
     _value = new_value;
@@ -97,5 +109,16 @@ class Base_Port<T> implements IPort {
       //var other:Port = cast i;
       port.enter(_value, context);
     }
+  }
+	
+	function check_property_dependencies(new_value:Dynamic, context:Context) {
+    for (port in property.ports) {
+  		var context = new Context(port, parent);
+			for (relationship in port.dependencies) {
+				new_value = relationship.check_value(new_value, context);
+			}
+		}
+		
+		return new_value;
   }
 }

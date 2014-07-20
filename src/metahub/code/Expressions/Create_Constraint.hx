@@ -39,7 +39,7 @@ class Create_Constraint<S> implements Expression {
 		if (reference.get_layer() == Layer.schema) {
 			var property_reference:Property_Reference = cast reference;
 			var port = property_reference.get_port(scope);
-			port.add_dependency(other_port, operator);
+			port.connect(other_port);
 			return null;
 		}
 		else {

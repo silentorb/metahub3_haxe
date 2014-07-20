@@ -122,7 +122,7 @@ class Node implements INode {
 		var result = new List<Dynamic>();
 		for (i in 1...ports.length) {
 			var port = get_port(i);
-			var value = port.dependencies.map(function(d) { return d.dependency.get_value(context); });
+			var value = port.connections.map(function(d) { return d.get_value(context); });
 			//var value = get_port(i).get_value();
 			result.push(value);
 		}

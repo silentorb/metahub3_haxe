@@ -29,7 +29,7 @@ class List_Port extends Base_Port<Array<Dynamic>> {
   public function add_value(new_value:Dynamic) {
     _value.push(new_value);
 		trace('list changed.');
-		update_property_dependents();
+		update_property_connections(new_value, null);
   }
 
 	//override public function get_value(context:Context = null):Dynamic {

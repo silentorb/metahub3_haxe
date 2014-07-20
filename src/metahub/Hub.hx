@@ -30,7 +30,7 @@ import haxe.Json;
 		node_factories.push(function (hub, id, trellis) {
 			return new Node(hub, id, trellis);
 		});
-		
+
     root_scope_definition = new Scope_Definition(this);
     root_scope = new Scope(this, root_scope_definition);
     schema = new Schema();
@@ -57,7 +57,7 @@ import haxe.Json;
 
 		if (node == null)
 			throw new Exception("Could not find valid factory to create node of type " + trellis.name + ".");
-			
+
     nodes.push(node);
     return node;
   }
@@ -75,12 +75,16 @@ import haxe.Json;
 
   public function load_schema_from_file(url:String, namespace:Namespace, auto_identity:Bool = false) {
     var data = Utility.load_json(url);
-    schema.load_trellises(data.trellises, new Load_Settings(namespace,auto_identity));
+    schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
   }
-	
+
 	public function load_schema_from_string(json:String, namespace:Namespace, auto_identity:Bool = false) {
     var data = Json.parse(json);
-    schema.load_trellises(data.trellises, new Load_Settings(namespace,auto_identity));
+    schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
+  }
+
+	public function load_schema_from_object(data:Dynamic, namespace:Namespace, auto_identity:Bool = false) {
+    schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
   }
 
   //public function parse(source:String):Dynamic {

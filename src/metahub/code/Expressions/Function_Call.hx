@@ -33,7 +33,7 @@ class Function_Call implements Expression {
       }
 
       var source = expressions[i].to_port(scope);
-      target.add_dependency(source, Constraint_Operator.equals);
+      target.connect(source);
     }
 
     var output = node.get_port(0);

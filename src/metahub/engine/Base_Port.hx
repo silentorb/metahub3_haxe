@@ -16,8 +16,7 @@ class Base_Port<T> implements IPort {
   var _value:T;
   public var property:Property;
   public var parent:INode;
-  public var dependencies = new Array<Relationship>();
-  public var dependents = new Array<Relationship>();
+  public var connections = new Array<IPort>();
 	var hub:Hub;
 	//var _action:Functions = Functions.none;
 	public var on_change = new Array<Base_Port<T>->T->Context->Void>();
@@ -29,10 +28,9 @@ class Base_Port<T> implements IPort {
     this._value = value;
   }
 
-  public function add_dependency(other:IPort, operator:Constraint_Operator) {
-		var relationship = new Relationship(this, operator, other);
-    this.dependencies.push(relationship);
-    other.dependents.push(relationship);
+  public function connect(other:IPort) {
+    this.connections.push(other);
+    other.connections.push(this);
   }
 
   public function get_index():Int {
@@ -51,13 +49,13 @@ class Base_Port<T> implements IPort {
   public function set_value(new_value:Dynamic, context:Context = null):Dynamic {
     if (!property.multiple && _value == new_value)
       return _value;
-			
-		for (relationship in dependencies) {
-			new_value = relationship.check_value(new_value, context);
-		}
-		
-		new_value = check_property_dependencies(new_value, context);
-		
+
+		//for (connection in connections) {
+			//new_value = connection.set_value(new_value, context);
+		//}
+
+		new_value = update_property_connections(new_value, context);
+
 		// Check again if the value is the same now that the value may have been modified by relationships.
 		if (!property.multiple && _value == new_value)
       return _value;
@@ -75,12 +73,12 @@ class Base_Port<T> implements IPort {
       }
     }
 
-    if (this.dependents != null && this.dependents.length > 0) {
-      update_dependents(context);
+    if (this.connections != null && this.connections.length > 0) {
+      update_connections(context);
     }
 
 		if (property.ports != null && property.ports.length > 0) {
-			update_property_dependents();
+			update_property_connections(new_value, null);
 		}
 
 		if (on_change != null && on_change.length > 0) {
@@ -96,29 +94,33 @@ class Base_Port<T> implements IPort {
 		return property.type;
 	}
 
-  function update_dependents(context:Context) {
-    for (other in dependents) {
-      other.set_value(_value, context);
-    }
+  function update_connections(context:Context) {
+		throw new Exception("Base_Port.update_connections is not implemented.");
+
+    //for (other in connections) {
+      //other.set_value(_value, context);
+    //}
   }
 
-	function update_property_dependents() {
+	function update_property_connections(new_value:Dynamic, context:Context):Dynamic {
     for (port in property.ports) {
   		var context = new Context(port, parent);
     //var other:Port = cast node.get_port_from_chain(i);
       //var other:Port = cast i;
-      port.enter(_value, context);
+      new_value = port.enter(new_value, context);
     }
-  }
-	
-	function check_property_dependencies(new_value:Dynamic, context:Context) {
-    for (port in property.ports) {
-  		var context = new Context(port, parent);
-			for (relationship in port.dependencies) {
-				new_value = relationship.check_value(new_value, context);
-			}
-		}
-		
+
 		return new_value;
   }
+
+	//function check_property_dependencies(new_value:Dynamic, context:Context) {
+    //for (port in property.ports) {
+  		//var context = new Context(port, parent);
+			//for (relationship in port.dependencies) {
+				//new_value = relationship.check_value(new_value, context);
+			//}
+		//}
+//
+		//return new_value;
+  //}
 }

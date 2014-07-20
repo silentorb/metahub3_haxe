@@ -4,7 +4,6 @@ import metahub.engine.Context;
 import metahub.engine.IPort;
 import metahub.engine.Node;
 using metahub.schema.Property_Chain;
-import metahub.engine.Relationship;
 
 /**
  * ...
@@ -15,18 +14,17 @@ class Property_Port implements IPort {
 	var property:Property;
 	var origin:Property_Chain;
 
-	public var dependencies = new Array<Relationship>();
-  public var dependents = new Array<Relationship>();
+	public var connections = new Array<IPort>();
+  //public var dependents = new Array<Relationship>();
 
 	public function new(property:Property, origin:Property_Chain) {
 		this.property = property;
     this.origin = origin;
 	}
 
-  public function add_dependency(other:IPort, operator:Constraint_Operator) {
-		var relationship = new Relationship(this, operator, other);
-    this.dependencies.push(relationship);
-    other.dependents.push(relationship);
+  public function connect(other:IPort) {
+    this.connections.push(other);
+    other.connections.push(this);
   }
 
 	public function get_type():Kind {
@@ -44,7 +42,7 @@ class Property_Port implements IPort {
 	}
 
 	public function enter(value:Dynamic, context:Context = null) {
-		update_dependents(value, context);
+		return update_connections(value, context);
 	}
 
 	public function exit(value:Dynamic, context:Context = null) {
@@ -63,9 +61,13 @@ class Property_Port implements IPort {
 		//}
 	}
 
-	public function update_dependents(value:Dynamic, context:Context) {
-    for (other in dependents) {
-      other.set_value(value, context);
+	public function update_connections(value:Dynamic, context:Context) {
+		throw new Exception("Property_Port.update_dependents is not implemented.");
+
+    for (other in connections) {
+      value = other.set_value(value, context);
     }
+
+		return value;
   }
 }

@@ -6,32 +6,32 @@ import metahub.engine.Port;
 import metahub.schema.Kind;
 import metahub.schema.Types;
 
-enum Functions {
+enum Functions2 {
   none;
   sum;
   subtract;
 }
 
-class Function_Calls {
-  public static function call(id:String, args:List<Dynamic>, type:Kind):Dynamic {
-		//trace(Reflect.fields(Function_Calls));
-		if (!Reflect.hasField(Function_Calls, id))
-			throw new Exception("Invalid function name " + id + ".");
-
-		var func = Reflect.field(Function_Calls, id);
-		var kind:Dynamic = type;
-		return Reflect.callMethod(Function_Calls, func, [ args ].concat(kind));
-    //switch (id) {
-      //case Functions.sum:
-        //return sum(args);
-      //case Functions.subtract:
-        //return subtract(args);
+class Function_Calls2 {
+  //public static function call(id:String, args:List<Dynamic>, type:Kind):Dynamic {
+		////trace(Reflect.fields(Function_Calls));
+		//if (!Reflect.hasField(Function_Calls, id))
+			//throw new Exception("Invalid function name " + id + ".");
 //
-      //default:
-    //}
-//
-		//throw new Exception("Invalid function id " + id + ".");
-  }
+		//var func = Reflect.field(Function_Calls, id);
+		//var kind:Dynamic = type;
+		//return Reflect.callMethod(Function_Calls, func, [ args ].concat(kind));
+    ////switch (id) {
+      ////case Functions.sum:
+        ////return sum(args);
+      ////case Functions.subtract:
+        ////return subtract(args);
+////
+      ////default:
+    ////}
+////
+		////throw new Exception("Invalid function id " + id + ".");
+  //}
 
   static function sum(args:Iterable<Dynamic>, type:Kind):Dynamic {
     var total = 0;

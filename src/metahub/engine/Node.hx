@@ -3,7 +3,7 @@ import metahub.schema.Trellis;
 import metahub.schema.Property;
 import metahub.schema.Property_Chain;
 import metahub.schema.Kind;
-import metahub.code.Functions;
+import metahub.code.functions.Functions;
 
 typedef Identity = UInt;
 
@@ -25,7 +25,12 @@ class Node implements INode {
     this.id = id;
     this.trellis = trellis;
 
-    for (property in trellis.properties) {
+		var properties = trellis.get_all_properties();
+
+    for (property in properties) {
+			if (property == trellis.identity_property)
+				continue;
+
       values.push(property.get_default());
       var port = property.type == Kind.list
       ? new List_Port(this, hub, property)
@@ -33,29 +38,17 @@ class Node implements INode {
       ports.push(port);
     }
 
-    if (trellis.is_a(hub.schema.get_trellis("function", hub.metahub_namespace))) {
-			initialize_function();
-		}
+    initialize();
   }
 
-	function initialize_function() {
-		var inputs = get_inputs();
-		for (i in inputs) {
-			var input:Port = cast i;
-			input.on_change.push(run_function);
-		}
-	}
+	private function initialize() {
 
-	function run_function<T>(input:Port, value:T, context:Context) {
-		throw new Exception("No longer used.");
-    var args = get_input_values(context);
-    //var result = Function_Calls.call(trellis.name, args, ports[0].get_type());
-		//ports[0].set_value(result, context);
 	}
 
   public function get_inputs():Array<IPort> {
+		var properties = trellis.get_all_properties();
     var result = new Array<IPort>();
-    for (property in trellis.properties) {
+    for (property in properties) {
       if (property.name != "output") {
         result.push(get_port(property.id));
       }
@@ -118,11 +111,14 @@ class Node implements INode {
     port.set_value(value);
   }
 
-	public function get_input_values(context:Context):List<Dynamic> {
-		var result = new List<Dynamic>();
+	public function get_input_values(context:Context):Array<Dynamic> {
+		var result = new Array<Dynamic>();
 		for (i in 1...ports.length) {
-			var port = get_port(i);
-			var value = port.connections.map(function(d) { return d.get_value(context); });
+			var port:Port = cast get_port(i);
+			var value = port.property.multiple
+			? port.connections.map(function(d) { return d.get_value(context); } )
+			: //port.get_value(context);
+				port.connections[0].get_value(context);
 			//var value = get_port(i).get_value();
 			result.push(value);
 		}

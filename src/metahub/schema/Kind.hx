@@ -6,7 +6,7 @@ package metahub.schema;
 
  @:enum
 abstract Kind(Int) {
-	var void = 0;
+	var any = 0;
   var int = 1;
   var string = 2;
   var reference = 3;

@@ -1,4 +1,4 @@
-package metahub.code;
+package metahub.code.functions;
 
 import metahub.engine.INode;
 import metahub.engine.IPort;
@@ -6,32 +6,23 @@ import metahub.engine.Port;
 import metahub.schema.Kind;
 import metahub.schema.Types;
 
-enum Functions2 {
+enum Functions {
   none;
-  sum;
+
+	// Comparison
+	equals;
+  lesser_than;
+  greater_than;
+  lesser_than_or_equal_to;
+  greater_than_or_equal_to;
+
+	// Operators
+  add;
   subtract;
+	count;
 }
 
 class Function_Calls2 {
-  //public static function call(id:String, args:List<Dynamic>, type:Kind):Dynamic {
-		////trace(Reflect.fields(Function_Calls));
-		//if (!Reflect.hasField(Function_Calls, id))
-			//throw new Exception("Invalid function name " + id + ".");
-//
-		//var func = Reflect.field(Function_Calls, id);
-		//var kind:Dynamic = type;
-		//return Reflect.callMethod(Function_Calls, func, [ args ].concat(kind));
-    ////switch (id) {
-      ////case Functions.sum:
-        ////return sum(args);
-      ////case Functions.subtract:
-        ////return subtract(args);
-////
-      ////default:
-    ////}
-////
-		////throw new Exception("Invalid function id " + id + ".");
-  //}
 
   static function sum(args:Iterable<Dynamic>, type:Kind):Dynamic {
     var total = 0;

@@ -1,8 +1,31 @@
 package metahub.parser;
+import metahub.code.functions.Functions;
 
 @:expose class MetaHub_Context extends Context {
 
-//  public function new() { }
+	private static var function_map:Map<String, Functions>;
+
+  public function new(definition) {
+		super(definition);
+
+		if (function_map == null) {
+			function_map = new Map<String, Functions>();
+			var map = {
+				"+": Functions.add,
+				"-": Functions.subtract,
+
+				"=": Functions.equals,
+				"<": Functions.lesser_than,
+				">": Functions.greater_than,
+				"<=": Functions.lesser_than_or_equal_to,
+				">=": Functions.greater_than_or_equal_to,
+			}
+
+			for (i in Reflect.fields(map)) {
+				function_map[i] = Reflect.field(map, i);
+			}
+		}
+	}
 
   public override function perform_action(name:String, data:Dynamic, match:Match):Dynamic {
     var name = match.pattern.name;
@@ -195,8 +218,11 @@ package metahub.parser;
     return {
 			type: "constraint",
 			path: [ data[0] ],
-			operator: data[2],
-			expression: data[4]
+			expression: {
+				type: "function",
+				"name": Std.string(function_map[data[2]]),
+				"inputs": [data[4]]
+			}
     };
   }
 }

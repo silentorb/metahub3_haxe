@@ -35,6 +35,10 @@ class Local_Symbol implements Symbol {
 		return Layer.engine;
 	}
 
+	public function get_type():Type_Reference {
+		throw new Exception("Local_Symbol.get_type() is not implemented.");
+	}
+
   public function resolve(scope:Scope):Dynamic {
     if (scope_definition.depth == scope.definition.depth)
       return scope.values[index];

@@ -1,7 +1,7 @@
 package metahub.engine;
 
 import metahub.schema.Property;
-import metahub.code.Functions;
+import metahub.code.functions.Functions;
 
 /**
  * ...

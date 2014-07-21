@@ -14,4 +14,8 @@ class Type_Reference {
     var type_id:Kind = cast Reflect.field(Types, name);
     return new Type_Reference(type_id);
   }
+
+	public static function create_from_property(property:Property):Type_Reference {
+		return new Type_Reference(property.type, property.other_trellis);
+  }
 }

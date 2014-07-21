@@ -6,7 +6,7 @@ import metahub.schema.Kind;
 class Block implements Expression {
 
   public var expressions:Array<Expression> = new Array<Expression>();
-  public var type:Type_Reference = new Type_Reference(Kind.void);
+  public var type:Type_Reference = new Type_Reference(Kind.any);
   var scope_definition:Scope_Definition;
 
   public function new(scope_definition:Scope_Definition) {

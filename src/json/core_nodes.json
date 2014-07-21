@@ -13,9 +13,16 @@
           "type": "int"
         }
       }
+		},
+		"float": {
+      "properties": {
+        "output": {
+          "type": "float"
+        }
+      }
     },
     "function": {},
-    "sum": {
+		"int_operation": {
       "parent": "function",
       "properties": {
         "output": {
@@ -27,6 +34,21 @@
           "multiple": "true"
         }
       }
+    },
+		"int_single": {
+      "parent": "function",
+      "properties": {
+        "output": {
+          "type": "int",
+          "multiple": "true"
+        },
+        "input": {
+          "type": "int"
+        }
+      }
+    },
+    "Add_Int": {
+      "parent": "int_operation"
     },
     "subtract": {
       "parent": "function",
@@ -53,6 +75,12 @@
           "multiple": "true"
         }
       }
+    },
+		"Greater_Than_Int": {
+      "parent": "int_single"
+    },
+		"Lesser_Than_Int": {
+      "parent": "int_single"
     }
   }
 }

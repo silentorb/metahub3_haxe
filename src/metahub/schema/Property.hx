@@ -1,5 +1,5 @@
 package metahub.schema;
-import metahub.code.Functions;
+import metahub.code.functions.Functions;
 import metahub.engine.INode;
 import metahub.schema.Trellis;
 import metahub.engine.IPort;

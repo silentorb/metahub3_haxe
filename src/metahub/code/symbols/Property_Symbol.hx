@@ -1,6 +1,7 @@
 package metahub.code.symbols;
 import metahub.code.expressions.Trellis_Scope;
 import metahub.code.references.*;
+import metahub.code.Type_Reference;
 import metahub.engine.IPort;
 import metahub.schema.*;
 import metahub.schema.Property_Chain;
@@ -36,6 +37,10 @@ class Property_Symbol implements ISchema_Symbol {
 
 	public function get_property():Property {
 		return property;
+	}
+
+	public function get_type():Type_Reference {
+		return Type_Reference.create_from_property(property);
 	}
 
 	public function create_reference(path:Array<String>):Reference<ISchema_Symbol> {

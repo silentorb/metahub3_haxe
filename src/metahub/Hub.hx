@@ -1,6 +1,7 @@
 package metahub;
 import haxe.ds.Vector;
 import haxe.xml.Parser;
+import metahub.code.functions.Function_Library;
 import metahub.parser.Definition;
 import metahub.parser.Match;
 import metahub.schema.Load_Settings;
@@ -12,6 +13,8 @@ import metahub.code.Coder;
 import metahub.code.Scope_Definition;
 import metahub.code.Scope;
 import metahub.engine.Node;
+import metahub.code.functions.Functions;
+import metahub.schema.Kind;
 import haxe.Json;
 
 @:expose class Hub {
@@ -22,7 +25,8 @@ import haxe.Json;
   public var parser_definition:metahub.parser.Definition;
 	static var remove_comments = ~/#[^\n]*/g;
 	public var metahub_namespace:Namespace;
-	public var node_factories = new Array<Hub->Int->Trellis->Node>();
+	public var node_factories = new Array < Hub->Int->Trellis->Node > ();
+	public var function_library:Function_Library;
 
   public function new() {
     nodes.push(null);
@@ -35,7 +39,8 @@ import haxe.Json;
     root_scope = new Scope(this, root_scope_definition);
     schema = new Schema();
 		metahub_namespace = schema.add_namespace('metahub');
-    create_functions();
+    load_internal_trellises();
+		function_library = new Function_Library(this);
   }
 
   private function load_parser() {
@@ -58,9 +63,13 @@ import haxe.Json;
 		if (node == null)
 			throw new Exception("Could not find valid factory to create node of type " + trellis.name + ".");
 
-    nodes.push(node);
+		add_node(node);
     return node;
   }
+
+	public function add_node(node:Node) {
+    nodes.push(node);
+	}
 
 	public function get_node(id:Int):Node {
 		if (id < 0 || id >= nodes.length)
@@ -86,13 +95,6 @@ import haxe.Json;
 	public function load_schema_from_object(data:Dynamic, namespace:Namespace, auto_identity:Bool = false) {
     schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
   }
-
-  //public function parse(source:String):Dynamic {
-    //var parser = new parser.MetaHub_Context(parser_definition);
-		//var without_comments = remove_comments.replace(source, '');
-		//trace('without_comments', without_comments);
-    //return parser.parse(without_comments);
-  //}
 
   public function run_data(source:Dynamic) {
     var coder = new Coder(this);
@@ -120,7 +122,7 @@ import haxe.Json;
     return context.parse(without_comments);
 	}
 
-  public function create_functions() {
+  public function load_internal_trellises() {
 		var functions = Macros.insert_file_as_string("json/core_nodes.json");
     var data = haxe.Json.parse(functions);
     schema.load_trellises(data.trellises, new Load_Settings(metahub_namespace));

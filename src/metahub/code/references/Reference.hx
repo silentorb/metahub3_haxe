@@ -1,6 +1,7 @@
 package metahub.code.references;
 import metahub.code.Layer;
 import metahub.code.Scope;
+import metahub.code.Type_Reference;
 import metahub.engine.IPort;
 import metahub.schema.Property_Chain;
 import metahub.code.symbols.*;
@@ -25,6 +26,12 @@ class Reference<S : Symbol> {
 
 	public function get_layer():Layer {
 		return symbol.get_layer();
+	}
+
+	public function get_type_reference():Type_Reference {
+		return chain != null && chain.length > 0
+		? Type_Reference.create_from_property(chain[chain.length - 1])
+		: symbol.get_type();
 	}
 
 	public function resolve(scope:Scope):Dynamic {

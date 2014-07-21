@@ -10,6 +10,7 @@ import metahub.code.expressions.*;
 import metahub.schema.Types;
 import metahub.code.references.*;
 import metahub.code.symbols.*;
+import metahub.code.functions.Functions;
 
 class Coder {
   var hub:Hub;
@@ -18,7 +19,7 @@ class Coder {
     this.hub = hub;
   }
 
-  public function convert(source:Dynamic, scope_definition:Scope_Definition):Expression {
+  public function convert(source:Dynamic, scope_definition:Scope_Definition, type:Type_Reference = null):Expression {
 
     switch(source.type) {
       case 'block':
@@ -34,7 +35,7 @@ class Coder {
       case 'reference':
         return create_reference(source, scope_definition);
       case 'function':
-        return function_expression(source, scope_definition);
+        return function_expression(source, scope_definition, type);
       case 'set':
         return set(source, scope_definition);
 			case 'trellis_scope':
@@ -45,24 +46,19 @@ class Coder {
   }
 
   function constraint(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var expression = convert(source.expression, scope_definition);
-		var operator:Constraint_Operator = cast Constraint.operators.indexOf(source.operator);
+		//var operator:Constraint_Operator = cast Constraint.operators.indexOf(source.operator);
     //var reference = scope_definition.find(source.path);
 		if (scope_definition._this.get_layer() == Layer.schema) {
 			var reference:Reference<ISchema_Symbol> = path_to_schema_reference(source.path, scope_definition);
-			return new metahub.code.expressions.Create_Constraint(reference, operator, expression);
+			var expression = convert(source.expression, scope_definition, reference.get_type_reference());
+			return new metahub.code.expressions.Create_Constraint(reference, expression);
 		}
 		else {
-			var reference:Reference<Local_Symbol> = path_to_engine_reference(source.path, scope_definition);
-			return new metahub.code.expressions.Create_Constraint(reference, operator, expression);
+			throw new Exception("Not currently maintained.");
+			//var reference:Reference<Local_Symbol> = path_to_engine_reference(source.path, scope_definition);
+			//return new metahub.code.expressions.Create_Constraint(reference, operator, expression);
 		}
   }
-
-  //function create_constraint(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    //var expression = convert(source.expression, scope_definition);
-    //var reference = scope_definition.find(source.path);
-    //return new code.expressions.Create_Constraint(reference, expression);
-  //}
 
   function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var new_scope_definition = new Scope_Definition(scope_definition);
@@ -80,7 +76,7 @@ class Coder {
     var type = get_type(source.value);
     return new metahub.code.expressions.Literal(source.value, new Type_Reference(type));
   }
-	
+
 	function get_namespace(path:Array<String>, start:Namespace):Namespace {
 		var current_namespace = start;
 		var i = 0;
@@ -96,7 +92,7 @@ class Coder {
 			}
 			++i;
 		}
-		
+
 		return current_namespace;
 	}
 
@@ -104,7 +100,7 @@ class Coder {
 		var path:Array<String> = source.trellis;
 		if (path.length == 0)
 			throw new Exception("Trellis path is empty for node creation.");
-		
+
 		var namespace = get_namespace(path, hub.schema.root_namespace);
     var trellis = hub.schema.get_trellis(path[path.length - 1], namespace, true);
     var result = new metahub.code.expressions.Create_Node(trellis);
@@ -179,11 +175,14 @@ class Coder {
     throw new Exception("Could not find type.");
   }
 
-  function function_expression(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var trellis = this.hub.schema.get_trellis(source.name, hub.schema.root_namespace);
+  function function_expression(source:Dynamic, scope_definition:Scope_Definition, type:Type_Reference):Expression {
+		if (type == null)
+			throw new Exception("Function expressions do not currently support unspecified return types.");
+
+		var func = Type.createEnum(Functions, source.name);
     var expressions:Array<Dynamic> = source.inputs;
     var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert(e, scope_definition)));
-    return new metahub.code.expressions.Function_Call(trellis, inputs);
+    return new metahub.code.expressions.Function_Call(func, type, inputs);
   }
 
   function set(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -204,9 +203,9 @@ class Coder {
 		var path:Array<String> = source.path;
 		if (path.length == 0)
 			throw new Exception("Trellis path is empty for node creation.");
-		
+
 		var namespace = get_namespace(path, hub.schema.root_namespace);
-		
+
     var new_scope_definition = new Scope_Definition(scope_definition);
 		var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
 		new_scope_definition._this = new Trellis_Symbol(trellis);

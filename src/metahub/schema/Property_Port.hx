@@ -62,8 +62,7 @@ class Property_Port implements IPort {
 	}
 
 	public function update_connections(value:Dynamic, context:Context) {
-		throw new Exception("Property_Port.update_dependents is not implemented.");
-
+		//throw new Exception("Property_Port.update_dependents is not implemented.");
     for (other in connections) {
       value = other.set_value(value, context);
     }

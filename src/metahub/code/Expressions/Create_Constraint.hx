@@ -11,11 +11,9 @@ class Create_Constraint<S> implements Expression {
   public var type:Type_Reference;
   var reference:Reference<S>;
   var expression:Expression;
-	var operator:Constraint_Operator;
 
-  public function new(reference:Reference<S>, operator:Constraint_Operator, expression:Expression) {
+  public function new(reference:Reference<S>, expression:Expression) {
     this.reference = reference;
-		this.operator = operator;
     this.expression = expression;
   }
 
@@ -42,9 +40,9 @@ class Create_Constraint<S> implements Expression {
 			port.connect(other_port);
 			return null;
 		}
-		else {
-
-		}
+		//else {
+//
+		//}
 
 		throw new Exception("Not implemented yet.");
   }

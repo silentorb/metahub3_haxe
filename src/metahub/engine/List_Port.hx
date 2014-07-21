@@ -2,7 +2,7 @@ package metahub.engine;
 
 import metahub.schema.Trellis;
 import metahub.schema.Property;
-import metahub.code.Functions;
+import metahub.code.functions.Functions;
 import metahub.schema.Types;
 
 class List_Port extends Port {

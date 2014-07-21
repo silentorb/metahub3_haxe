@@ -3,7 +3,7 @@ package metahub.engine;
 import metahub.schema.Kind;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
-import metahub.code.Functions;
+import metahub.code.functions.Functions;
 import metahub.schema.Types;
 using metahub.schema.Property_Chain;
 import metahub.engine.Relationship;
@@ -50,17 +50,20 @@ class Port implements IPort {
     if (!property.multiple && _value == new_value)
       return _value;
 
-		//for (connection in connections) {
-			//new_value = connection.set_value(new_value, context);
-		//}
+		for (connection in connections) {
+			new_value = connection.set_value(new_value, context);
+		}
+
+		var old_value = _value;
+    _value = new_value;
 
 		new_value = update_property_connections(new_value, context);
 
 		// Check again if the value is the same now that the value may have been modified by relationships.
-		if (!property.multiple && _value == new_value)
+		if (!property.multiple && old_value == new_value) {
+			_value = new_value;
       return _value;
-
-    _value = new_value;
+		}
 
     if (property.type == Kind.reference) {
       if (property.other_property.type == Kind.list) {
@@ -95,11 +98,11 @@ class Port implements IPort {
 	}
 
   function update_connections(context:Context) {
-		throw new Exception("Base_Port.update_connections is not implemented.");
+		//throw new Exception("Base_Port.update_connections is not implemented.");
 
-    //for (other in connections) {
-      //other.set_value(_value, context);
-    //}
+    for (other in connections) {
+      other.set_value(_value, context);
+    }
   }
 
 	function update_property_connections(new_value:Dynamic, context:Context):Dynamic {

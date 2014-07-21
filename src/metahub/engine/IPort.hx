@@ -1,6 +1,6 @@
 package metahub.engine;
 
-import metahub.code.Functions;
+import metahub.code.functions.Functions;
 import metahub.schema.Kind;
 import metahub.schema.Types;
 import metahub.engine.Constraint_Operator;

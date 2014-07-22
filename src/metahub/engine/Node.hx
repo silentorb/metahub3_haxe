@@ -9,12 +9,10 @@ typedef Identity = UInt;
 
 class Node implements INode {
   public var hub:Hub;
-  var values = new Array<Dynamic>();
+  //var values = new Array<Dynamic>();
   var ports = new Array<IPort>();
   public var id:Identity;
   var trellis:Trellis;
-//  var dependencies = new Array<Dependency>();
-//  var dependents = new Array<Dependency>();
 	public var port_count(get, null):Int;
 	public function get_port_count():Int {
 		return ports.length;
@@ -31,7 +29,7 @@ class Node implements INode {
 			if (property == trellis.identity_property)
 				continue;
 
-      values.push(property.get_default());
+      //values.push(property.get_default());
       var port = property.type == Kind.list
       ? new List_Port(this, hub, property)
       : new Port(this, hub, property, property.get_default());
@@ -74,7 +72,7 @@ class Node implements INode {
 		if (chain.length == 0)
 			throw new Exception("Cannot follow empty property chain.");
 
-		var current_node = this;
+		var current_node:INode = this;
 		var i = 0;
 		for (link in chain) {
 			var port = current_node.get_port(link.id);
@@ -97,18 +95,18 @@ class Node implements INode {
 
   public function get_value(index:Int):Dynamic {
     var port:Port = cast get_port(index);
-    return port.get_value();
+    return port.get_value(null);
   }
 
   public function get_value_by_name(name:String):Dynamic {
     var property = trellis.get_property(name);
     var port:Port = cast ports[property.id];
-    return port.get_value();
+    return port.get_value(null);
   }
 
   public function set_value(index:Int, value:Dynamic) {
     var port:Port = cast ports[index];
-    port.set_value(value);
+    port.set_value(value, null);
   }
 
 	public function get_input_values(context:Context):Array<Dynamic> {

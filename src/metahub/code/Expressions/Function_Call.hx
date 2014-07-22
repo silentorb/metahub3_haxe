@@ -5,6 +5,7 @@ import metahub.schema.Trellis;
 import metahub.engine.Node;
 import metahub.engine.IPort;
 import metahub.engine.Constraint_Operator;
+import metahub.code.functions.Function;
 
 class Function_Call implements Expression {
   public var type:Type_Reference;
@@ -27,8 +28,8 @@ class Function_Call implements Expression {
   public function to_port(scope:Scope):IPort {
 		var hub = scope.hub;
 		var info = hub.function_library.get_function_class(func, type.type);
-		var node = Type.createInstance(info.type, [hub, hub.nodes.length, info.trellis]);
-    hub.add_node(node);
+		var node:Function = Type.createInstance(info.type, [hub, hub.nodes.length, info.trellis]);
+    hub.add_internal_node(node);
 		var expressions = inputs;
     var ports = node.get_inputs();
     var target:IPort = null;

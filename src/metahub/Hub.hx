@@ -12,6 +12,7 @@ import metahub.schema.Property;
 import metahub.code.Coder;
 import metahub.code.Scope_Definition;
 import metahub.code.Scope;
+import metahub.engine.INode;
 import metahub.engine.Node;
 import metahub.code.functions.Functions;
 import metahub.schema.Kind;
@@ -19,6 +20,7 @@ import haxe.Json;
 
 @:expose class Hub {
   public var nodes:Array<Node>= new Array<Node>();
+  public var internal_nodes:Array<INode>= new Array<INode>();
   public var schema:Schema;
   public var root_scope:Scope;
   public var root_scope_definition:Scope_Definition;
@@ -69,6 +71,10 @@ import haxe.Json;
 
 	public function add_node(node:Node) {
     nodes.push(node);
+	}
+
+	public function add_internal_node(node:INode) {
+    internal_nodes.push(node);
 	}
 
 	public function get_node(id:Int):Node {

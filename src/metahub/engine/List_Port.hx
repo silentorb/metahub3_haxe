@@ -7,7 +7,7 @@ import metahub.schema.Types;
 
 class List_Port extends Port {
 
-	public function new(node:INode, hub:Hub, property:Property, value:Dynamic = null) {
+	public function new(node:Node, hub:Hub, property:Property, value:Dynamic = null) {
 		if (value == null)
 			value = new Array<Dynamic>();
 
@@ -36,7 +36,7 @@ class List_Port extends Port {
     //throw new Exception("Not supported.");
   //}
 
-  override public function set_value(new_value:Dynamic, context:Context = null):Dynamic {
+  override public function set_value(new_value:Dynamic, context:Context):Dynamic {
     throw new Exception("Not supported.");
   }
 }

@@ -23,7 +23,7 @@ class Literal implements Expression {
     //var trellis = scope.hub.schema.get_trellis(Std.string(type.type));
     var node = scope.hub.create_node(trellis);
     var port:Port = cast node.get_port(0);
-    port.set_value(value);
+    port.set_value(value, null);
     return port;
   }
 

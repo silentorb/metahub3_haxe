@@ -10,7 +10,7 @@ interface IPort {
   //var parent:INode;
   function connect(other:IPort):Void;
   //var action(get, set):Functions;
-  function get_value(context:Context = null):Dynamic;
-  function set_value(v:Dynamic, context:Context = null):Dynamic;
+  function get_value(context:Context):Dynamic;
+  function set_value(v:Dynamic, context:Context):Dynamic;
 	function get_type():Kind;
 }

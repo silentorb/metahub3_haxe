@@ -1,4 +1,5 @@
 package metahub.engine;
+import metahub.Hub;
 import metahub.schema.Property;
 import metahub.schema.Property_Port;
 
@@ -8,12 +9,12 @@ import metahub.schema.Property_Port;
  */
 
 class Context {
-	public var property_port:Property_Port;
-	public var entry_node:INode;
+	public var node:Node;
+	public var hub:Hub;
 
-	public function new(property_port:Property_Port, entry_node:INode) {
-		this.property_port = property_port;
-		this.entry_node = entry_node;
+	public function new(entry_node:Node, hub:Hub) {
+		this.node = entry_node;
+		this.hub = hub;
 	}
 
 }

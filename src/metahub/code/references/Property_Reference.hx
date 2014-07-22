@@ -19,9 +19,11 @@ class Property_Reference extends Reference<ISchema_Symbol> {
 
 	override public function get_port(scope:Scope):IPort {
 		var property = get_property(scope);
-		var origin_chain = create_chain_to_origin(scope);
-		var port = new Property_Port(property, origin_chain);
-		property.ports.push(port);
+		var port = property.port;
+		if (port == null) {
+			port = property.port = new Property_Port(property);
+		}
+
 		return port;
 	}
 

@@ -15,13 +15,13 @@ import metahub.engine.Relationship;
 class Port implements IPort {
   var _value:Dynamic;
   public var property:Property;
-  public var parent:INode;
+  public var parent:Node;
   public var connections = new Array<IPort>();
 	var hub:Hub;
 	//var _action:Functions = Functions.none;
 	public var on_change = new Array<Port->Dynamic->Context->Void>();
 
-  public function new(node:INode, hub:Hub, property:Property, value:Dynamic = null) {
+  public function new(node:Node, hub:Hub, property:Property, value:Dynamic = null) {
     this.parent = node;
 		this.hub = hub;
     this.property = property;
@@ -37,16 +37,16 @@ class Port implements IPort {
     return property.id;
   }
 
-	public function get_other_node():Node {
+	public function get_other_node():INode {
 		var node_id:Int = cast _value;
 		return hub.get_node(node_id);
 	}
 
-  public function get_value(context:Context = null):Dynamic {
+  public function get_value(context:Context):Dynamic {
     return _value;
   }
 
-  public function set_value(new_value:Dynamic, context:Context = null):Dynamic {
+  public function set_value(new_value:Dynamic, context:Context):Dynamic {
     if (!property.multiple && _value == new_value)
       return _value;
 
@@ -76,11 +76,11 @@ class Port implements IPort {
       }
     }
 
-    if (this.connections != null && this.connections.length > 0) {
-      update_connections(context);
-    }
+    //if (this.connections != null && this.connections.length > 0) {
+      //update_connections(context);
+    //}
 
-		if (property.ports != null && property.ports.length > 0) {
+		if (property.port != null) {
 			update_property_connections(new_value, null);
 		}
 
@@ -106,12 +106,11 @@ class Port implements IPort {
   }
 
 	function update_property_connections(new_value:Dynamic, context:Context):Dynamic {
-    for (port in property.ports) {
-  		var context = new Context(port, parent);
-    //var other:Port = cast node.get_port_from_chain(i);
-      //var other:Port = cast i;
-      new_value = port.enter(new_value, context);
-    }
+		if (property.port == null)
+			return new_value;
+
+		var context = new Context(parent, hub);
+		new_value = property.port.output(new_value, context);
 
 		return new_value;
   }

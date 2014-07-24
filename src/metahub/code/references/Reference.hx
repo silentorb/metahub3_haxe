@@ -1,4 +1,5 @@
 package metahub.code.references;
+import metahub.code.Context_Converter;
 import metahub.code.Layer;
 import metahub.code.Scope;
 import metahub.code.Type_Reference;
@@ -36,6 +37,10 @@ class Reference<S : Symbol> {
 
 	public function resolve(scope:Scope):Dynamic {
 		throw new Exception("Not implemented yet.");
+	}
+
+	public function create_converter(scope:Scope):Context_Converter {
+		return null;
 	}
 
 	//public static function create_from_path(symbol:Symbol, path:Array<String>):Reference {

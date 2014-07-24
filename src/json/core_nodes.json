@@ -81,6 +81,9 @@
     },
 		"Lesser_Than_Int": {
       "parent": "int_single"
+    },
+		"Subtract_Int": {
+      "parent": "int_single"
     }
   }
 }

@@ -47,8 +47,10 @@ class Port implements IPort {
   }
 
   public function set_value(new_value:Dynamic, context:Context):Dynamic {
-    if (!property.multiple && _value == new_value)
-      return _value;
+    if (!property.multiple && _value == new_value) {
+			hub.history.log("attempted " + property.fullname() + "|set_value " + new_value);
+			return _value;
+		}
 
 		for (connection in connections) {
 			new_value = connection.set_value(new_value, context);
@@ -56,6 +58,7 @@ class Port implements IPort {
 
 		var old_value = _value;
     _value = new_value;
+		hub.history.log(property.fullname() + "|set_value " + new_value);
 
 		new_value = update_property_connections(new_value, context);
 

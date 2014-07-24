@@ -20,22 +20,35 @@ class Context_Converter {
 		this.input_property = input_property;
 		this.output_property = output_property;
 
-		input_port = new Signal_Port(kind);
-		output_port = new Signal_Port(kind);
+		input_port = new Signal_Port(kind, function(context) { return output_port.get_external_value(context); } );
+		output_port = new Signal_Port(kind, function(context) { return input_port.get_external_value(context); } );
+
 
 		input_port.on_change.push(function(input:Signal_Port, value:Dynamic, context:Context) {
-			output_port.output(value, create_context(context, input_property));
+			process(output_port, value, input_property, context);
 		});
 
 		output_port.on_change.push(function(input:Signal_Port, value:Dynamic, context:Context) {
-			input_port.output(value, create_context(context, output_property));
+			process(input_port, value, output_property, context);
 		});
 	}
 
-	function create_context(context:Context, property:Property) {
-		var node_id:Int = cast context.node.get_value(property.id);
+	function create_context(context:Context, node_id:Int) {
 		var node = context.hub.get_node(node_id);
 		return new Context(node, context.hub);
+	}
+
+	function process(port:Signal_Port, value:Dynamic, property:Property, context:Context) {
+		if (property.type == Kind.list) {
+			var ids:Array<Int> = cast context.node.get_value(property.id);
+			for (i in ids) {
+				port.output(value, create_context(context, i));
+			}
+		}
+		else {
+			var node_id:Int = cast context.node.get_value(property.id);
+			port.output(value, create_context(context, node_id));
+		}
 	}
 
 }

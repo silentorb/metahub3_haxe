@@ -1,4 +1,6 @@
 package metahub.code.references;
+import metahub.code.Scope;
+import metahub.code.Context_Converter;
 import metahub.code.symbols.Property_Symbol;
 import metahub.engine.IPort;
 import metahub.schema.Property_Port;
@@ -53,4 +55,11 @@ class Property_Reference extends Reference<ISchema_Symbol> {
 		//var symbol.resolve(scope);
 	}
 
+	override public function create_converter(scope:Scope):Context_Converter {
+		var prop = get_property(scope);
+    if (prop.other_property == null)
+      return null;
+
+		return new Context_Converter(prop, prop.other_property, prop.type);
+	}
 }

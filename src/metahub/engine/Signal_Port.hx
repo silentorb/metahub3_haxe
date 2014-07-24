@@ -1,4 +1,5 @@
 package metahub.engine;
+import metahub.code.functions.Function;
 import metahub.schema.Kind;
 
 /**
@@ -10,9 +11,11 @@ class Signal_Port implements IPort{
 	public var on_change = new Array<Signal_Port->Dynamic->Context->Void>();
 	public var multiple:Bool;
 	public var kind:Kind;
+	public var getter:Context->Dynamic;
 
-  public function new(kind:Kind, multiple:Bool = false ) {
+  public function new(kind:Kind, getter:Context->Dynamic, multiple:Bool = false ) {
 		this.kind = kind;
+		this.getter = getter;
 		this.multiple = multiple;
   }
 
@@ -22,6 +25,10 @@ class Signal_Port implements IPort{
   }
 
   public function get_value(context:Context):Dynamic {
+    return getter(context);
+  }
+
+	public function get_external_value(context:Context):Dynamic {
     return multiple
 			? connections.map(function(d) { return d.get_value(context); } )
 			:	connections[0].get_value(context);

@@ -30,6 +30,7 @@ import haxe.Json;
 	public var metahub_namespace:Namespace;
 	public var node_factories = new Array < Hub->Int->Trellis->Node > ();
 	public var function_library:Function_Library;
+	public var history = new History();
 
   public function new() {
     nodes.push(null);

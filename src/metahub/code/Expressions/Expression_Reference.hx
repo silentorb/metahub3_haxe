@@ -23,16 +23,21 @@ class Expression_Reference<S> implements Expression {
 		//throw new Exception("Not supported");
 		var port = reference.get_port(scope);
 		var chain = reference.chain;
-		var converter = null;
-		if (chain.length > 0) {
-			converter = new Context_Converter(chain[0], chain[chain.length - 1], chain[0].type);
+		var converter = reference.create_converter(scope);
+		if (converter != null) {
+			converter.input_port.connect(port);
+			return converter.output_port;
 		}
-		else {
-			return port;
-			//var property_reference:Property_Reference = cast reference;
-			//converter = new Context_Converter(property_reference.get_property(scope));
-		}
-		converter.input_port.connect(port);
-    return converter.output_port;
+
+		return port;
+		//if (chain.length > 0) {
+			//converter = new Context_Converter(chain[0], chain[chain.length - 1], chain[0].type);
+		//}
+		//else {
+			//return port;
+			////var property_reference:Property_Reference = cast reference;
+			////converter = new Context_Converter(property_reference.get_property(scope));
+		//}
+
   }
 }

@@ -25,7 +25,7 @@ class Function implements INode {
 			if (property == trellis.identity_property)
 				continue;
 
-      var port = new Signal_Port(property.type);
+      var port = new Signal_Port(property.type, property.name == "output" ? get_forward : get_reverse);
       ports.push(port);
     }
 		var properties = trellis.get_all_properties();
@@ -63,20 +63,31 @@ class Function implements INode {
 	public function get_input_values(context:Context):Array<Dynamic> {
 		var result = new Array<Dynamic>();
 		for (i in 1...ports.length) {
-			var port:Port = cast get_port(i);
-			result.push(port.get_value(context));
+			var port:Signal_Port = cast get_port(i);
+			result.push(port.get_external_value(context));
 		}
 		return result;
 	}
 
-	function run_forward<T>(input:Signal_Port, value:T, context:Context) {
+	function get_forward(context:Context) {
+		return forward(get_input_values(context));
+	}
+
+	function get_reverse(context:Context) {
+		return get_input_values(context);
+	}
+
+	function run_forward(input:Signal_Port, value:Dynamic, context:Context) {
     var args = get_input_values(context);
-		return forward(args);
+		context.hub.history.log("function " + trellis.name + " forward()" + args);
+		var new_value = forward(args);
+		input.output(new_value, context);
     //var result = Function_Calls.call(trellis.name, args, ports[0].get_type());
 		//ports[0].set_value(result, context);
 	}
 
-	function run_reverse<T>(input:Signal_Port, value:T, context:Context) {
+	function run_reverse(input:Signal_Port, value:Dynamic, context:Context) {
+		context.hub.history.log("function " + trellis.name + " reverse()");
     //var args = [
 			//value,
 			//get_outputs()[0].get_value(context)
@@ -85,6 +96,8 @@ class Function implements INode {
 		if (new_value != value) {
 			input.output(new_value, context);
 		}
+
+		return new_value;
     //var result = Function_Calls.call(trellis.name, args, ports[0].get_type());
 		//ports[0].set_value(result, context);
 	}

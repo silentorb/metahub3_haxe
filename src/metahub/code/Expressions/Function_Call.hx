@@ -27,6 +27,9 @@ class Function_Call implements Expression {
 
   public function to_port(scope:Scope):IPort {
 		var hub = scope.hub;
+		if (func == Functions.equals) {
+			return inputs[0].to_port(scope);
+		}
 		var info = hub.function_library.get_function_class(func, type.type);
 		var node:Function = Type.createInstance(info.type, [hub, hub.nodes.length, info.trellis]);
     hub.add_internal_node(node);

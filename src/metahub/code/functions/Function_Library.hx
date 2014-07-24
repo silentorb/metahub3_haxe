@@ -5,6 +5,7 @@ import metahub.schema.Kind;
 import metahub.code.functions.Add_Int;
 import metahub.code.functions.Greater_Than_Int;
 import metahub.code.functions.Lesser_Than_Int;
+import metahub.code.functions.Count;
 
 /**
  * ...
@@ -39,6 +40,7 @@ class Function_Library{
 		add(Functions.add, "Add_Int");
 		add(Functions.greater_than, "Greater_Than_Int");
 		add(Functions.lesser_than, "Lesser_Than_Int");
+		add(Functions.count, "Count");
 
 		//var map = {
 			//: [ ],

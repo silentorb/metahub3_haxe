@@ -1,7 +1,7 @@
 require('source-map-support').install()
 var buster = require("buster")
 var assert = buster.referee.assert
-var MetaHub = require('../output/nodejs/metahub.js')
+var MetaHub = require('../output/nodejs/metahub.js').metahub
 var fs = require('fs')
 
 var ansiColorizer = require("ansi-colorizer");
@@ -130,7 +130,7 @@ buster.testCase("Parser", {
     console.log(require('util').inspect(data, { showHidden: false, depth: 10 }));
     assert(data);
   },
-  "=>run shorthand trellis constraint": function () {
+  "run shorthand trellis constraint": function () {
     var hub = create_hub();
     hub.load_parser();
     var code = fs.readFileSync('test/general.mh', { encoding: 'ascii' })
@@ -145,5 +145,23 @@ buster.testCase("Parser", {
     assert.equals(book.get_value_by_name('y'), 5)
     assert.equals(boy.get_value_by_name('item_count'), 2)
 
+  },
+  "=>dummy": function () {
+    assert(true)
+
   }
 })
+
+var hub = create_hub();
+hub.load_parser();
+var code = fs.readFileSync('test/general.mh', { encoding: 'ascii' })
+hub.run_code(code);
+
+var boy = hub.nodes[4]
+var sword = hub.nodes[5]
+var book = hub.nodes[6]
+console.log(hub.nodes.map(function(x) { return x ? x.trellis.name : ''}));
+assert.equals(boy.get_value_by_name('x'), 6)
+assert.equals(sword.get_value_by_name('y'), 5)
+assert.equals(book.get_value_by_name('y'), 5)
+assert.equals(boy.get_value_by_name('item_count'), 2)

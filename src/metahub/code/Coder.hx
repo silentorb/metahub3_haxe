@@ -181,7 +181,7 @@ class Coder {
 
 		var func = Type.createEnum(Functions, source.name);
     var expressions:Array<Dynamic> = source.inputs;
-    var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert(e, scope_definition)));
+    var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert(e, scope_definition, type)));
     return new metahub.code.expressions.Function_Call(func, type, inputs);
   }
 

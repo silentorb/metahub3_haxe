@@ -1,1 +1,1 @@
-set TARGET=cpp
+set TARGET=nodejs

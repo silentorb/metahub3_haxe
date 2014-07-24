@@ -1,13 +1,15 @@
-Character (item_count = items:count)
+Character (item_count = items|count)
 Item (y = owner.x - 1)
 
 let boy = new Character { name: 'James' }
 let sword = new Item { name: 'Vorpal Sword', owner: boy }
-#let book2 = Item:filter(name == 'Marloth'):first
+#let book2 = Item|filter(name == 'Marloth')|first
 let book = new Item { name: 'Marloth', owner: boy }
 set boy { x: 6 }
 
-# assert: 
+# assert:
 #  sword.y == 5
 #  book.y == 5
 #  book == book2
+
+# Character|mutual(a,b) = (a.position, b.position)|distance > a.radius + b.radius

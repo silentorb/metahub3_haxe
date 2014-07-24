@@ -63,11 +63,11 @@
         }
       }
     },
-    "count": {
+    "Count": {
       "parent": "function",
       "properties": {
         "output": {
-          "type": "int",
+          "type": "any",
           "multiple": "true"
         },
         "input": {

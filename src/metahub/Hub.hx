@@ -1,6 +1,7 @@
 package metahub;
 import haxe.ds.Vector;
 import haxe.xml.Parser;
+import metahub.code.expressions.Expression;
 import metahub.code.functions.Function_Library;
 import metahub.parser.Definition;
 import metahub.parser.Match;
@@ -102,11 +103,9 @@ import haxe.Json;
     schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
   }
 
-  public function run_data(source:Dynamic) {
+  public function run_data(source:Dynamic):Expression {
     var coder = new Coder(this);
-
-    var expression = coder.convert(source, root_scope_definition);
-    expression.resolve(root_scope);
+    return coder.convert(source, root_scope_definition);
   }
 
   public function run_code(code:String) {
@@ -115,7 +114,8 @@ import haxe.Json;
        throw new Exception("Error parsing code.");
 
     var match:metahub.parser.Match = cast result;
-		run_data(match.get_data());
+		var expression = run_data(match.get_data());
+    expression.resolve(root_scope);
   }
 
 	public function parse_code(code:String) {

@@ -18,8 +18,8 @@ class Create_Constraint<S> implements Expression {
   }
 
   public function resolve(scope:Scope):Dynamic {
-		trace('constraint', Type.getClassName(Type.getClass(reference)));
-		var other_port = expression.to_port(scope);
+		var group = new Group();
+		var other_port = expression.to_port(scope, group);
 		/*
 		if (Type.getClass(reference) == Property_Reference) {
 			var property_reference:Property_Reference = cast reference;
@@ -47,7 +47,7 @@ class Create_Constraint<S> implements Expression {
 		throw new Exception("Not implemented yet.");
   }
 
-  public function to_port(scope:Scope):IPort {
+  public function to_port(scope:Scope, group:Group):IPort {
     return null;
   }
 }

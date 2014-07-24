@@ -28,7 +28,7 @@ class Trellis_Scope implements Expression {
     return null;
   }
 
-  public function to_port(scope:Scope):IPort {
+  public function to_port(scope:Scope, group:Group):IPort {
     return null;
   }
 }

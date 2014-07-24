@@ -17,7 +17,7 @@ class Literal implements Expression {
     return value;
   }
 
-  public function to_port(scope:Scope):IPort {
+  public function to_port(scope:Scope, group:Group):IPort {
 		//var trellis = type.trellis;
 		var trellis = scope.hub.schema.get_trellis(get_type_string(type.type), scope.hub.metahub_namespace);
     //var trellis = scope.hub.schema.get_trellis(Std.string(type.type));

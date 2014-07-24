@@ -25,10 +25,10 @@ class Function_Call implements Expression {
     //return to_port(scope).parent.id;
   }
 
-  public function to_port(scope:Scope):IPort {
+  public function to_port(scope:Scope, group:Group):IPort {
 		var hub = scope.hub;
 		if (func == Functions.equals) {
-			return inputs[0].to_port(scope);
+			return inputs[0].to_port(scope, group);
 		}
 		var info = hub.function_library.get_function_class(func, type.type);
 		var node:Function = Type.createInstance(info.type, [hub, hub.nodes.length, info.trellis]);
@@ -41,7 +41,7 @@ class Function_Call implements Expression {
         target = ports[i];
       }
 
-      var source = expressions[i].to_port(scope);
+      var source = expressions[i].to_port(scope, group);
       target.connect(source);
     }
 

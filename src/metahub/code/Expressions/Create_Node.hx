@@ -25,7 +25,7 @@ class Create_Node implements Expression {
     return node.id;
   }
 
-  public function to_port(scope:Scope):IPort {
+  public function to_port(scope:Scope, group:Group):IPort {
     return null;
   }
 }

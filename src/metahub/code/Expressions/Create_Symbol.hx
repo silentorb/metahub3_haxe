@@ -19,7 +19,7 @@ class Create_Symbol implements Expression {
     return value;
   }
 
-  public function to_port(scope:Scope):IPort {
+  public function to_port(scope:Scope, group:Group):IPort {
    return null;
   }
 }

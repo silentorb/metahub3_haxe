@@ -16,11 +16,11 @@ class Trellis {
   public var name:String;
   public var schema:Schema;
   public var properties:Array<Property> = new Array<Property>();
-  var property_keys:Map<String, Property> = new Map<String, Property>();
-  var parent:Trellis;
+  public var parent:Trellis;
   public var id:Identity;
 	public var identity_property:Property;
 	public var namespace:Namespace;
+  var property_keys:Map<String, Property> = new Map<String, Property>();
 
   public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;
@@ -36,7 +36,7 @@ class Trellis {
     this.properties.push(property);
     return property;
   }
-	
+
 	public function copy_identity(source:Dynamic, target:Dynamic) {
 		var identity_key = identity_property.name;
 		Reflect.setField(target, identity_key, Reflect.field(source, identity_key));
@@ -52,11 +52,11 @@ class Trellis {
     }
     return result;
   }
-	
+
 	public function get_identity(seed:Dynamic) {
 		if (identity_property == null)
 			throw new Exception("This trellis does not have an identity property set.");
-			
+
 		return Reflect.field(seed, identity_property.name);
 	}
 
@@ -67,7 +67,7 @@ class Trellis {
 
     return properties[name];
   }
-	
+
 	public function get_property_or_null(name:String):Property {
     var properties = this.get_all_properties();
     if (!properties.exists(name))
@@ -138,7 +138,7 @@ class Trellis {
 			}
 		}
   }
-	
+
 	  public function initialize2(source:ITrellis_Source) {
     if (source.properties != null) {
       for (j in Reflect.fields(source.properties)) {

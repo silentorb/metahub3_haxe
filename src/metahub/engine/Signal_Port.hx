@@ -6,16 +6,18 @@ import metahub.schema.Kind;
  * ...
  * @author Christopher W. Johnson
  */
-class Signal_Port implements IPort{
+class Signal_Port implements IPort {
   public var connections = new Array<IPort>();
 	public var on_change = new Array<Signal_Port->Dynamic->Context->Void>();
 	public var multiple:Bool;
 	public var kind:Kind;
-	public var getter:Context->Dynamic;
+  public var node:Signal_Node;
+	public var id:Int;
 
-  public function new(kind:Kind, getter:Context->Dynamic, multiple:Bool = false ) {
+  public function new(kind:Kind, id:Int, node:Signal_Node, multiple:Bool = false ) {
 		this.kind = kind;
-		this.getter = getter;
+    this.node = node;
+		this.id = id;
 		this.multiple = multiple;
   }
 
@@ -25,7 +27,9 @@ class Signal_Port implements IPort{
   }
 
   public function get_value(context:Context):Dynamic {
-    return getter(context);
+    return id == 0
+		? node.get_output(context)
+		: node.get_input(context);
   }
 
 	public function get_external_value(context:Context):Dynamic {

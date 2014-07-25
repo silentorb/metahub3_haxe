@@ -8,7 +8,7 @@ typedef Identity = UInt;
  * ...
  * @author Christopher W. Johnson
  */
-class Function implements INode {
+class Function implements INode implements Signal_Node {
 	public var hub:Hub;
   var ports = new Array<Signal_Port>();
   var trellis:Trellis;
@@ -25,7 +25,7 @@ class Function implements INode {
 			if (property == trellis.identity_property)
 				continue;
 
-      var port = new Signal_Port(property.type, property.name == "output" ? get_forward : get_reverse);
+      var port = new Signal_Port(property.type, ports.length, this);
       ports.push(port);
     }
 		var properties = trellis.get_all_properties();
@@ -69,11 +69,11 @@ class Function implements INode {
 		return result;
 	}
 
-	function get_forward(context:Context) {
+	function get_output(context:Context) {
 		return forward(get_input_values(context));
 	}
 
-	function get_reverse(context:Context) {
+	function get_input(context:Context) {
 		return get_input_values(context);
 	}
 
@@ -81,7 +81,7 @@ class Function implements INode {
     var args = get_input_values(context);
 		context.hub.history.log("function " + trellis.name + " forward()" + args);
 		var new_value = forward(args);
-		input.output(new_value, context);
+		output.output(new_value, context);
     //var result = Function_Calls.call(trellis.name, args, ports[0].get_type());
 		//ports[0].set_value(result, context);
 	}

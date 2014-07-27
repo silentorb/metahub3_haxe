@@ -15,6 +15,7 @@ import metahub.code.Scope_Definition;
 import metahub.code.Scope;
 import metahub.engine.INode;
 import metahub.engine.Node;
+import metahub.code.Group;
 import metahub.code.functions.Functions;
 import metahub.schema.Kind;
 import haxe.Json;
@@ -31,6 +32,7 @@ import haxe.Json;
 	public var node_factories = new Array < Hub->Int->Trellis->Node > ();
 	public var function_library:Function_Library;
 	public var history = new History();
+	public var constraints = new Array<Group>();
 
   public function new() {
     nodes.push(null);
@@ -80,7 +82,7 @@ import haxe.Json;
 	}
 
 	public function get_node(id:Int):Node {
-		if (id < 0 || id >= nodes.length)
+		if (id < 1 || id >= nodes.length)
 			throw new Exception("There is no node with an id of " + id + ".");
 
 		return nodes[id];

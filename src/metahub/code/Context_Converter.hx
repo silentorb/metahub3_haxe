@@ -1,8 +1,7 @@
 package metahub.code;
 import metahub.engine.Context;
-import metahub.engine.IPort;
-import metahub.engine.Signal_Port;
-import metahub.engine.Signal_Node;
+import metahub.engine.INode;
+import metahub.engine.General_Port;
 import metahub.schema.Kind;
 import metahub.schema.Property;
 
@@ -10,27 +9,16 @@ import metahub.schema.Property;
  * ...
  * @author Christopher W. Johnson
  */
-class Context_Converter implements Signal_Node {
-	var input_property:Property;
-	public var input_port:Signal_Port;
+class Context_Converter implements INode {
+	public var ports = new Array<General_Port>();
+	public var properties = new Array<Property>();
 
-	var output_property:Property;
-	public var output_port:Signal_Port;
+	public function new(output_property:Property, input_property:Property) {
+		properties.push(output_property);
+		properties.push(input_property);
 
-	public function new(input_property:Property, output_property:Property, kind:Kind) {
-		this.input_property = input_property;
-		this.output_property = output_property;
-
-		output_port = new Signal_Port(kind, 0, this);
-		input_port = new Signal_Port(kind, 1, this);
-
-		input_port.on_change.push(function(input:Signal_Port, value:Dynamic, context:Context) {
-			process(output_port, value, input_property, context);
-		});
-
-		output_port.on_change.push(function(input:Signal_Port, value:Dynamic, context:Context) {
-			process(input_port, value, output_property, context);
-		});
+		ports.push(new General_Port(this, 0));
+		ports.push(new General_Port(this, 1));
 	}
 
 	function create_context(context:Context, node_id:Int) {
@@ -38,25 +26,54 @@ class Context_Converter implements Signal_Node {
 		return new Context(node, context.hub);
 	}
 
-	function get_output(context:Context) {
-		return output_port.get_external_value(context);
+	public function get_port(index:Int):General_Port {
+		#if debug
+		if (index <0 || index > 1)
+			throw new Exception("Invalid port id: " + index);
+		#end
+			
+		return ports[index];
 	}
-
-	function get_input(context:Context) {
-		return input_port.get_external_value(context);
+	
+	public function get_value(index:Int, context:Context):Dynamic {
+		//index = 1 - index;
+		var port = ports[1 - index];
+		var property = properties[index];
+		if (property.type == Kind.list) {
+			var list:Array<Dynamic> = cast context.node.get_value(property.id);
+			return Lambda.array(Lambda.map(list, function(node_id) { 
+				if (node_id == null)
+					throw new Exception("Context_Converter cannot get value for null reference.");
+				
+				return port.get_external_value(create_context(context, node_id));
+			}));
+		}
+		else {
+			trace("get - Converting " + property.fullname() + " to " + property.other_property.fullname());
+			var node_id:Int = cast context.node.get_value(property.id);
+			if (node_id == null)
+				throw new Exception("Context_Converter cannot get value for null reference.");
+				
+			return port.get_external_value(create_context(context, node_id));
+		}
 	}
-
-	function process(port:Signal_Port, value:Dynamic, property:Property, context:Context) {
+	
+	public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		//index = 1 - index;
+		var port = ports[1 - index];
+		var property = properties[index];
+		trace("set - Converting " + property.fullname() + " to " + property.other_property.fullname());		
 		if (property.type == Kind.list) {
 			var ids:Array<Int> = cast context.node.get_value(property.id);
 			for (i in ids) {
-				port.output(value, create_context(context, i));
+				if (i > 0)
+					port.set_external_value(value, create_context(context, i));
 			}
 		}
 		else {
 			var node_id:Int = cast context.node.get_value(property.id);
-			port.output(value, create_context(context, node_id));
+			if (node_id > 0)
+				port.set_external_value(value, create_context(context, node_id));
 		}
 	}
-
 }

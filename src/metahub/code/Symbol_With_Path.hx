@@ -1,7 +1,7 @@
 package metahub.code;
 import metahub.schema.Trellis;
 import metahub.engine.Node;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 import metahub.schema.Property_Chain;
 /*
 class Symbol_With_Path2 implements Symbol {
@@ -20,7 +20,7 @@ class Symbol_With_Path2 implements Symbol {
     //return reference;
   //}
 
-  public function get_port(scope:Scope, path:Property_Chain = null):IPort {
+  public function get_port(scope:Scope, path:Property_Chain = null):Port {
 		throw new Exception("Not supported");
 		//return symbol.get_port(scope, property_path);
     //var node = get_node(scope, path);

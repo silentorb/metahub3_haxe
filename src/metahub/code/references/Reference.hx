@@ -3,7 +3,7 @@ import metahub.code.Context_Converter;
 import metahub.code.Layer;
 import metahub.code.Scope;
 import metahub.code.Type_Reference;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 import metahub.schema.Property_Chain;
 import metahub.code.symbols.*;
 
@@ -21,7 +21,7 @@ class Reference<S : Symbol> {
 		this.chain = chain;
 	}
 
-	public function get_port(scope:Scope):IPort {
+	public function get_port(scope:Scope):General_Port {
 		throw new Exception("Abstract class.  Not implemented.");
 	}
 

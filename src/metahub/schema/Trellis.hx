@@ -1,8 +1,8 @@
 package metahub.schema;
+import metahub.engine.Context;
 import metahub.engine.INode;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 import metahub.engine.Node.Identity;
-import Exception;
 import metahub.schema.Property;
 
 typedef ITrellis_Source = {
@@ -12,15 +12,18 @@ typedef ITrellis_Source = {
 	?primary_key:String
 }
 
-class Trellis {
+class Trellis implements INode {
   public var name:String;
   public var schema:Schema;
-  public var properties:Array<Property> = new Array<Property>();
-  public var parent:Trellis;
+  var core_properties:Array<Property> = new Array<Property>();
+  var all_properties:Array<Property>;
+	public var parent:Trellis;
   public var id:Identity;
 	public var identity_property:Property;
 	public var namespace:Namespace;
   var property_keys:Map<String, Property> = new Map<String, Property>();
+	var ports = new Array<General_Port>();
+	public var properties = new Array<Property>();
 
   public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;
@@ -32,8 +35,10 @@ class Trellis {
   public function add_property(name:String, source:IProperty_Source):Property {
     var property = new Property(name, source, this);
     this.property_keys[name] = property;
-    property.id = this.properties.length;
-    this.properties.push(property);
+    property.id = this.core_properties.length;
+    core_properties.push(property);
+		properties.push(property);
+		ports.push(new General_Port(this, ports.length));
     return property;
   }
 
@@ -46,7 +51,7 @@ class Trellis {
     var result = new Map<String, Property>();
     var tree = this.get_tree();
     for (trellis in tree) {
-      for (property in trellis.properties) {
+      for (property in trellis.core_properties) {
         result[property.name] = property;
       }
     }
@@ -76,12 +81,25 @@ class Trellis {
     return properties[name];
   }
 
-  public function get_value(index:Int):Dynamic {
-		throw new Exception("Cannot get value of a trellis property.");
+  public function get_value(index:Int, context:Context):Dynamic {
+		return context.node.get_value(index);
 	}
 
-  public function set_value(index:Int, value:Dynamic):Void {
-		throw new Exception("Cannot set value of a trellis property.");
+  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		if (context.node.trellis.id != id)
+			throw new Exception("Type mismatch: a " + context.node.trellis.name + " node was passed to trellis " + name + ".");
+			
+		context.node.set_value(index, value, source);
+	}
+	
+	 public function set_external_value(index:Int, value:Dynamic, context:Context, source:General_Port) {
+		var port = ports[index];
+		for (connection in port.connections) {
+			if (connection == source)
+				continue;
+				
+			connection.set_node_value(value, context, port);
+		}
 	}
 
   public function get_tree():Array<Trellis> {
@@ -156,4 +174,8 @@ class Trellis {
 //
 //    this.identity = parent.identity.map((x) => x.clone(this))
   }
+	
+	public function get_port(index:Int):General_Port {
+		return ports[index];
+	}
 }

@@ -2,7 +2,6 @@ package metahub.schema;
 import metahub.code.functions.Functions;
 import metahub.engine.INode;
 import metahub.schema.Trellis;
-import metahub.engine.IPort;
 
 typedef IProperty_Source = {
 	type:String,
@@ -23,7 +22,6 @@ typedef IProperty_Source = {
   public var other_trellis:Trellis;
   public var other_property:Property;
   public var multiple:Bool = false;
-  public var port:Property_Port;
 
   public function new(name:String, source:IProperty_Source, trellis:Trellis) {
     this.type = cast Reflect.field(Kind, source.type);

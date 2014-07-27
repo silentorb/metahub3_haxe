@@ -6,8 +6,9 @@ import metahub.schema.Kind;
  * ...
  * @author Christopher W. Johnson
  */
-class Signal_Port implements IPort {
-  public var connections = new Array<IPort>();
+/*
+class Signal_Port {
+  public var connections = new Array<Port>();
 	public var on_change = new Array<Signal_Port->Dynamic->Context->Void>();
 	public var multiple:Bool;
 	public var kind:Kind;
@@ -57,4 +58,4 @@ class Signal_Port implements IPort {
 	public function get_type():Kind {
 		return kind;
 	}
-}
+}*/

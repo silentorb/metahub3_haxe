@@ -2,8 +2,8 @@ package metahub.code.symbols;
 
 import metahub.code.references.*;
 import metahub.engine.INode;
-import metahub.engine.IPort;
 import metahub.engine.Node;
+import metahub.engine.Port;
 import metahub.schema.Trellis;
 import metahub.schema.Property_Chain;
 import metahub.schema.Kind;
@@ -50,12 +50,12 @@ class Local_Symbol implements Symbol {
     return resolve(scope.parent);
   }
 
-	public function get_port(scope:Scope, path:Property_Chain = null):IPort {
+	public function get_port(scope:Scope, path:Property_Chain = null):Port {
 		var node = get_node2(scope, path);
     return node.get_port(path[path.length - 1].id);
   }
 
-  function get_node2(scope:Scope, path:Property_Chain):INode {
+  function get_node2(scope:Scope, path:Property_Chain):Node {
     var node = get_node(scope);
     var nodes = scope.hub.nodes;
     var i = 0;

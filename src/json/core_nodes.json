@@ -22,48 +22,46 @@
       }
     },
     "function": {},
-		"int_operation": {
+		"int1": {
       "parent": "function",
       "properties": {
         "output": {
           "type": "int",
           "multiple": "true"
         },
-        "input": {
-          "type": "int",
-          "multiple": "true"
+        "first": {
+          "type": "int"
         }
       }
     },
-		"int_single": {
+		"int2": {
       "parent": "function",
       "properties": {
         "output": {
           "type": "int",
           "multiple": "true"
         },
-        "input": {
+        "first": {
+          "type": "int"
+        },
+        "second": {
           "type": "int"
         }
       }
     },
     "Add_Int": {
-      "parent": "int_operation"
+      "parent": "int2"
     },
-    "subtract": {
-      "parent": "function",
-      "properties": {
-        "output": {
-          "type": "int",
-          "multiple": "true"
-        },
-        "input": {
-          "type": "int",
-          "multiple": "true"
-        }
-      }
+		"Subtract_Int": {
+      "parent": "int2"
     },
-    "Count": {
+		"Greater_Than_Int": {
+      "parent": "int1"
+    },
+		"Lesser_Than_Int": {
+      "parent": "int1"
+    },
+		"Count": {
       "parent": "function",
       "properties": {
         "output": {
@@ -75,15 +73,6 @@
           "multiple": "true"
         }
       }
-    },
-		"Greater_Than_Int": {
-      "parent": "int_single"
-    },
-		"Lesser_Than_Int": {
-      "parent": "int_single"
-    },
-		"Subtract_Int": {
-      "parent": "int_single"
     }
   }
 }

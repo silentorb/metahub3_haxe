@@ -1,6 +1,6 @@
 package metahub.code.expressions;
 import metahub.code.symbols.Local_Symbol;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 
 class Create_Symbol implements Expression {
   public var symbol:Local_Symbol;
@@ -19,7 +19,7 @@ class Create_Symbol implements Expression {
     return value;
   }
 
-  public function to_port(scope:Scope, group:Group):IPort {
+  public function to_port(scope:Scope, group:Group):General_Port {
    return null;
   }
 }

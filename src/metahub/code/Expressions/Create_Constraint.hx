@@ -4,7 +4,7 @@ import metahub.code.references.Property_Reference;
 import metahub.code.references.Reference;
 import metahub.code.symbols.Property_Symbol;
 import metahub.engine.Constraint_Operator;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 import metahub.code.reference.*;
 
 class Create_Constraint<S> implements Expression {
@@ -19,6 +19,7 @@ class Create_Constraint<S> implements Expression {
 
   public function resolve(scope:Scope):Dynamic {
 		var group = new Group();
+		scope.hub.constraints.push(group);
 		var other_port = expression.to_port(scope, group);
 		/*
 		if (Type.getClass(reference) == Property_Reference) {
@@ -47,7 +48,7 @@ class Create_Constraint<S> implements Expression {
 		throw new Exception("Not implemented yet.");
   }
 
-  public function to_port(scope:Scope, group:Group):IPort {
+  public function to_port(scope:Scope, group:Group):General_Port {
     return null;
   }
 }

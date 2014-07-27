@@ -1,8 +1,8 @@
 package metahub.code.functions;
 
 import metahub.engine.INode;
-import metahub.engine.IPort;
-import metahub.engine.Port;
+import metahub.engine.General_Port;
+import metahub.engine.General_Port;
 import metahub.schema.Kind;
 import metahub.schema.Types;
 

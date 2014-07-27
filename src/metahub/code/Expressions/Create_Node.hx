@@ -1,7 +1,7 @@
 package metahub.code.expressions;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 import metahub.schema.Kind;
 
 class Create_Node implements Expression {
@@ -25,7 +25,7 @@ class Create_Node implements Expression {
     return node.id;
   }
 
-  public function to_port(scope:Scope, group:Group):IPort {
+  public function to_port(scope:Scope, group:Group):General_Port {
     return null;
   }
 }

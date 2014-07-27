@@ -2,7 +2,7 @@ package metahub.code.expressions;
 import metahub.code.symbols.Local_Symbol;
 import metahub.engine.INode;
 import metahub.engine.Node;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 
 class Assignment {
   var index:Int;
@@ -40,7 +40,7 @@ class Set implements Expression {
     return null;
   }
 
-  public function to_port(scope:Scope, group:Group):IPort {
+  public function to_port(scope:Scope, group:Group):General_Port {
     return null;
   }
 }

@@ -1,6 +1,7 @@
 package metahub.code.expressions;
-import metahub.engine.IPort;
-import metahub.engine.Port;
+import metahub.engine.General_Port;
+import metahub.engine.General_Port;
+import metahub.engine.Literal_Node;
 import metahub.schema.Kind;
 import metahub.schema.Types;
 
@@ -17,14 +18,14 @@ class Literal implements Expression {
     return value;
   }
 
-  public function to_port(scope:Scope, group:Group):IPort {
+  public function to_port(scope:Scope, group:Group):General_Port {
 		//var trellis = type.trellis;
-		var trellis = scope.hub.schema.get_trellis(get_type_string(type.type), scope.hub.metahub_namespace);
+		//var trellis = scope.hub.schema.get_trellis(get_type_string(type.type), scope.hub.metahub_namespace);
     //var trellis = scope.hub.schema.get_trellis(Std.string(type.type));
-    var node = scope.hub.create_node(trellis);
-    var port:Port = cast node.get_port(0);
-    port.set_value(value, null);
-    return port;
+    //var node = scope.hub.create_node(trellis);
+		var node = new Literal_Node(value);
+		group.nodes.unshift(node);
+    return node.get_port(0);
   }
 
 	static function get_type_string(id:Kind) {

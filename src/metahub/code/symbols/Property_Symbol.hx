@@ -2,7 +2,7 @@ package metahub.code.symbols;
 import metahub.code.expressions.Trellis_Scope;
 import metahub.code.references.*;
 import metahub.code.Type_Reference;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 import metahub.schema.*;
 import metahub.schema.Property_Chain;
 
@@ -14,7 +14,7 @@ class Property_Symbol implements ISchema_Symbol {
 		this.property = property;
 	}
 
-	public function get_port(scope:Scope, path:Property_Chain = null):IPort {
+	public function get_port(scope:Scope, path:Property_Chain = null):General_Port {
     throw new Exception("Not supported");
 		//return property;
   }

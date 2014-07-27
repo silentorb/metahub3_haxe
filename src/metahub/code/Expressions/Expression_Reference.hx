@@ -1,7 +1,7 @@
 package metahub.code.expressions;
 import metahub.code.Context_Converter;
 import metahub.code.references.*;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 
 import metahub.schema.Trellis;
 import metahub.engine.Node;
@@ -18,17 +18,18 @@ class Expression_Reference<S> implements Expression {
     return reference.resolve(scope).id;
   }
 
-  public function to_port(scope:Scope, group:Group):IPort {
+  public function to_port(scope:Scope, group:Group):General_Port {
 		//if (reference.get_layer() ==
 		//throw new Exception("Not supported");
 		var port = reference.get_port(scope);
 		var chain = reference.chain;
 		var converter = reference.create_converter(scope);
 		if (converter != null) {
-			converter.input_port.connect(port);
-			return converter.output_port;
+			converter.ports[1].connect(port);
+			port = converter.ports[0];
 		}
 
+		group.nodes.unshift(port.node);
 		return port;
 		//if (chain.length > 0) {
 			//converter = new Context_Converter(chain[0], chain[chain.length - 1], chain[0].type);

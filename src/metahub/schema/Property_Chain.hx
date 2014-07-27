@@ -42,20 +42,21 @@ class Property_Chain_Helper {
 //
 		//return node;
 	//}
-
+/*
 	public static function perform(chain:Property_Chain, node:Node, hub:Hub, action, start:Int = 0) {
 		for (i in start...chain.length) {
 			var link = chain[i];
 			if (link.type == Kind.list) {
-				var list_port:List_Port = cast node.get_port(link.id);
-				var array = list_port.get_array();
-				for (j in array) {
-					perform(chain, hub.get_node(j), hub, action, i + 1);
-				}
-				return;
+				throw new Exception("Property_Chain.perform is not implemented for lists.");
+				//var list_port:List_Port = cast node.get_port(link.id);
+				//var array = list_port.get_array();
+				//for (j in array) {
+					//perform(chain, hub.get_node(j), hub, action, i + 1);
+				//}
+				//return;
 			}
 			else if (link.type == Kind.reference) {
-				var id = node.get_value(link.id);
+				var id = node.get_value(link.id, null);
 				node = hub.nodes[id];
 			}
 			else {
@@ -66,6 +67,6 @@ class Property_Chain_Helper {
 
 		action(node);
 	}
-
+*/
 }
 

@@ -4,7 +4,7 @@ import metahub.schema.Trellis;
 import metahub.schema.Property;
 import metahub.code.functions.Functions;
 import metahub.schema.Types;
-
+/*
 class List_Port extends Port {
 
 	public function new(node:Node, hub:Hub, property:Property, value:Dynamic = null) {
@@ -39,4 +39,4 @@ class List_Port extends Port {
   override public function set_value(new_value:Dynamic, context:Context):Dynamic {
     throw new Exception("Not supported.");
   }
-}
+}*/

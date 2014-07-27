@@ -1,6 +1,6 @@
 package metahub.code.expressions;
 import metahub.schema.Property;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 import metahub.schema.Kind;
 
 class Block implements Expression {
@@ -22,7 +22,7 @@ class Block implements Expression {
     return null;
   }
 
-  public function to_port(scope:Scope, group:Group):IPort {
+  public function to_port(scope:Scope, group:Group):General_Port {
     return null;
   }
 }

@@ -6,6 +6,7 @@ import metahub.schema.Kind;
  * ...
  * @author Christopher W. Johnson
  */
+/*
 class Relationship2
 {
 	public var dependent:IPort;
@@ -72,4 +73,4 @@ class Relationship2
 				throw new Exception("Operator " + operator + " is not yet supported.");
 		}
 	}
-}
+}*/

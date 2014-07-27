@@ -17,6 +17,7 @@ class Schema {
 	}
 
   function add_trellis(name:String, trellis:Trellis):Trellis {
+		trellis.id = trellises.length;
     trellises.push(trellis);
     return trellis;
   }

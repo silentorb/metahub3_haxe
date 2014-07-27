@@ -1,6 +1,6 @@
 package metahub.code.references;
 import metahub.code.symbols.Local_Symbol;
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 
 /**
  * ...
@@ -9,7 +9,7 @@ import metahub.engine.IPort;
 
 class Port_Reference extends Reference<Local_Symbol> {
 
-	override public function get_port(scope:Scope):IPort {
+	override public function get_port(scope:Scope):General_Port {
 		throw new Exception("Not implemented yet.");
 	}
 

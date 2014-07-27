@@ -1,6 +1,6 @@
 package metahub.code.expressions;
 
-import metahub.engine.IPort;
+import metahub.engine.General_Port;
 import metahub.schema.Trellis;
 
 class Trellis_Constraint implements Expression {
@@ -21,7 +21,7 @@ class Trellis_Constraint implements Expression {
     return null;
   }
 
-  public function to_port(scope:Scope):IPort {
+  public function to_port(scope:Scope):General_Port {
     return null;
   }
 }

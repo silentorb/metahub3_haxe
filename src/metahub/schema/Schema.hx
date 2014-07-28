@@ -55,14 +55,14 @@ class Schema {
 // Initialize parents
     for (name in Reflect.fields(trellises)) {
       source = Reflect.field(trellises, name);
-      trellis =  namespace.trellises[name];
+      trellis = namespace.trellises[name];
       trellis.initialize1(source, namespace);
     }
 
 		// Connect everything together
     for (name in Reflect.fields(trellises)) {
       source = Reflect.field(trellises, name);
-      trellis =  namespace.trellises[name];
+      trellis = namespace.trellises[name];
       trellis.initialize2(source);
     }
   }

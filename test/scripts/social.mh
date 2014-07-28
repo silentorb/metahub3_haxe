@@ -1,0 +1,8 @@
+Feed (
+  relevance = post.likes|filter(l => l.friends|contains(post.user))|length + (post.author in user.friends)|int
+  relevance > 0
+)
+
+Post (
+  feeds|greedy
+)

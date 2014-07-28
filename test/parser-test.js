@@ -136,9 +136,9 @@ buster.testCase("Parser", {
     var code = fs.readFileSync('test/general.mh', { encoding: 'ascii' })
     hub.run_code(code);
 
-    var boy = hub.nodes[4]
-    var sword = hub.nodes[5]
-    var book = hub.nodes[6]
+    var boy = hub.nodes[1]
+    var sword = hub.nodes[2]
+    var book = hub.nodes[3]
     console.log(hub.nodes.map(function(x) { return x ? x.trellis.name : ''}));
     assert.equals(boy.get_value_by_name('x'), 6)
     assert.equals(sword.get_value_by_name('y'), 5)
@@ -146,12 +146,12 @@ buster.testCase("Parser", {
     assert.equals(boy.get_value_by_name('item_count'), 2)
 
   },
-  "=>dummy": function () {
+  "dummy": function () {
     assert(true)
 
   }
 })
-
+/*
 var hub = create_hub();
 hub.load_parser();
 var code = fs.readFileSync('test/general.mh', { encoding: 'ascii' })
@@ -164,4 +164,4 @@ console.log(hub.nodes.map(function(x) { return x ? x.trellis.name : ''}));
 assert.equals(boy.get_value_by_name('x'), 6)
 assert.equals(sword.get_value_by_name('y'), 5)
 assert.equals(book.get_value_by_name('y'), 5)
-assert.equals(boy.get_value_by_name('item_count'), 2)
+assert.equals(boy.get_value_by_name('item_count'), 2)*/

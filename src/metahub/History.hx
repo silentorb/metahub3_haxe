@@ -6,12 +6,15 @@ package metahub;
  */
 class History {
 
+	public var print_logs = false;
+
 	public function new() {
 
 	}
 
 	public function log(message:String) {
-		trace(message);
+		if (print_logs)
+			trace(message);
 	}
 
 }

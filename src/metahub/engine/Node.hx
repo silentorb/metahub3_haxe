@@ -29,7 +29,7 @@ class Node {
 
       //values.push(property.get_default());
       var port = new Port(this, property.id);
-      ports.push(port);			
+      ports.push(port);
     }
 
     initialize();
@@ -41,19 +41,19 @@ class Node {
 	public function get_port_count():Int {
 		return ports.length;
 	}
-	
+
 	public function get_default_value(property:Property):Dynamic {
-		switch (property.type) 
+		switch (property.type)
 		{
 			case Kind.list:
 				return new Array<Dynamic>();
-				
+
 			case Kind.int:
 				return 0;
-				
+
 			case Kind.float:
 				return 0.0;
-				
+
 			case Kind.reference:
 				return 0;
 
@@ -62,7 +62,7 @@ class Node {
 
 			case Kind.bool:
 				return false;
-				
+
 			default:
 				throw new Exception("No default is implemented for type " + property.type + ".");
 		}
@@ -131,20 +131,23 @@ class Node {
 		var property = trellis.properties[index];
 		if (property.type == Kind.list)
 			throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
-	
+
 		if (!property.multiple && old_value == value) {
 			hub.history.log("attempted " + property.fullname() + "|set_value " + value);
 			return;
 		}
 
 		hub.set_entry_node(this);
-		
+
 		values[index] = value;
 		hub.history.log(property.fullname() + "|set_value " + value);
-		
+
 		var context = new Context(this, hub);
-		trellis.set_external_value(index, value, context, source);
-		
+		var tree = trellis.get_tree();
+		for (t in tree) {
+			t.set_external_value(index, value, context, source);
+		}
+
 		if (property.type == Kind.reference) {
       if (property.other_property.type == Kind.list) {
         var other_node = hub.get_node(value);
@@ -155,23 +158,23 @@ class Node {
 
       }
     }
-		
+
 		hub.run_change_queue(this);
   }
-	
+
 	public function add_item(index:Int, value:Dynamic) {
 		var port = ports[index];
 		var property = trellis.properties[index];
 		if (property.type != Kind.list)
 			throw new Exception("Cannot add items to " + property.fullname + " because it is not a list.");
-			
+
 		var list:Array<Dynamic> = cast values[index];
 		list.push(value);
 		hub.history.log(property.fullname() + "|add_item " + value);
-		
+
 		var context = new Context(this, hub);
 		trellis.set_external_value(index, value, context, null);
-		
+
 		if (property.other_property.type == Kind.reference) {
 			var other_node = hub.get_node(value);
 			if (other_node.get_value(property.other_property.id) != id)

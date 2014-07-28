@@ -1,0 +1,57 @@
+{
+  "trellises": {
+    "user": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "likes": {
+          "type": "list",
+          "trellis": "post"
+        },
+        "friends": {
+          "type": "list",
+          "trellis": "user"
+        },
+        "feeds": {
+          "type": "list",
+          "trellis": "feed"
+        }
+      }
+    },
+    "post": {
+      "properties": {
+        "author": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "likes": {
+          "type": "list",
+          "trellis": "user"
+        },
+        "feeds": {
+          "type": "list",
+          "trellis": "feed"
+        }
+      }
+    },
+    "feed": {
+      "properties": {
+        "user": {
+          "type": "reference",
+          "trellis": "user"
+        },
+        "post": {
+          "type": "reference",
+          "trellis": "post"
+        },
+        "relevance": {
+          "type": "int"
+        }
+      }
+    }
+  }
+
+}

@@ -38,12 +38,34 @@ class Function implements INode {
 	}
 	
 	public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		if (source == ports[0]) {
+			for (i in 0...ports.length) {
+				ports[i].set_external_value(value, context);			
+			}
+			return;
+		}
+		
 		if (index == 1) {
 			var new_value = run_forward(context);
-			ports[0].set_external_value(new_value, context);
+			if (new_value != value) {
+				hub.add_change(this, index, new_value, context, ports[0]);
+			}
+			else {
+				ports[0].set_external_value(new_value, context);
+			}
 		}
-		else
-			throw new Exception("Not implemented 367.");
+		else {
+			var new_value = run_reverse(value, context);
+			if (new_value != value) {
+				hub.add_change(this, index, new_value, context, ports[0]);
+			}
+			else {
+				for (i in 1...ports.length) {
+					ports[i].set_external_value(new_value, context);			
+				}
+			//throw new Exception("Not implemented 367.");
+			}
+		}
 	}
 
   public function get_inputs():Array<General_Port> {
@@ -84,15 +106,11 @@ class Function implements INode {
 		//ports[0].set_value(result, context);
 	}
 
-	function run_reverse(input:General_Port, value:Dynamic, context:Context) {
+	function run_reverse(value:Dynamic, context:Context) {
 		context.hub.history.log("function " + trellis.name + " reverse()");
-		throw new Exception("Function.run_reverse Not implemented.");
-		//var new_value = reverse(value, get_input_values(context));
-		//if (new_value != value) {
-			//input.output(new_value, context);
-		//}
-//
-		//return new_value;
+		//throw new Exception("Function.run_reverse Not implemented.");
+		
+		return reverse(value, get_input_values(context));
 	}
 
 	private function forward(args:Array<Dynamic>):Dynamic {

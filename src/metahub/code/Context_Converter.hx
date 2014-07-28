@@ -42,7 +42,7 @@ class Context_Converter implements INode {
 		if (property.type == Kind.list) {
 			var list:Array<Dynamic> = cast context.node.get_value(property.id);
 			return Lambda.array(Lambda.map(list, function(node_id) { 
-				if (node_id == null)
+				if (node_id == 0)
 					throw new Exception("Context_Converter cannot get value for null reference.");
 				
 				return port.get_external_value(create_context(context, node_id));
@@ -51,7 +51,7 @@ class Context_Converter implements INode {
 		else {
 			trace("get - Converting " + property.fullname() + " to " + property.other_property.fullname());
 			var node_id:Int = cast context.node.get_value(property.id);
-			if (node_id == null)
+			if (node_id == 0)
 				throw new Exception("Context_Converter cannot get value for null reference.");
 				
 			return port.get_external_value(create_context(context, node_id));

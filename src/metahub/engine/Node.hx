@@ -131,12 +131,14 @@ class Node {
 		var property = trellis.properties[index];
 		if (property.type == Kind.list)
 			throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
-		
+	
 		if (!property.multiple && old_value == value) {
 			hub.history.log("attempted " + property.fullname() + "|set_value " + value);
 			return;
 		}
 
+		hub.set_entry_node(this);
+		
 		values[index] = value;
 		hub.history.log(property.fullname() + "|set_value " + value);
 		
@@ -153,6 +155,8 @@ class Node {
 
       }
     }
+		
+		hub.run_change_queue(this);
   }
 	
 	public function add_item(index:Int, value:Dynamic) {

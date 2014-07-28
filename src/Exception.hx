@@ -31,6 +31,7 @@ class Exception {
 	public var code:Dynamic;
 
 	public function new(message:String, code:Dynamic = null) {
+		trace(message);
 		this.message = message;
 		this.code = code;
 	}

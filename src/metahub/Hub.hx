@@ -1,8 +1,9 @@
 package metahub;
-import haxe.ds.Vector;
 import haxe.xml.Parser;
 import metahub.code.expressions.Expression;
 import metahub.code.functions.Function_Library;
+import metahub.engine.Context;
+import metahub.engine.General_Port;
 import metahub.parser.Definition;
 import metahub.parser.Match;
 import metahub.schema.Load_Settings;
@@ -15,6 +16,7 @@ import metahub.code.Scope_Definition;
 import metahub.code.Scope;
 import metahub.engine.INode;
 import metahub.engine.Node;
+import metahub.engine.Change;
 import metahub.code.Group;
 import metahub.code.functions.Functions;
 import metahub.schema.Kind;
@@ -33,6 +35,9 @@ import haxe.Json;
 	public var function_library:Function_Library;
 	public var history = new History();
 	public var constraints = new Array<Group>();
+	var queue = new Array<Change>();
+	var entry_node:Node = null;
+	public var max_steps = 100;
 
   public function new() {
     nodes.push(null);
@@ -48,6 +53,42 @@ import haxe.Json;
     load_internal_trellises();
 		function_library = new Function_Library(this);
   }
+	
+	public function add_change(node:INode, index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		var i = queue.length;
+		while (--i >= 0) {
+			if (queue[i].node == node) {
+				queue.splice(i, 1);
+			}
+		}
+		var change = new Change(node, index, value, context, source);
+		queue.push(change);
+	}
+	
+	public function set_entry_node(node:Node) {
+		if (entry_node == null)
+			entry_node = node;
+	}
+	
+	//public function unset_entry_node(node:Node) {
+		//if (entry_node == node)
+			//entry_node = null;		
+	//}
+	
+	public function run_change_queue(node:Node) {
+		if (entry_node != node)
+			return;		
+
+		var steps = 0;
+		while (queue.length > 0) {
+			var change = queue.shift();
+			change.run();
+			if (++steps > max_steps)
+				throw new Exception("Max steps of " + max_steps + " was reached.");
+		}
+		
+		entry_node = null;
+	}
 
   private function load_parser() {
     var boot_definition = new metahub.parser.Definition();

@@ -53,7 +53,7 @@ import haxe.Json;
     load_internal_trellises();
 		function_library = new Function_Library(this);
   }
-	
+
 	public function add_change(node:INode, index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		var i = queue.length;
 		while (--i >= 0) {
@@ -64,20 +64,20 @@ import haxe.Json;
 		var change = new Change(node, index, value, context, source);
 		queue.push(change);
 	}
-	
+
 	public function set_entry_node(node:Node) {
 		if (entry_node == null)
 			entry_node = node;
 	}
-	
+
 	//public function unset_entry_node(node:Node) {
 		//if (entry_node == node)
-			//entry_node = null;		
+			//entry_node = null;
 	//}
-	
+
 	public function run_change_queue(node:Node) {
 		if (entry_node != node)
-			return;		
+			return;
 
 		var steps = 0;
 		while (queue.length > 0) {
@@ -86,7 +86,7 @@ import haxe.Json;
 			if (++steps > max_steps)
 				throw new Exception("Max steps of " + max_steps + " was reached.");
 		}
-		
+
 		entry_node = null;
 	}
 
@@ -94,9 +94,15 @@ import haxe.Json;
     var boot_definition = new metahub.parser.Definition();
     boot_definition.load_parser_schema();
     var context = new metahub.parser.Bootstrap(boot_definition);
-    var result:Match = cast context.parse(metahub.Macros.insert_file_as_string("metahub.grammar"), false);
-    parser_definition = new Definition();
-    parser_definition.load(result.get_data());
+    var result = context.parse(metahub.Macros.insert_file_as_string("metahub.grammar"), false);
+		if (result.success) {
+			var match:Match = cast result;
+			parser_definition = new Definition();
+			parser_definition.load(match.get_data());
+		}
+		else {
+			throw new Exception("Error loading parser.");
+		}
   }
 
   public function create_node(trellis:Trellis):Node {

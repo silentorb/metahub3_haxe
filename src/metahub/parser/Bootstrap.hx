@@ -128,8 +128,8 @@ package metahub.parser;
     var map:Dynamic < String > = cast {};
 //    trace('start', data);
 
-    for (index in Reflect.fields(data)) {
-      var item = Reflect.field(data, index);
+		var items:Array<Dynamic> = data;
+    for (item in items) {
       Reflect.setField(map, item.name, item.value);
 //      map.setField(item.name, item.value);
     }

@@ -2,6 +2,12 @@ package metahub.parser;
 
 import haxe.Json;
 
+typedef Group_Source = {
+	type:String,
+	?action:String,
+	patterns:Array<Dynamic>
+}
+
 @:expose class Definition {
   public var patterns = new Array<Pattern>();
   public var pattern_keys = new Map<String, Pattern>();
@@ -83,12 +89,12 @@ import haxe.Json;
 			return;
 		}
     if (source.type == "and" || source.type == "or") {
+			var group_source:Group_Source = cast source;
       var group:Group = cast pattern;
-      if (Reflect.hasField(source, "action"))
-        group.action = source.action;
+      if (Reflect.hasField(group_source, "action"))
+        group.action = group_source.action;
 
-      for (key in Reflect.fields(source.patterns)) {
-        var child = Reflect.field(source.patterns, key);
+      for (child in group_source.patterns) {
         var child_pattern = create_pattern(child);
 //        trace("  " + key);
         if (child_pattern == null) {

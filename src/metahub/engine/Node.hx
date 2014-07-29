@@ -125,6 +125,22 @@ class Node {
     return values[property.id];
   }
 
+	function equals(first:Dynamic, second:Dynamic, property:Property):Bool {
+		if (property.other_trellis != null && property.other_trellis.copy) {
+			var first_node = hub.get_node(first);
+			var second_node = hub.get_node(second);
+			var properties = property.trellis.properties;
+			for (i in 0...properties.length) {
+				if (!equals(first_node.get_value(i), second_node.get_value(i), properties[i]))
+					return false;
+			}
+			return true;
+		}
+		else {
+			return first == second;
+		}
+	}
+
   public function set_value(index:Int, value:Dynamic, source:General_Port = null) {
 		var old_value = values[index];
 		var port = ports[index];
@@ -132,13 +148,18 @@ class Node {
 		if (property.type == Kind.list)
 			throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
 
-		if (!property.multiple && old_value == value) {
+		if (equals(old_value, value, property)) {
 			hub.history.log("attempted " + property.fullname() + "|set_value " + value);
 			return;
 		}
 
 		hub.set_entry_node(this);
 
+		if (property.other_trellis != null && property.other_trellis.copy) {
+			var original = hub.get_node(value);
+			var new_node = original.clone();
+			value = new_node.id;
+		}
 		values[index] = value;
 		hub.history.log(property.fullname() + "|set_value " + value);
 
@@ -185,5 +206,14 @@ class Node {
 
 		}
   }
+
+	public function clone():Node {
+		var result = hub.create_node(trellis);
+		for (i in 0...trellis.properties.length) {
+			result.set_value(i, get_value(i));
+		}
+
+		return result;
+	}
 
 }

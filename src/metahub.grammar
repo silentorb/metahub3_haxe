@@ -3,7 +3,7 @@ start = trim @(statement, newlines, 0, 0) final_trim
 none = /&*/
 ws = /\s+/
 trim = /\s*/
-final_trim = /\s*/
+final_trim = /\s*$/
 newlines = /(\s*\n)+\s*/
 comma_or_newline = /\s*((\s*\n)+|,)\s*/
 dot = "."
@@ -62,4 +62,4 @@ trellis_scope = path_or_id trim constraint_block
 
 constraint_block = "(" trim @(constraint, comma_or_newline, 1, 0) trim ")"
 
-constraint = id trim constraint_operator trim expression
+constraint = path_or_id trim constraint_operator trim expression

@@ -10,7 +10,7 @@ typedef ITrellis_Source = {
   properties:Map<String, IProperty_Source>,
   parent:String,
 	?primary_key:String,
-	?copy:Bool
+	?is_value:Bool
 }
 
 class Trellis implements INode {
@@ -25,7 +25,7 @@ class Trellis implements INode {
   var property_keys:Map<String, Property> = new Map<String, Property>();
 	var ports = new Array<General_Port>();
 	public var properties = new Array<Property>();
-	public var copy:Bool = false;
+	public var is_value:Bool = false;
 
   public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;
@@ -166,10 +166,10 @@ class Trellis implements INode {
   }
 
 	 public function initialize2(source:ITrellis_Source) {
-		 if (Reflect.hasField(source, 'copy'))
-			copy = source.copy;
+		 if (Reflect.hasField(source, 'is_value'))
+			is_value = source.is_value;
 		else if (parent != null) {
-			copy = parent.copy;
+			is_value = parent.is_value;
 		}
 
     if (source.properties != null) {

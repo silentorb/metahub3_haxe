@@ -1,6 +1,6 @@
-require('source-map-support').install()
 var buster = require("buster")
 var assert = buster.referee.assert
+var refute = buster.referee.refute
 var MetaHub = require('../output/nodejs/metahub.js').metahub
 var fs = require('fs')
 
@@ -9,7 +9,7 @@ var color = ansiColorizer.configure({ color: true, bright: true });
 
 function create_hub() {
   var hub = new MetaHub.Hub()
-  hub.load_schema_from_file('test/schema.json')
+  hub.load_schema_from_file('test/schema/general.json')
   return hub
 }
 
@@ -70,7 +70,7 @@ buster.testCase("Parser", {
     var parser = new MetaHub.parser.Bootstrap(definition)
     parser.debug = true
 //    parser.draw_offsets = true
-    var code = fs.readFileSync('metahub/metahub.grammar', { encoding: 'ascii' });
+    var code = fs.readFileSync('src/metahub.grammar', { encoding: 'ascii' });
 //    var code = fs.readFileSync('test/string.grammar', { encoding: 'ascii' });
     var result = parser.parse(code)
 //    console.log(render_info(result))
@@ -98,7 +98,7 @@ buster.testCase("Parser", {
   "parse shorthand": function () {
     var hub = create_hub();
     hub.load_parser();
-    var code = fs.readFileSync('test/boy.mh', { encoding: 'ascii' })
+    var code = fs.readFileSync('test/scripts/boy.mh', { encoding: 'ascii' })
 
     var result = hub.parse_code(code);
     console.log(render_info(result))
@@ -110,7 +110,7 @@ buster.testCase("Parser", {
   "run shorthand": function () {
     var hub = create_hub();
     hub.load_parser();
-    var code = fs.readFileSync('test/boy.mh', { encoding: 'ascii' })
+    var code = fs.readFileSync('test/scripts/boy.mh', { encoding: 'ascii' })
     hub.run_code(code);
 
     var boy = hub.nodes[1]
@@ -121,7 +121,7 @@ buster.testCase("Parser", {
   "parse shorthand trellis constraint": function () {
     var hub = create_hub();
     hub.load_parser();
-    var code = fs.readFileSync('test/general.mh', { encoding: 'ascii' })
+    var code = fs.readFileSync('test/scripts/general.mh', { encoding: 'ascii' })
 
     var result = hub.parse_code(code);
     console.log(render_info(result))
@@ -133,7 +133,7 @@ buster.testCase("Parser", {
   "run shorthand trellis constraint": function () {
     var hub = create_hub();
     hub.load_parser();
-    var code = fs.readFileSync('test/general.mh', { encoding: 'ascii' })
+    var code = fs.readFileSync('test/scripts/general.mh', { encoding: 'ascii' })
     hub.run_code(code);
 
     var boy = hub.nodes[1]
@@ -149,19 +149,18 @@ buster.testCase("Parser", {
   "dummy": function () {
     assert(true)
 
-  }
+  },
+  "=>error 1": function () {
+    var hub = create_hub();
+    hub.silent = true;
+    hub.load_parser();
+    var code = fs.readFileSync('test/scripts/error1.mh', { encoding: 'ascii' })
+
+    var result = hub.parse_code(code);
+    console.log(render_info(result))
+    console.log(result.end)
+    refute(result.success, 'Match found.')
+    assert.equals(result.end.x, 10)
+    assert.equals(result.end.y, 2)
+  },
 })
-/*
-var hub = create_hub();
-hub.load_parser();
-var code = fs.readFileSync('test/general.mh', { encoding: 'ascii' })
-hub.run_code(code);
-console.log('Done running')
-var boy = hub.nodes[1]
-var sword = hub.nodes[2]
-var book = hub.nodes[3]
-console.log(hub.nodes.map(function(x) { return x ? x.trellis.name : ''}));
-assert.equals(boy.get_value_by_name('x'), 6)
-assert.equals(sword.get_value_by_name('y'), 5)
-assert.equals(book.get_value_by_name('y'), 5)
-assert.equals(boy.get_value_by_name('item_count'), 2)*/

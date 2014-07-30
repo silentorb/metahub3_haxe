@@ -21,6 +21,9 @@ class Pattern {
       return __test__(new_position, depth);
     }
 
+		//if (match.length == 0)
+			//throw new Exception("Match cannot be successful and have a length of 0");
+
     return result;
   }
 
@@ -32,12 +35,14 @@ class Pattern {
     return "";
   }
 
-  function failure(position:Position, children:Array<Result> = null):Failure {
-    return new Failure(this, position, children);
+  function failure(start:Position, end:Position, children:Array<Result> = null):Failure {
+    return new Failure(this, start, end, children);
   }
 
   function success(position:Position, length:Int, children:Array<Result> = null, matches:Array<Match> = null):Match {
-    return new Match(this, position, length, children, matches);
+    var match = new Match(this, position, length, children, matches);
+		match.end = position.move(length);
+		return match;
   }
 
 

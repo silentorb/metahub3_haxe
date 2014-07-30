@@ -15,7 +15,7 @@ class Regex extends Pattern {
   override function __test__(start:Position, depth:Int):Result {
     if (!regex.matchSub(start.context.text, start.get_offset())) {
 //      trace(Position.pad(depth) + 'regfail', text);
-      return failure(start);
+      return failure(start, start);
     }
 
     var match = regex.matched(0);

@@ -13,7 +13,7 @@ class Repetition extends Pattern {
 
   override function __test__(start:Position, depth:Int):Result {
     var context = start.context;
-    var position = start;
+    var position = start, end = position;
     var step = 0;
     var matches = new Array<Match>();
     var last_divider_length = 0;
@@ -23,7 +23,10 @@ class Repetition extends Pattern {
 
     do {
       var result = pattern.test(position, depth + 1);
-      info_items.push(result);
+			if (result.end.get_offset() > end.get_offset())
+				end = result.end;
+
+			info_items.push(result);
       if (!result.success) {
           break;
       }
@@ -37,6 +40,9 @@ class Repetition extends Pattern {
 
 // Divider
       result = divider.test(position, depth + 1);
+			if (result.end.get_offset() > end.get_offset())
+				end = result.end;
+
       info_items.push(result);
       if (!result.success)
         break;
@@ -49,9 +55,10 @@ class Repetition extends Pattern {
     while (max < 1 || step < max);
 
     if (step < min)
-      return failure(start, info_items);
+      return failure(start, end, info_items);
 
     var final = new Repetition_Match(this, start, length, info_items, matches);
+		final.end = end;
     final.dividers = dividers;
     return final;
   }

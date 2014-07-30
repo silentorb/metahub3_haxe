@@ -12,7 +12,7 @@ class Literal extends Pattern {
     if (start.context.text.substr(start.get_offset(), text.length) == text)
       return success(start, text.length);
 
-    return failure(start);
+    return failure(start, start);
   }
 
   override function get_data(match:Match):Dynamic {

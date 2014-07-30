@@ -55,6 +55,10 @@ class Node {
 				return 0.0;
 
 			case Kind.reference:
+				if (property.other_trellis.is_value) {
+					var node = hub.create_node(property.other_trellis);
+					return node.id;
+				}
 				return 0;
 
 			case Kind.string:
@@ -126,10 +130,10 @@ class Node {
   }
 
 	function equals(first:Dynamic, second:Dynamic, property:Property):Bool {
-		if (property.other_trellis != null && property.other_trellis.copy) {
+		if (property.other_trellis != null && property.other_trellis.is_value) {
 			var first_node = hub.get_node(first);
 			var second_node = hub.get_node(second);
-			var properties = property.trellis.properties;
+			var properties = property.other_trellis.properties;
 			for (i in 0...properties.length) {
 				if (!equals(first_node.get_value(i), second_node.get_value(i), properties[i]))
 					return false;
@@ -155,10 +159,10 @@ class Node {
 
 		hub.set_entry_node(this);
 
-		if (property.other_trellis != null && property.other_trellis.copy) {
-			var original = hub.get_node(value);
-			var new_node = original.clone();
-			value = new_node.id;
+		if (property.other_trellis != null && property.other_trellis.is_value) {
+			var mine = hub.get_node(old_value);
+			var other = hub.get_node(value);
+			other.copy(mine);
 		}
 		values[index] = value;
 		hub.history.log(property.fullname() + "|set_value " + value);
@@ -169,7 +173,7 @@ class Node {
 			t.set_external_value(index, value, context, source);
 		}
 
-		if (property.type == Kind.reference) {
+		if (property.type == Kind.reference && !property.other_trellis.is_value) {
       if (property.other_property.type == Kind.list) {
         var other_node = hub.get_node(value);
 				other_node.add_item(property.other_property.id, id);
@@ -194,7 +198,7 @@ class Node {
 		hub.history.log(property.fullname() + "|add_item " + value);
 
 		var context = new Context(this, hub);
-		trellis.set_external_value(index, value, context, null);
+		trellis.set_external_value(index, list, context, null);
 
 		if (property.other_property.type == Kind.reference) {
 			var other_node = hub.get_node(value);
@@ -207,13 +211,10 @@ class Node {
 		}
   }
 
-	public function clone():Node {
-		var result = hub.create_node(trellis);
+	public function copy(target:Node) {
 		for (i in 0...trellis.properties.length) {
-			result.set_value(i, get_value(i));
+			target.set_value(i, get_value(i));
 		}
-
-		return result;
 	}
 
 }

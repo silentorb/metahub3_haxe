@@ -217,7 +217,7 @@ import metahub.code.functions.Functions;
 	static function constraint(data:Dynamic):Dynamic {
     return {
 			type: "constraint",
-			path: [ data[0] ],
+			path: data[0],
 			expression: {
 				type: "function",
 				"name": Std.string(function_map[data[2]]),

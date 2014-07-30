@@ -160,9 +160,9 @@ import haxe.Json;
 
   public function run_code(code:String) {
 		var result = parse_code(code);
-		if (!result.success)
-       throw new Exception("Error parsing code.");
-
+		if (!result.success) {
+       throw new Exception("Syntax Error at " + result.end.y + ":" + result.end.x);
+		}
     var match:metahub.parser.Match = cast result;
 		var expression = run_data(match.get_data());
     expression.resolve(root_scope);

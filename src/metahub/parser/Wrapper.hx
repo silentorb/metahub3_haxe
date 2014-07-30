@@ -11,7 +11,7 @@ class Wrapper extends Pattern {
   override function __test__(start:Position, depth:Int):Result {
     var result = pattern.test(start, depth);
     if (!result.success)
-      return failure(start, [ result ]);
+      return failure(start, start, [ result ]);
 
     var match:Match = cast result;
 

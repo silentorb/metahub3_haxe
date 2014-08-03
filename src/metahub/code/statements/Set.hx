@@ -1,4 +1,7 @@
-package metahub.code.expressions;
+package metahub.code.statements;
+import metahub.code.expressions.Expression;
+import metahub.code.expressions.Expression_Utility;
+import metahub.code.Node_Signature;
 import metahub.code.symbols.Local_Symbol;
 import metahub.engine.INode;
 import metahub.engine.Node;
@@ -14,12 +17,13 @@ class Assignment {
   }
 
   public function apply(node:Node, scope:Scope) {
-    node.set_value(index, expression.resolve(scope));
+		//throw new Exception("Assignment.apply is not implemented.");
+
+    node.set_value(index, Expression_Utility.resolve(expression, scope));
   }
 }
 
-class Set implements Expression {
-  public var type:Type_Reference;
+class Set implements Statement {
   var reference:Local_Symbol;
   var assignments = new Array<Assignment>();
 
@@ -40,7 +44,11 @@ class Set implements Expression {
     return null;
   }
 
-  public function to_port(scope:Scope, group:Group):General_Port {
+  public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
     return null;
   }
+
+	public function get_type():Type_Signature {
+		return reference.get_type();
+	}
 }

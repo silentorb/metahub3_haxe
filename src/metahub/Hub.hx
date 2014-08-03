@@ -2,6 +2,7 @@ package metahub;
 import haxe.xml.Parser;
 import metahub.code.expressions.Expression;
 import metahub.code.functions.Function_Library;
+import metahub.code.statements.Statement;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
 import metahub.parser.Definition;
@@ -153,9 +154,9 @@ import haxe.Json;
     schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
   }
 
-  public function run_data(source:Dynamic):Expression {
+  public function run_data(source:Dynamic):Statement {
     var coder = new Coder(this);
-    return coder.convert(source, root_scope_definition);
+    return coder.convert_statement(source, root_scope_definition);
   }
 
   public function run_code(code:String) {
@@ -164,8 +165,8 @@ import haxe.Json;
        throw new Exception("Syntax Error at " + result.end.y + ":" + result.end.x);
 		}
     var match:metahub.parser.Match = cast result;
-		var expression = run_data(match.get_data());
-    expression.resolve(root_scope);
+		var statement = run_data(match.get_data());
+    statement.resolve(root_scope);
   }
 
 	public function parse_code(code:String) {

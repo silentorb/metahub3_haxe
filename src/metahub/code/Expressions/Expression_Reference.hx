@@ -8,7 +8,6 @@ import metahub.engine.Node;
 
 class Expression_Reference<S> implements Expression {
   public var reference:Reference<S>;
-  public var type:Type_Reference;
 
   public function new(reference:Reference<S>) {
     this.reference = reference;
@@ -18,7 +17,7 @@ class Expression_Reference<S> implements Expression {
     return reference.resolve(scope).id;
   }
 
-  public function to_port(scope:Scope, group:Group):General_Port {
+  public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
 		//if (reference.get_layer() ==
 		//throw new Exception("Not supported");
 		var port = reference.get_port(scope);
@@ -31,14 +30,9 @@ class Expression_Reference<S> implements Expression {
 
 		group.nodes.unshift(port.node);
 		return port;
-		//if (chain.length > 0) {
-			//converter = new Context_Converter(chain[0], chain[chain.length - 1], chain[0].type);
-		//}
-		//else {
-			//return port;
-			////var property_reference:Property_Reference = cast reference;
-			////converter = new Context_Converter(property_reference.get_property(scope));
-		//}
-
   }
+
+	public function get_type():Type_Signature {
+		return reference.get_type_reference();
+	}
 }

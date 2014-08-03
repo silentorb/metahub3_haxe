@@ -5,7 +5,7 @@ import metahub.schema.Trellis;
 
 class Trellis_Constraint implements Expression {
 	var property:Property;
-  public var type:Type_Reference;
+  public var type:Type_Signature;
   var expression:Expression;
 
   public function new(property:Property, expression:Expression) {

@@ -10,12 +10,12 @@ import metahub.schema.Kind;
 import metahub.code.references.Reference;
 
 class Local_Symbol implements Symbol {
-  public var type:Type_Reference;
+  public var type:Type_Signature;
   public var scope_definition:Scope_Definition;
   public var index:Int;
   public var name:String;
 
-  public function new(type:Type_Reference, scope_definition:Scope_Definition, index:Int, name:String) {
+  public function new(type:Type_Signature, scope_definition:Scope_Definition, index:Int, name:String) {
     this.type = type;
     this.scope_definition = scope_definition;
     this.index = index;
@@ -36,7 +36,7 @@ class Local_Symbol implements Symbol {
 		return Layer.engine;
 	}
 
-	public function get_type():Type_Reference {
+	public function get_type():Type_Signature {
 		throw new Exception("Local_Symbol.get_type() is not implemented.");
 	}
 

@@ -24,7 +24,7 @@ class Scope_Definition {
 		}
   }
 
-  public function add_symbol(name:String, type:Type_Reference):Local_Symbol {
+  public function add_symbol(name:String, type:Type_Signature):Local_Symbol {
     var symbol = new Local_Symbol(type, this, this.types.length, name);
     this.types.push(symbol);
     this.symbols[name] = symbol;

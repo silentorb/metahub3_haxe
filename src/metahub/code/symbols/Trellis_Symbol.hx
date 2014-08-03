@@ -27,7 +27,7 @@ class Trellis_Symbol implements ISchema_Symbol implements This  {
     throw new Exception("Not supported");
   }
 
-	public function get_type():Type_Reference {
+	public function get_type():Type_Signature {
 		throw new Exception("Trellis_Symbol.get_type() is not implemented.");
 	}
 

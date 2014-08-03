@@ -14,4 +14,13 @@ abstract Kind(Int) {
   var float = 5;
   var bool = 6;
 	var unknown = 7;
+	/*
+	static var name_map:Map <String, Kind>; 
+	static public function from_string(text:String):Kind {
+		if (name_map == null) {
+			name_map = new Map <String, Kind> ();
+		}
+		
+		return Kind.any;
+	}*/
 }

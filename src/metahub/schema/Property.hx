@@ -24,8 +24,13 @@ typedef IProperty_Source = {
   public var multiple:Bool = false;
 
   public function new(name:String, source:IProperty_Source, trellis:Trellis) {
-    this.type = cast Reflect.field(Kind, source.type);
-
+		#if php
+		if (source.type == "list") // Hack to fix bug in Haxe/PHP, which changes "list" to "hlist"
+			this.type = Kind.list;
+		else
+		#end
+			this.type = cast Reflect.field(Kind, source.type);
+		
     if (source.default_value != null)
       this.default_value = source.default_value;
 

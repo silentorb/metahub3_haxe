@@ -167,7 +167,7 @@ class Node {
 		values[index] = value;
 		hub.history.log(property.fullname() + "|set_value " + value);
 
-		var context = new Context(this, hub);
+		var context = new Node_Context(this, hub);
 		var tree = trellis.get_tree();
 		for (t in tree) {
 			t.set_external_value(index, value, context, source);
@@ -197,7 +197,7 @@ class Node {
 		list.push(value);
 		hub.history.log(property.fullname() + "|add_item " + value);
 
-		var context = new Context(this, hub);
+		var context = new Node_Context(this, hub);
 		trellis.set_external_value(index, list, context, null);
 
 		if (property.other_property.type == Kind.reference) {

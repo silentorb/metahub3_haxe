@@ -21,7 +21,7 @@ class Reference<S : Symbol> {
 		this.chain = chain;
 	}
 
-	public function get_port(scope:Scope):General_Port {
+	public function resolve_port(scope:Scope):General_Port {
 		throw new Exception("Abstract class.  Not implemented.");
 	}
 
@@ -31,7 +31,7 @@ class Reference<S : Symbol> {
 
 	public function get_type_reference():Type_Signature {
 		return chain != null && chain.length > 0
-		? Type_Signature.create_from_property(chain[chain.length - 1])
+		? Type_Signature.from_property(chain[chain.length - 1])
 		: symbol.get_type();
 	}
 
@@ -43,36 +43,4 @@ class Reference<S : Symbol> {
 		return null;
 	}
 
-	//public static function create_from_path(symbol:Symbol, path:Array<String>):Reference {
-		//trace(Type.getClassName(Type.getClass(symbol)));
-		//var trellis = symbol.get_trellis();
-		//var chain = Property_Chain_Helper.from_string(path, trellis);
-		//var symbol_type = Type.getClassName(Type.getClass(symbol));
-//
-		//if (symbol_type == Type.getClassName(Local_Symbol))
-			//return new Node_Reference(symbol, chain);
-//
-		//if (symbol_type == Type.getClassName(Trellis_Symbol))
-			//return new Trellis_Reference(symbol, chain);
-//
-		//if (symbol_type == Type.getClassName(Property_Symbol))
-			//return new Property_Reference(symbol, chain);
-//
-		//throw new Exception("Not finished.");
-	//}
-
-	//public static function create_schema_symbol_from_path(symbol:ISchema_Symbol, path:Array<String>):Reference {
-		//trace(Type.getClassName(Type.getClass(symbol)));
-		//var trellis = symbol.get_trellis();
-		//var chain = Property_Chain_Helper.from_string(path, trellis);
-		//var symbol_type = Type.getClassName(Type.getClass(symbol));
-//
-		//if (symbol_type == Type.getClassName(Trellis_Symbol))
-			//return new Trellis_Reference(symbol, chain);
-//
-		//if (symbol_type == Type.getClassName(Property_Symbol))
-			//return new Property_Reference(symbol, chain);
-//
-		//throw new Exception("Invalid symbol.");
-	//}
 }

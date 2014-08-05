@@ -29,6 +29,8 @@ class Coder {
         return create_reference(source, scope_definition);
       case 'function':
         return function_expression(source, scope_definition, type);
+			case 'node':
+        return create_node(source, scope_definition);
     }
 
     throw new Exception("Invalid block: " + source.type);
@@ -41,8 +43,6 @@ class Coder {
         return create_block(source, scope_definition);
       case 'constraint':
         return constraint(source, scope_definition);
-      case 'node':
-        return create_node(source, scope_definition);
       case 'symbol':
         return create_symbol(source, scope_definition);
       case 'set':
@@ -105,19 +105,19 @@ class Coder {
 		return current_namespace;
 	}
 
-  function create_node(source:Dynamic, scope_definition:Scope_Definition):Statement {
+  function create_node(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		var path:Array<String> = source.trellis;
 		if (path.length == 0)
 			throw new Exception("Trellis path is empty for node creation.");
 
 		var namespace = get_namespace(path, hub.schema.root_namespace);
     var trellis = hub.schema.get_trellis(path[path.length - 1], namespace, true);
-    var result = new metahub.code.statements.Create_Node(trellis);
+    var result = new metahub.code.expressions.Create_Node(trellis);
 
     if (source.set != null) {
       for (key in Reflect.fields(source.set)) {
         var property = trellis.get_property(key);
-        result.assignments[property.id] = convert_statement(Reflect.field(source.set, key), scope_definition);
+        result.assignments[property.id] = convert_expression(Reflect.field(source.set, key), scope_definition);
       }
     }
     return result;
@@ -163,9 +163,9 @@ class Coder {
   }
 
   function create_symbol(source:Dynamic, scope_definition:Scope_Definition):Statement {
-    var statement = convert_expression(source.expression, scope_definition);
-    var symbol = scope_definition.add_symbol(source.name, statement.get_type());
-    return new metahub.code.statements.Create_Symbol(symbol, statement);
+    var expression = convert_expression(source.expression, scope_definition);
+    var symbol = scope_definition.add_symbol(source.name, expression.get_types()[0][0]);
+    return new metahub.code.statements.Create_Symbol(symbol, expression);
   }
 
   static function get_type(value:Dynamic):Kind {
@@ -191,7 +191,7 @@ class Coder {
 		var func = Type.createEnum(Functions, source.name);
     var expressions:Array<Dynamic> = source.inputs;
     var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
-    return new metahub.code.expressions.Function_Call(func, type, inputs);
+    return new metahub.code.expressions.Function_Call(func, type, inputs, hub);
   }
 
   function set(source:Dynamic, scope_definition:Scope_Definition):Statement {

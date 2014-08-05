@@ -130,7 +130,7 @@ buster.testCase("Parser", {
     console.log(require('util').inspect(data, { showHidden: false, depth: 10 }));
     assert(data);
   },
-  "run shorthand trellis constraint": function () {
+  "=>run shorthand trellis constraint": function () {
     var hub = create_hub();
     hub.load_parser();
     var code = fs.readFileSync('test/scripts/general.mh', { encoding: 'ascii' })
@@ -150,7 +150,7 @@ buster.testCase("Parser", {
     assert(true)
 
   },
-  "=>error 1": function () {
+  "error 1": function () {
     var hub = create_hub();
     hub.silent = true;
     hub.load_parser();
@@ -158,9 +158,10 @@ buster.testCase("Parser", {
 
     var result = hub.parse_code(code);
     console.log(render_info(result))
-    console.log(result.end)
+    console.log('end', result.end)
     refute(result.success, 'Match found.')
-    assert.equals(result.end.x, 10)
-    assert.equals(result.end.y, 2)
+    assert.equals(result.end.x, 12)
+    assert.equals(result.end.y, 1)
   },
 })
+require('source-map-support').install()

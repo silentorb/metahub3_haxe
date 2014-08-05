@@ -57,7 +57,7 @@ class Property_Reference extends Reference<ISchema_Symbol> {
 		//var symbol.resolve(scope);
 	}
 	
-	override public function get_port(scope:Scope):General_Port {
+	override public function resolve_port(scope:Scope):General_Port {
 		var property = get_property(scope);
 		return property.trellis.get_port(property.id);
 	}

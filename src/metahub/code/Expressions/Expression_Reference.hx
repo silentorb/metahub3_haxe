@@ -20,7 +20,7 @@ class Expression_Reference<S> implements Expression {
   public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
 		//if (reference.get_layer() ==
 		//throw new Exception("Not supported");
-		var port = reference.get_port(scope);
+		var port = reference.resolve_port(scope);
 		var chain = reference.chain;
 		var converter = reference.create_converter(scope);
 		if (converter != null) {
@@ -32,7 +32,19 @@ class Expression_Reference<S> implements Expression {
 		return port;
   }
 
-	public function get_type():Type_Signature {
-		return reference.get_type_reference();
+	public function get_types():Array<Array<Type_Signature>> {
+		return [ [ reference.get_type_reference() ] ];
+	}
+		
+	public function to_string():String {
+		return "Expression_Reference";
+	}
+	
+	public function get_children():Array<Expression> {
+		return [];
+	}
+	
+	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
+		return reference.resolve(scope);
 	}
 }

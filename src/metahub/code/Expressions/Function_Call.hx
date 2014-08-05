@@ -3,7 +3,9 @@ package metahub.code.expressions;
 import metahub.code.functions.Functions;
 import metahub.code.Node_Signature;
 import metahub.code.Scope;
+import metahub.code.Type_Signature;
 import metahub.schema.Trellis;
+import metahub.schema.Kind;
 import metahub.engine.Node;
 import metahub.engine.General_Port;
 import metahub.engine.Constraint_Operator;
@@ -12,9 +14,11 @@ import metahub.code.functions.Function;
 class Function_Call implements Expression {
   var inputs:Array<Expression>;
 	var func:Functions;
+	var hub:Hub;
   //var func:Functions;
 
-  public function new(func:Functions, type:Type_Signature, inputs:Array<Expression>) {
+  public function new(func:Functions, type:Type_Signature, inputs:Array<Expression>, hub:Hub) {
+		this.hub = hub;
 		this.func = func;
     this.inputs = inputs;
     //func = Type.createEnum(Functions, trellis.name);
@@ -26,11 +30,10 @@ class Function_Call implements Expression {
   }
 
   public function to_port(scope:Scope, group:Group, node_signature:Node_Signature):General_Port {
-		var hub = scope.hub;
 		if (func == Functions.equals) {
 			return inputs[0].to_port(scope, group, node_signature);
 		}
-		var info = hub.function_library.get_function_class(func, node_signature.signature);
+		var info = hub.function_library.get_function_info(func, node_signature.signature);
 		var node:Function = Type.createInstance(info.type, [hub, hub.nodes.length, info.trellis]);
     hub.add_internal_node(node);
 		var expressions = inputs;
@@ -60,16 +63,29 @@ class Function_Call implements Expression {
 		return result;
 	}
 
-	//function args_types(args:Array < General_Port > ) {
-		//var result = new Array<Type_Signature>();
-		//for (a in args) {
-			//result.push(a.get_type());
-		//}
-//
-		//return result;
-	//}
-
-	public function get_type():Type_Signature {
-		throw new Exception("Function.get_type() is not implemented.");
+	public function get_types():Array < Array < Type_Signature >> {
+		if (func == Functions.equals)
+			return null;
+			
+		var options = hub.function_library.get_function_options(func);
+		var result = new Array < Array < Type_Signature >> ();
+		for (option in options) {
+			result.push(option.signature);
+		}
+		
+		return result;
 	}
+	
+	public function to_string():String {
+		return Std.string(func);
+	}
+	
+	public function get_children():Array<Expression> {
+		return inputs;
+	}
+	
+	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
+		throw new Exception("Not implemented");
+	}
+	
 }

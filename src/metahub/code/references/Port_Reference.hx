@@ -9,7 +9,7 @@ import metahub.engine.General_Port;
 
 class Port_Reference extends Reference<Local_Symbol> {
 
-	override public function get_port(scope:Scope):General_Port {
+	override public function resolve_port(scope:Scope):General_Port {
 		throw new Exception("Not implemented yet.");
 	}
 

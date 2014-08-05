@@ -11,12 +11,12 @@ import metahub.code.symbols.Local_Symbol;
 
 class Node_Reference extends Reference<Local_Symbol> {
 
-	override public function get_port(scope:Scope):General_Port {
+	override public function resolve_port(scope:Scope):General_Port {
 		throw new Exception("Not implemented yet.");
 	}
 
 	override public function resolve(scope:Scope):Dynamic {
-		return get_node(scope);
+		return get_node(scope).id;
 	}
 
 	function get_node(scope:Scope):Node {

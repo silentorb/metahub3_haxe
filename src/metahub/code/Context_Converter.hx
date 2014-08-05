@@ -2,6 +2,7 @@ package metahub.code;
 import metahub.engine.Context;
 import metahub.engine.INode;
 import metahub.engine.General_Port;
+import metahub.engine.Node_Context;
 import metahub.schema.Kind;
 import metahub.schema.Property;
 
@@ -23,7 +24,7 @@ class Context_Converter implements INode {
 
 	function create_context(context:Context, node_id:Int) {
 		var node = context.hub.get_node(node_id);
-		return new Context(node, context.hub);
+		return new Node_Context(node, context.hub);
 	}
 
 	public function get_port(index:Int):General_Port {

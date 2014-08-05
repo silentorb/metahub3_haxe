@@ -18,8 +18,8 @@ class Assignment {
 
   public function apply(node:Node, scope:Scope) {
 		//throw new Exception("Assignment.apply is not implemented.");
-
-    node.set_value(index, Expression_Utility.resolve(expression, scope));
+		var input_type = Type_Signature.from_property(node.trellis.properties[index]);
+    node.set_value(index, Expression_Utility.resolve(expression, input_type, scope));
   }
 }
 

@@ -1,4 +1,5 @@
 package metahub.code.functions;
+import metahub.schema.Trellis;
 
 /**
  * @author Christopher W. Johnson
@@ -6,5 +7,6 @@ package metahub.code.functions;
 
 typedef Function_Class_Info = {
 	signature:Array<Type_Signature>,
-	type:Dynamic
+	type:Dynamic,
+	trellis:Trellis
 }

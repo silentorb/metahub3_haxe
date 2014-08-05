@@ -37,7 +37,7 @@ class Local_Symbol implements Symbol {
 	}
 
 	public function get_type():Type_Signature {
-		throw new Exception("Local_Symbol.get_type() is not implemented.");
+		return type;
 	}
 
   public function resolve(scope:Scope):Dynamic {

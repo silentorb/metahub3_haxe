@@ -19,21 +19,20 @@ class Create_Constraint<S> implements Statement {
   }
 
   public function resolve(scope:Scope):Dynamic {
+		if (reference.get_layer() != Layer.schema)
+			throw new Exception("Not implemented.");
+
+		var property_reference:Property_Reference = cast reference;
+		var port = property_reference.resolve_port(scope);
+		
 		var group = new Group();
 		scope.hub.constraints.push(group);
-		var other_port = expression.to_port(scope, group, null);
+		var signature = Type_Network.analyze(expression, property_reference.get_type_reference(), scope);
+		var other_port = expression.to_port(scope, group, signature);
 
-		if (reference.get_layer() == Layer.schema) {
-			var property_reference:Property_Reference = cast reference;
-			var port = property_reference.get_port(scope);
-			port.connect(other_port);
-			return null;
-		}
 
-		throw new Exception("Not implemented yet.");
+		port.connect(other_port);
+		return null;
   }
 
-	public function get_type():Type_Signature {
-		return reference.get_type_reference();
-	}
 }

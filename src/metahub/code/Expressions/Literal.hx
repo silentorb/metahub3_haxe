@@ -23,7 +23,9 @@ class Literal implements Expression {
     //var trellis = scope.hub.schema.get_trellis(Std.string(type.type));
     //var node = scope.hub.create_node(trellis);
 		var node = new Literal_Node(value);
-		group.nodes.unshift(node);
+		if (group != null)
+			group.nodes.unshift(node);
+			
     return node.get_port(0);
   }
 
@@ -33,7 +35,19 @@ class Literal implements Expression {
 		return fields[index + 1];
 	}
 
-	public function get_type():Type_Signature {
-		return possible_type;
+	public function get_types():Array<Array<Type_Signature>> {
+		return [ [ possible_type ] ];
+	}
+		
+	public function to_string():String {
+		return '{' + value + '}';
+	}
+	
+	public function get_children():Array<Expression> {
+		return [];
+	}
+	
+	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
+		return value;
 	}
 }

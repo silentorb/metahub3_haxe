@@ -23,4 +23,19 @@ abstract Kind(Int) {
 		
 		return Kind.any;
 	}*/
+	
+		static var names:Array<String> = [ 
+			"any",
+			"int",
+			"string",
+			"reference",
+			"list",
+			"float",
+			"bool",
+			"unknown"
+		];
+		
+		static public function to_string(kind:Kind) {
+			return names[cast kind];
+		}
 }

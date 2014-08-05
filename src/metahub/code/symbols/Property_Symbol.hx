@@ -40,7 +40,7 @@ class Property_Symbol implements ISchema_Symbol {
 	}
 
 	public function get_type():Type_Signature {
-		return Type_Signature.create_from_property(property);
+		return Type_Signature.from_property(property);
 	}
 
 	public function create_reference(path:Array<String>):Reference<ISchema_Symbol> {

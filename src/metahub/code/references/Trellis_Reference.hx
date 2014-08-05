@@ -14,7 +14,7 @@ class Trellis_Reference extends Reference<ISchema_Symbol>{
 		super(symbol, chain);
 	}
 
-	override public function get_port(scope:Scope):General_Port {
+	override public function resolve_port(scope:Scope):General_Port {
 		throw new Exception("Not implemented yet.");
 	}
 

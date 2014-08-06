@@ -25,7 +25,7 @@ class Literal implements Expression {
 		var node = new Literal_Node(value);
 		if (group != null)
 			group.nodes.unshift(node);
-			
+
     return node.get_port(0);
   }
 
@@ -38,15 +38,15 @@ class Literal implements Expression {
 	public function get_types():Array<Array<Type_Signature>> {
 		return [ [ possible_type ] ];
 	}
-		
+
 	public function to_string():String {
-		return '{' + value + '}';
+		return value;
 	}
-	
+
 	public function get_children():Array<Expression> {
 		return [];
 	}
-	
+
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
 		return value;
 	}

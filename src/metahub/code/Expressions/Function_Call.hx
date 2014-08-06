@@ -34,7 +34,7 @@ class Function_Call implements Expression {
 			return inputs[0].to_port(scope, group, node_signature);
 		}
 		var info = hub.function_library.get_function_info(func, node_signature.signature);
-		var node:Function = Type.createInstance(info.type, [hub, hub.nodes.length, info.trellis]);
+		var node:Function = Type.createInstance(info.type, [hub, hub.nodes.length, info.trellis, func]);
     hub.add_internal_node(node);
 		var expressions = inputs;
     var ports = node.get_inputs();
@@ -66,26 +66,26 @@ class Function_Call implements Expression {
 	public function get_types():Array < Array < Type_Signature >> {
 		if (func == Functions.equals)
 			return null;
-			
+
 		var options = hub.function_library.get_function_options(func);
 		var result = new Array < Array < Type_Signature >> ();
 		for (option in options) {
 			result.push(option.signature);
 		}
-		
+
 		return result;
 	}
-	
+
 	public function to_string():String {
 		return Std.string(func);
 	}
-	
+
 	public function get_children():Array<Expression> {
 		return inputs;
 	}
-	
+
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
 		throw new Exception("Not implemented");
 	}
-	
+
 }

@@ -14,7 +14,7 @@
           "trellis": "Item"
         },
         "x": {
-          "type": "int"
+          "type": "float"
         },
         "item_count": {
           "type": "int"
@@ -31,7 +31,7 @@
           "trellis": "Character"
         },
         "y": {
-          "type": "int"
+          "type": "float"
         }
       }
     }

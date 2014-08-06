@@ -49,6 +49,33 @@
         }
       }
     },
+		"float1": {
+      "parent": "function",
+      "properties": {
+        "output": {
+          "type": "float",
+          "multiple": "true"
+        },
+        "first": {
+          "type": "float"
+        }
+      }
+    },
+		"float2": {
+      "parent": "function",
+      "properties": {
+        "output": {
+          "type": "float",
+          "multiple": "true"
+        },
+        "first": {
+          "type": "float"
+        },
+        "second": {
+          "type": "float"
+        }
+      }
+    },
     "Add_Int": {
       "parent": "int2"
     },

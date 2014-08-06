@@ -13,6 +13,14 @@ function create_hub() {
   return hub
 }
 
+function run_file(filename) {
+  var hub = create_hub();
+  hub.load_parser();
+  var code = fs.readFileSync(filename, { encoding: 'ascii' })
+  hub.run_code(code);
+  return hub;
+}
+
 function pad(depth) {
   var result = ""
   for (var i = 0; i < depth; ++i)
@@ -130,7 +138,7 @@ buster.testCase("Parser", {
     console.log(require('util').inspect(data, { showHidden: false, depth: 10 }));
     assert(data);
   },
-  "=>run shorthand trellis constraint": function () {
+  "run shorthand trellis constraint": function () {
     var hub = create_hub();
     hub.load_parser();
     var code = fs.readFileSync('test/scripts/general.mh', { encoding: 'ascii' })
@@ -145,6 +153,13 @@ buster.testCase("Parser", {
     assert.equals(book.get_value_by_name('y'), 5)
     assert.equals(boy.get_value_by_name('item_count'), 2)
 
+  },
+  "=>lesser float": function () {
+    var hub = run_file('test/scripts/lesser.mh')
+
+    var boy = hub.nodes[1]
+    assert.greater(boy.get_value_by_name('x'), 9.9)
+    assert.greater(10, boy.get_value_by_name('x'))
   },
   "dummy": function () {
     assert(true)

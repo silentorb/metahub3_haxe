@@ -49,7 +49,9 @@ class Coder {
         return set(source, scope_definition);
 			case 'trellis_scope':
 				return trellis_scope(source, scope_definition);
-    }
+			case 'node':
+        return create_node(source, scope_definition);
+		}
 
     throw new Exception("Invalid block: " + source.type);
   }
@@ -83,7 +85,7 @@ class Coder {
 
   function create_literal(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var type = get_type(source.value);
-    return new metahub.code.expressions.Literal(source.value, new Type_Signature(type));
+    return new metahub.code.expressions.Literal(source.value, type);
   }
 
 	function get_namespace(path:Array<String>, start:Namespace):Namespace {
@@ -105,7 +107,7 @@ class Coder {
 		return current_namespace;
 	}
 
-  function create_node(source:Dynamic, scope_definition:Scope_Definition):Expression {
+  function create_node(source:Dynamic, scope_definition:Scope_Definition):Expression_Statement {
 		var path:Array<String> = source.trellis;
 		if (path.length == 0)
 			throw new Exception("Trellis path is empty for node creation.");
@@ -168,18 +170,21 @@ class Coder {
     return new metahub.code.statements.Create_Symbol(symbol, expression);
   }
 
-  static function get_type(value:Dynamic):Kind {
-    if (Std.is(value, Int))
-      return Kind.int;
+  static function get_type(value:Dynamic):Type_Signature {
+    if (Std.is(value, Int)) {
+			var result = new Type_Signature(Kind.unknown);
+			result.is_numeric = true;
+      return result;
+		}
 
     if (Std.is(value, Float))
-      return Kind.float;
+      return new Type_Signature(Kind.float);
 
     if (Std.is(value, Bool))
-      return Kind.bool;
+      return new Type_Signature(Kind.bool);
 
     if (Std.is(value, String))
-      return Kind.string;
+      return new Type_Signature(Kind.string);
 
     throw new Exception("Could not find type.");
   }

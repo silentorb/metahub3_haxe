@@ -1,11 +1,12 @@
 package metahub.code.expressions;
 import metahub.code.expressions.Expression;
+import metahub.code.statements.Statement;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
 import metahub.engine.General_Port;
 import metahub.schema.Kind;
 
-class Create_Node implements Expression {
+class Create_Node implements Expression_Statement {
   public var trellis:Trellis;
   public var assignments = new Map<Int, Expression>();
   public var trellis_type:Type_Signature;
@@ -22,16 +23,16 @@ class Create_Node implements Expression {
 	public function get_types():Array<Array<Type_Signature>>{
 		return [ [ trellis_type ] ];
 	}
-	
+
 	public function to_string():String {
 		return "new " + trellis.name;
 	}
-	
+
 	public function get_children():Array<Expression> {
 		return [];
 	}
-	
-	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
+
+	public function resolve(scope:Scope):Dynamic {
 		trace('create node', trellis.name);
     var node = scope.hub.create_node(trellis);
     for (i in assignments.keys()) {
@@ -41,5 +42,9 @@ class Create_Node implements Expression {
     }
 
     return node.id;
+	}
+
+	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
+		return resolve(scope);
 	}
 }

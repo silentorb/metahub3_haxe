@@ -12,12 +12,14 @@ class Function implements INode {
 	public var hub:Hub;
   var ports = new Array<General_Port>();
   var trellis:Trellis;
+	var func:Functions;
 	public var id:Identity;
 
-	public function new(hub:Hub, id:Identity, trellis:Trellis) {
+	public function new(hub:Hub, id:Identity, trellis:Trellis, func:Functions) {
     this.hub = hub;
     this.id = id;
     this.trellis = trellis;
+		this.func = func;
 
 		var properties = trellis.get_all_properties();
 
@@ -120,4 +122,5 @@ class Function implements INode {
 	private function reverse(new_value:Dynamic, args:Array<Dynamic>):Dynamic {
 		throw new Exception("Function.reverse is abstract.");
 	}
+
 }

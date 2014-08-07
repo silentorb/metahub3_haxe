@@ -8,7 +8,6 @@ import metahub.schema.Namespace;
 import metahub.schema.Property;
 import metahub.code.expressions.*;
 import metahub.schema.Trellis;
-import metahub.schema.Types;
 import metahub.code.references.*;
 import metahub.code.symbols.*;
 import metahub.code.functions.Functions;
@@ -26,6 +25,8 @@ class Coder {
   public function convert_expression(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature = null):Expression {
 
     switch(source.type) {
+			case 'block':
+        return create_block(source, scope_definition);
       case 'literal':
         return create_literal(source, scope_definition);
       case 'reference':
@@ -46,11 +47,13 @@ class Coder {
         return create_block(source, scope_definition);
       case 'symbol':
         return create_symbol(source, scope_definition);
-      case 'set':
-        return set(source, scope_definition);
+      //case 'set':
+        //return set(source, scope_definition);
+			case 'node_scope':
+				return node_scope(source, scope_definition);
 			case 'trellis_scope':
 				return trellis_scope(source, scope_definition);
-			case 'node':
+			case 'create_node':
         return create_node(source, scope_definition);
 		}
 
@@ -75,7 +78,7 @@ class Coder {
 		return new metahub.code.statements.Create_Constraint(reference, expression);
   }
 
-  function create_block(source:Dynamic, scope_definition:Scope_Definition):Statement {
+  function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression_Statement {
     var new_scope_definition = new Scope_Definition(scope_definition);
     var block = new metahub.code.statements.Block(new_scope_definition);
 
@@ -121,7 +124,7 @@ class Coder {
     var result = new metahub.code.expressions.Create_Node(trellis);
 
     if (source.set != null) {
-			result.setter = create_setter(source.set, scope_definition, trellis);
+			result.block = create_block(source.set, scope_definition, trellis);
       //for (key in Reflect.fields(source.set)) {
         //var property = trellis.get_property(key);
         //result.assignments[property.id] = convert_expression(Reflect.field(source.set, key), scope_definition);
@@ -196,16 +199,17 @@ class Coder {
     return new metahub.code.expressions.Function_Call(func, type, inputs, hub);
   }
 
-  function set(source:Dynamic, scope_definition:Scope_Definition):Statement {
-    var reference = Reference.from_scope(source.path, scope_definition);
-    var trellis = reference.symbol.get_trellis();
-    //var trellis = reference.symbol.type.trellis;
+  //function set(source:Dynamic, scope_definition:Scope_Definition):Statement {
+    //var reference = Reference.from_scope(source.path, scope_definition);
+    //var trellis = reference.symbol.get_trellis();
+    ////var trellis = reference.symbol.type.trellis;
+//
+    //var result = new metahub.code.statements.Set(reference);
+		//result.block = create_block(source, scope_definition);
+    //return result;
+  //}
 
-    var result = new metahub.code.statements.Set(reference);
-		result.setter = create_setter(source, scope_definition, trellis);
-    return result;
-  }
-
+/*
 	function create_setter(source:Dynamic, scope_definition:Scope_Definition, trellis:Trellis):Setter {
 		var result = new Setter();
 		var items:Array<Dynamic> = cast source;
@@ -225,7 +229,7 @@ class Coder {
     }
 
 		return result;
-	}
+	}*/
 
 	function trellis_scope(source:Dynamic, scope_definition:Scope_Definition):Statement {
 		var path:Array<String> = source.path;

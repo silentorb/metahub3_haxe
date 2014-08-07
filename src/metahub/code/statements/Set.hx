@@ -7,17 +7,17 @@ import metahub.code.symbols.Local_Symbol;
 import metahub.engine.INode;
 import metahub.engine.Node;
 import metahub.engine.General_Port;
-
+/*
 class Set implements Statement {
   var reference:Reference;
-	public var setter:Setter;
+	public var block:Block;
 
   public function new(reference:Reference) {
     this.reference = reference;
   }
 
   public function add_assignment(reference:Reference, expression:Expression) {
-    setter.add(reference, expression);
+    block.add(reference, expression);
   }
 
   public function resolve(scope:Scope):Dynamic {
@@ -36,4 +36,4 @@ class Set implements Statement {
 		return reference.get_type();
 	}
 
-}
+}*/

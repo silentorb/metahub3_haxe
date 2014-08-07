@@ -8,6 +8,7 @@ class Scope {
   public var definition:Scope_Definition;
   public var values:Vector<Dynamic>;
   public var parent:Scope;
+	public var node:Node = null;
 
   public function new(hub:Hub, definition:Scope_Definition, parent:Scope = null) {
     this.hub = hub;

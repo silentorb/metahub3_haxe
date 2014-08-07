@@ -57,8 +57,8 @@ import metahub.code.functions.Functions;
       case "set_property":
         return set_property(data);
 
-      case "set_values":
-        return set_values(data);
+      case "node_scope":
+        return node_scope(data);
 
       case "trellis_scope":
         return trellis_scope(data);
@@ -139,7 +139,7 @@ import metahub.code.functions.Functions;
 
   static function create_node(data:Dynamic):Dynamic {
     var result:Dynamic = cast {
-    type: "node",
+    type: "create_node",
     trellis: data[2]
     };
 
@@ -173,7 +173,10 @@ import metahub.code.functions.Functions;
   }
 
   static function set_property_block(data:Dynamic):Dynamic {
-		return data[2];
+		return {
+			type: "block",
+			expressions: data[2]
+		};
     //var result = new Array<Dynamic>();
     //var items:Array<Dynamic> = cast data[2];
 //
@@ -192,11 +195,11 @@ import metahub.code.functions.Functions;
 		};
   }
 
-  static function set_values(data:Dynamic):Dynamic {
+  static function node_scope(data:Dynamic):Dynamic {
     return {
-    type: "set",
-    "path": data[2],
-    "assignments": data[4]
+    type: "node_scope",
+    "path": data[0],
+    "block": data[2]
     };
   }
 

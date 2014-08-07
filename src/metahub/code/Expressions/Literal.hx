@@ -2,7 +2,6 @@ package metahub.code.expressions;
 import metahub.engine.General_Port;
 import metahub.engine.Literal_Node;
 import metahub.schema.Kind;
-import metahub.schema.Types;
 
 class Literal implements Expression {
   var value:Dynamic;
@@ -29,11 +28,11 @@ class Literal implements Expression {
     return node.get_port(0);
   }
 
-	static function get_type_string(id:Kind) {
-		var fields = Reflect.fields(Types);
-		var index:Int = cast id;
-		return fields[index + 1];
-	}
+	//static function get_type_string(id:Kind) {
+		//var fields = Reflect.fields(Types);
+		//var index:Int = cast id;
+		//return fields[index + 1];
+	//}
 
 	public function get_types():Array<Array<Type_Signature>> {
 		return [ [ possible_type ] ];

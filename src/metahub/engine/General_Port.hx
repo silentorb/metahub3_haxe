@@ -4,7 +4,6 @@ import metahub.schema.Kind;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
 import metahub.code.functions.Functions;
-import metahub.schema.Types;
 import metahub.engine.Relationship;
 
 /**

@@ -14,17 +14,19 @@ abstract Kind(Int) {
   var float = 5;
   var bool = 6;
 	var unknown = 7;
+	var pulse = 8;
+
 	/*
-	static var name_map:Map <String, Kind>; 
+	static var name_map:Map <String, Kind>;
 	static public function from_string(text:String):Kind {
 		if (name_map == null) {
 			name_map = new Map <String, Kind> ();
 		}
-		
+
 		return Kind.any;
 	}*/
-	
-		static var names:Array<String> = [ 
+
+		static var names:Array<String> = [
 			"any",
 			"int",
 			"string",
@@ -32,9 +34,10 @@ abstract Kind(Int) {
 			"list",
 			"float",
 			"bool",
-			"unknown"
+			"unknown",
+			"pulse"
 		];
-		
+
 		static public function to_string(kind:Kind) {
 			return names[cast kind];
 		}

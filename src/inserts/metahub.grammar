@@ -38,6 +38,7 @@ expression_part =
     value
   | create_node
   | reference
+	| set_property_block
 
 string = ('"' /[^"]*/ '"') | ("'" /[^']*/ "'")
 bool = "true" | "false"
@@ -52,9 +53,9 @@ dummy = "@&^%"
 
 create_node = "new" ws path_or_id trim @(set_property_block, dummy, 0, 1)
 
-set_property_block = "{" trim @(set_property, comma_or_newline, 1, 0) trim "}"
+set_property_block = "{" trim @(set_property, comma_or_newline, 0, 0) trim "}"
 
-set_property = id trim ":" trim expression
+set_property = path_or_id trim ":" trim @(operator, dummy, 0, 1) trim expression
 
 set_values = "set" ws path_or_id trim set_property_block
 

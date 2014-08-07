@@ -2,8 +2,8 @@ package metahub.code.symbols;
 import metahub.code.Layer;
 import metahub.code.Type_Signature;
 import metahub.engine.General_Port;
-import metahub.schema.Property_Chain;
 import metahub.schema.Trellis;
+
 
 interface Symbol {
 	//var symbol_type:Symbol_Type;

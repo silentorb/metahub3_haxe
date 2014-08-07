@@ -95,21 +95,21 @@ package metahub.parser;
 //    trace('rule', data);
     var settings = data[1];
     var result = {
-    type: "repetition",
-    pattern: {
-    type: "reference",
-    name: settings[0]
-    },
-    divider: {
-    type: "reference",
-    name: settings[1]
-    }
+			type: "repetition",
+			pattern: {
+				type: "reference",
+				name: settings[0]
+			},
+			divider: {
+				type: "reference",
+				name: settings[1]
+			}
     };
 
     if (settings.length > 2) {
-      Reflect.setField(result, "min", settings[2]);
+      Reflect.setField(result, "min", Std.int(settings[2]));
       if (settings.length > 3) {
-        Reflect.setField(result, "max", settings[3]);
+        Reflect.setField(result, "max", Std.int(settings[3]));
       }
     }
     return result;

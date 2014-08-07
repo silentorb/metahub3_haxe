@@ -2,7 +2,7 @@ package metahub.code.expressions;
 
 import metahub.code.functions.Functions;
 import metahub.code.Node_Signature;
-import metahub.code.Scope;
+
 import metahub.code.Type_Signature;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
@@ -34,7 +34,7 @@ class Function_Call implements Expression {
 			return inputs[0].to_port(scope, group, node_signature);
 		}
 		var info = hub.function_library.get_function_info(func, node_signature.signature);
-		var node:Function = Type.createInstance(info.type, [hub, hub.nodes.length, info.trellis, func]);
+		var node:Function = Type.createInstance(info.type, [hub, hub.get_node_count(), info.trellis, func]);
     hub.add_internal_node(node);
 		var expressions = inputs;
     var ports = node.get_inputs();

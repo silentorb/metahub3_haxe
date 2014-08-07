@@ -119,7 +119,7 @@ typedef Group_Source = {
         repetition.min = source.min;
 
       if (Reflect.hasField(source, "max"))
-        repetition.min = source.max;
+        repetition.max = source.max;
 
       if (Reflect.hasField(source, "action"))
         repetition.action = source.action;
@@ -129,7 +129,7 @@ typedef Group_Source = {
   public function load_parser_schema() {
     //var data = Utility.load_json("metahub/parser.json");
 		//var data = macro File.getContent("metahub/parser.json");
-		var data = metahub.Macros.insert_file_as_string("json/parser.json");
+		var data = metahub.Macros.insert_file_as_string("inserts/parser.json");
     load(Json.parse(data));
   }
 

@@ -8,8 +8,8 @@ import metahub.code.symbols.Local_Symbol;
  * ...
  * @author Christopher W. Johnson
  */
-
-class Node_Reference extends Reference<Local_Symbol> {
+/*
+class Node_Reference extends Reference {
 
 	override public function resolve_port(scope:Scope):General_Port {
 		throw new Exception("Not implemented yet.");
@@ -21,14 +21,13 @@ class Node_Reference extends Reference<Local_Symbol> {
 
 	function get_node(scope:Scope):Node {
 		var id = symbol.resolve(scope);
-		var node = scope.hub.nodes[id];
-    var nodes = scope.hub.nodes;
+		var node = scope.hub.get_node(id);
     var length = chain.length - 1;
     for (i in 0...length) {
       var id = node.get_value(chain[i].id);
-      node = nodes[id];
+      node = scope.hub.get_node(id);
     }
 
     return node;
   }
-}
+}*/

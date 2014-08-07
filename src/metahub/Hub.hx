@@ -15,6 +15,7 @@ import metahub.schema.Property;
 import metahub.code.Coder;
 import metahub.code.Scope_Definition;
 import metahub.code.Scope;
+
 import metahub.engine.INode;
 import metahub.engine.Node;
 import metahub.engine.Change;
@@ -24,7 +25,7 @@ import metahub.schema.Kind;
 import haxe.Json;
 
 @:expose class Hub {
-  public var nodes:Array<Node>= new Array<Node>();
+  var nodes:Map<Int, Node> = new Map<Int, Node>();
   public var internal_nodes:Array<INode>= new Array<INode>();
   public var schema:Schema;
   public var root_scope:Scope;
@@ -39,9 +40,11 @@ import haxe.Json;
 	var queue = new Array<Change>();
 	var entry_node:Node = null;
 	public var max_steps = 100;
+	var node_count:Int;
 
   public function new() {
-    nodes.push(null);
+    nodes[0] = null;
+		node_count = 1;
 
 		node_factories.push(function (hub, id, trellis) {
 			return new Node(hub, id, trellis);
@@ -95,7 +98,7 @@ import haxe.Json;
     var boot_definition = new metahub.parser.Definition();
     boot_definition.load_parser_schema();
     var context = new metahub.parser.Bootstrap(boot_definition);
-    var result = context.parse(metahub.Macros.insert_file_as_string("metahub.grammar"), false);
+    var result = context.parse(metahub.Macros.insert_file_as_string("inserts/metahub.grammar"), false);
 		if (result.success) {
 			var match:Match = cast result;
 			parser_definition = new Definition();
@@ -108,8 +111,9 @@ import haxe.Json;
 
   public function create_node(trellis:Trellis):Node {
 		var node:Node = null;
+		var id = ++node_count;
 		for (factory in node_factories) {
-			node = factory(this, nodes.length, trellis);
+			node = factory(this, id, trellis);
 			if (node != null)
 				break;
 		}
@@ -121,8 +125,11 @@ import haxe.Json;
     return node;
   }
 
-	public function add_node(node:Node) {
-    nodes.push(node);
+	function add_node(node:Node) {
+		if (nodes.exists(node.id))
+			throw new Exception("Node " + node.id + " already exists!");
+
+    nodes[node.id] = node;
 	}
 
 	public function add_internal_node(node:INode) {
@@ -130,14 +137,15 @@ import haxe.Json;
 	}
 
 	public function get_node(id:Int):Node {
-		if (id < 1 || id >= nodes.length)
+		if (!nodes.exists(id))
+		//if (id < 1 || id >= nodes.length)
 			throw new Exception("There is no node with an id of " + id + ".");
 
 		return nodes[id];
 	}
 
-  function get_node_count() {
-    return nodes.length - 1;
+  public function get_node_count() {
+    return node_count;
   }
 
   public function load_schema_from_file(url:String, namespace:Namespace, auto_identity:Bool = false) {
@@ -180,7 +188,7 @@ import haxe.Json;
 	}
 
   public function load_internal_trellises() {
-		var functions = Macros.insert_file_as_string("json/core_nodes.json");
+		var functions = Macros.insert_file_as_string("inserts/core_nodes.json");
     var data = haxe.Json.parse(functions);
     schema.load_trellises(data.trellises, new Load_Settings(metahub_namespace));
   }

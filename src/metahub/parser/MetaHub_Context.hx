@@ -173,18 +173,23 @@ import metahub.code.functions.Functions;
   }
 
   static function set_property_block(data:Dynamic):Dynamic {
-    var result:Dynamic = {}
-    var items:Array<Dynamic> = cast data[2];
-
-    for (item in items) {
-      result[item[0]] = item[1];
-    }
-
-    return result;
+		return data[2];
+    //var result = new Array<Dynamic>();
+    //var items:Array<Dynamic> = cast data[2];
+//
+    //for (item in items) {
+      //result[item[0]] = item[1];
+    //}
+//
+    //return result;
   }
 
   static function set_property(data:Dynamic):Dynamic {
-    return [ data[0], data[4] ];
+    return {
+				path: data[0],
+				expression: data[6],
+				modifier: data[4]
+		};
   }
 
   static function set_values(data:Dynamic):Dynamic {

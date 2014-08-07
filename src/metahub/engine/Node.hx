@@ -1,7 +1,7 @@
 package metahub.engine;
+import metahub.code.Path;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
-import metahub.schema.Property_Chain;
 import metahub.schema.Kind;
 import metahub.code.functions.Functions;
 
@@ -97,28 +97,28 @@ class Node {
     return get_port(property.id);
   }
 
-	public function get_port_from_chain(chain:Property_Chain):Port {
-		if (chain.length == 0)
-			throw new Exception("Cannot follow empty property chain.");
-
-		var current_node = this;
-		var i = 0;
-		for (link in chain) {
-			if (link.type == Kind.reference) {
-				current_node = hub.get_node(link.id);
-			}
-			else {
-				if (i < chain.length - 1)
-					throw new Exception('Invalid chain. ' + link.fullname() + ' is not a reference.');
-
-				return current_node.get_port(link.id);
-			}
-
-			++i;
-		}
-
-		throw new Exception('Could not follow chain');
-	}
+	//public function get_port_from_chain(chain:Path):Port {
+		//if (chain.length == 0)
+			//throw new Exception("Cannot follow empty property chain.");
+//
+		//var current_node = this;
+		//var i = 0;
+		//for (link in chain) {
+			//if (link.type == Kind.reference) {
+				//current_node = hub.get_node(link.id);
+			//}
+			//else {
+				//if (i < chain.length - 1)
+					//throw new Exception('Invalid chain. ' + link.fullname() + ' is not a reference.');
+//
+				//return current_node.get_port(link.id);
+			//}
+//
+			//++i;
+		//}
+//
+		//throw new Exception('Could not follow chain');
+	//}
 
   public function get_value(index:Int):Dynamic {
     return values[index];
@@ -146,9 +146,14 @@ class Node {
 	}
 
   public function set_value(index:Int, value:Dynamic, source:General_Port = null) {
+		var property = trellis.properties[index];
+		if (property.type == Kind.pulse) {
+			update_trellis_connections(index, value, source);
+			return;
+		}
+
 		var old_value = values[index];
 		var port = ports[index];
-		var property = trellis.properties[index];
 		if (property.type == Kind.list)
 			throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
 
@@ -167,11 +172,7 @@ class Node {
 		values[index] = value;
 		hub.history.log(property.fullname() + "|set_value " + value);
 
-		var context = new Node_Context(this, hub);
-		var tree = trellis.get_tree();
-		for (t in tree) {
-			t.set_external_value(index, value, context, source);
-		}
+		update_trellis_connections(index, value, source);
 
 		if (property.type == Kind.reference && !property.other_trellis.is_value) {
       if (property.other_property.type == Kind.list) {
@@ -186,6 +187,14 @@ class Node {
 
 		hub.run_change_queue(this);
   }
+
+	function update_trellis_connections(index:Int, value:Dynamic, source:General_Port = null) {
+		var context = new Node_Context(this, hub);
+		var tree = trellis.get_tree();
+		for (t in tree) {
+			t.set_external_value(index, value, context, source);
+		}
+	}
 
 	public function add_item(index:Int, value:Dynamic) {
 		var port = ports[index];

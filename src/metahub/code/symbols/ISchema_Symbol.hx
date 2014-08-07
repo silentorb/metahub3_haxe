@@ -7,6 +7,6 @@ import metahub.schema.Trellis;
  */
 
 interface ISchema_Symbol extends Symbol {
-	function create_reference(path:Array<String>):Reference<ISchema_Symbol>;
+	//function create_reference(path:Array<String>):Reference<ISchema_Symbol>;
   function get_parent_trellis():Trellis;
 }

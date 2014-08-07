@@ -5,9 +5,10 @@ import metahub.engine.INode;
 import metahub.engine.Node;
 import metahub.engine.Port;
 import metahub.schema.Trellis;
-import metahub.schema.Property_Chain;
 import metahub.schema.Kind;
 import metahub.code.references.Reference;
+import metahub.code.Scope_Definition;
+
 
 class Local_Symbol implements Symbol {
   public var type:Type_Signature;
@@ -25,7 +26,7 @@ class Local_Symbol implements Symbol {
 
   public function get_node(scope:Scope):Node {
     var id = resolve(scope);
-    return scope.hub.nodes[id];
+    return scope.hub.get_node(id);
   }
 
 	public function get_trellis():Trellis {
@@ -50,41 +51,40 @@ class Local_Symbol implements Symbol {
     return resolve(scope.parent);
   }
 
-	public function get_port(scope:Scope, path:Property_Chain = null):Port {
-		var node = get_node2(scope, path);
-    return node.get_port(path[path.length - 1].id);
-  }
+	//public function get_port(scope:Scope, path:Property_Chain = null):Port {
+		//var node = get_node2(scope, path);
+    //return node.get_port(path[path.length - 1].id);
+  //}
 
-  function get_node2(scope:Scope, path:Property_Chain):Node {
-    var node = get_node(scope);
-    var nodes = scope.hub.nodes;
-    var i = 0;
-    var length = path.length - 1;
-    while (i < length) {
-      var id = node.get_value(path[i].id);
-      node = nodes[id];
-      ++i;
-    }
+  //function get_node2(scope:Scope, path:Property_Chain):Node {
+    //var node = get_node(scope);
+    //var i = 0;
+    //var length = path.length - 1;
+    //while (i < length) {
+      //var id = node.get_value(path[i].id);
+      //node = scope.hub.get_node(id);
+      //++i;
+    //}
+//
+    //return node;
+  //}
 
-    return node;
-  }
-
-	public function create_reference(path:Array<String>):Reference<Local_Symbol> {
-		var trellis = get_trellis();
-		var chain = Property_Chain_Helper.from_string(path, trellis);
-		if (chain.length == 0) {
-			if (type.type == Kind.reference)
-				return new Node_Reference(this, chain);
-
-			return new Port_Reference(this, chain);
-		}
-		else {
-			trace(chain);
-			var last_property = chain[chain.length - 1];
-			if (last_property.other_trellis == null)
-				return new Node_Reference(this, chain);
-
-			return new Port_Reference(this, chain);
-		}
-	}
+	//public function create_reference(path:Array<String>):Symbol_Reference {
+		//var trellis = get_trellis();
+		//var chain = Property_Chain_Helper.from_string(path, trellis);
+		//if (chain.length == 0) {
+			//if (type.type == Kind.reference)
+				//return new Node_Reference(this, chain);
+//
+			//return new Port_Reference(this, chain);
+		//}
+		//else {
+			//trace(chain);
+			//var last_property = chain[chain.length - 1];
+			//if (last_property.other_trellis == null)
+				//return new Node_Reference(this, chain);
+//
+			//return new Port_Reference(this, chain);
+		//}
+	//}
 }

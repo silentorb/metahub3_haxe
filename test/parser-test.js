@@ -110,12 +110,13 @@ buster.testCase("Parser", {
 
     var result = hub.parse_code(code);
     console.log(render_info(result))
+    console.log('end', result.end)
     assert(result.success, 'Match found.')
     var data = result.get_data()
     console.log(require('util').inspect(data, { showHidden: false, depth: 10 }));
     assert(data);
   },
-  "run shorthand": function () {
+  "=>run shorthand": function () {
     var hub = create_hub();
     hub.load_parser();
     var code = fs.readFileSync('test/scripts/boy.mh', { encoding: 'ascii' })
@@ -154,7 +155,7 @@ buster.testCase("Parser", {
     assert.equals(boy.get_value_by_name('item_count'), 2)
 
   },
-  "=>lesser float": function () {
+  "lesser float": function () {
     var hub = run_file('test/scripts/lesser.mh')
 
     var boy = hub.nodes[1]

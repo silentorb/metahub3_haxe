@@ -4,8 +4,8 @@ import metahub.code.references.*;
 import metahub.code.Type_Signature;
 import metahub.engine.General_Port;
 import metahub.schema.*;
-import metahub.schema.Property_Chain;
 
+/*
 class Property_Symbol implements ISchema_Symbol {
 
 	var property:Property;
@@ -43,22 +43,22 @@ class Property_Symbol implements ISchema_Symbol {
 		return Type_Signature.from_property(property);
 	}
 
-	public function create_reference(path:Array<String>):Reference<ISchema_Symbol> {
-		var trellis = get_trellis();
-		var chain = Property_Chain_Helper.from_string(path, trellis);
-		if (chain.length == 0) {
-			if (property.type == Kind.reference)
-				return new Trellis_Reference(this, chain);
-
-			return new Property_Reference(this, chain);
-		}
-		else {
-			var last_property = chain[chain.length - 1];
-			if (last_property.other_trellis == null)
-				return new Property_Reference(this, chain);
-
-			return new Trellis_Reference(this, chain);
-		}
-
-	}
-}
+	//public function create_reference(path:Array<String>):Reference<ISchema_Symbol> {
+		//var trellis = get_trellis();
+		//var chain = Property_Chain_Helper.from_string(path, trellis);
+		//if (chain.length == 0) {
+			//if (property.type == Kind.reference)
+				//return new Trellis_Reference(this, chain);
+//
+			//return new Property_Reference(this, chain);
+		//}
+		//else {
+			//var last_property = chain[chain.length - 1];
+			//if (last_property.other_trellis == null)
+				//return new Property_Reference(this, chain);
+//
+			//return new Trellis_Reference(this, chain);
+		//}
+//
+	//}
+}*/

@@ -7,7 +7,7 @@ import metahub.schema.Property_Chain;
  * ...
  * @author Christopher W. Johnson
  */
-
+/*
 class Trellis_Reference extends Reference<ISchema_Symbol>{
 
 	public function new(symbol:ISchema_Symbol, chain:Property_Chain = null) {
@@ -22,4 +22,4 @@ class Trellis_Reference extends Reference<ISchema_Symbol>{
 		throw new Exception("Not implemented yet.");
 	}
 
-}
+}*/

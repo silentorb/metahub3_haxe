@@ -2,6 +2,7 @@ package metahub.schema;
 import metahub.code.functions.Functions;
 import metahub.engine.INode;
 import metahub.schema.Trellis;
+import metahub.code.Type_Signature;
 
 typedef IProperty_Source = {
 	type:String,
@@ -30,7 +31,7 @@ typedef IProperty_Source = {
 		else
 		#end
 			this.type = cast Reflect.field(Kind, source.type);
-		
+
     if (source.default_value != null)
       this.default_value = source.default_value;
 
@@ -99,5 +100,8 @@ typedef IProperty_Source = {
     }
   }
 
+	public function get_signature() {
+		return new Type_Signature(type, other_trellis);
+	}
 
 }

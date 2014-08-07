@@ -6,7 +6,7 @@ import metahub.engine.General_Port;
 import metahub.schema.Property_Chain;
 import metahub.schema.Trellis;
 import metahub.code.references.Reference;
-
+/*
 class Trellis_Symbol implements ISchema_Symbol implements This  {
 	var trellis:Trellis;
 	var symbol:ISchema_Symbol;
@@ -56,4 +56,4 @@ class Trellis_Symbol implements ISchema_Symbol implements This  {
 
 		return new Property_Reference(symbol, chain);
 	}
-}
+}*/

@@ -26,6 +26,7 @@ class Trellis implements INode {
 	var ports = new Array<General_Port>();
 	public var properties = new Array<Property>();
 	public var is_value:Bool = false;
+	public var events:Array<String>;
 
   public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;
@@ -165,8 +166,8 @@ class Trellis implements INode {
     }
   }
 
-	 public function initialize2(source:ITrellis_Source) {
-		 if (Reflect.hasField(source, 'is_value'))
+	public function initialize2(source:ITrellis_Source) {
+		if (Reflect.hasField(source, 'is_value'))
 			is_value = source.is_value;
 		else if (parent != null) {
 			is_value = parent.is_value;

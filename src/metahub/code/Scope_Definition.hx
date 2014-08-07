@@ -3,13 +3,14 @@ import metahub.engine.Node;
 import metahub.code.symbols.*;
 import metahub.schema.Kind;
 import metahub.schema.Namespace;
+import metahub.schema.Trellis;
 
 class Scope_Definition {
   var parent:Scope_Definition;
   var types = new Array<Symbol>();
   var symbols = new Map<String, Symbol>();
+	public var trellis:Trellis = null;
   public var depth:Int = 0;
-	public var _this:This;
 	public var hub:Hub;
 
   public function new(parent:Scope_Definition = null, hub:Hub = null) {
@@ -17,7 +18,6 @@ class Scope_Definition {
     if (parent != null) {
 			this.hub = parent.hub;
       this.depth = parent.depth + 1;
-			this._this = parent._this;
 		}
 		else {
 			this.hub = hub;
@@ -41,7 +41,7 @@ class Scope_Definition {
     return parent._find(name);
   }
 
-	public function find(name:String, namespace:Namespace):Symbol {
+	public function find(name:String):Symbol {
     if (symbols.exists(name))
       return symbols[name];
 
@@ -49,21 +49,21 @@ class Scope_Definition {
     if (parent != null)
 			result = parent._find(name);
 
-		if (result == null) {
-			if (_this != null) {
-				return _this.get_context_symbol(name);
-			}
-		}
+		//if (result == null) {
+			//if (_this != null) {
+				//return _this.get_context_symbol(name);
+			//}
+		//}
 
-		if (result == null) {
-			var trellis = hub.schema.get_trellis(name, namespace, false);
-			if (trellis != null) {
-				result = new Trellis_Symbol(trellis);
-			}
-		}
+		//if (result == null) {
+			//var trellis = hub.schema.get_trellis(name, namespace, false);
+			//if (trellis != null) {
+				//result = new Trellis_Symbol(trellis);
+			//}
+		//}
 
-		if (result == null)
-			throw new Exception("Could not find symbol: " + name + ".");
+		//if (result == null)
+			//throw new Exception("Could not find symbol: " + name + ".");
 
     return result;
   }

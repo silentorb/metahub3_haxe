@@ -1,7 +1,7 @@
 package metahub.parser;
 
 class Repetition extends Pattern {
-  public var min:Int;
+  public var min:Int; // min < 1 means this pattern is optional
   public var max:Int; // max < 1 is infinite
   public var pattern:Pattern;
   public var divider:Pattern;

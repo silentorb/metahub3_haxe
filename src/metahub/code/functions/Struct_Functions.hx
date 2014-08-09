@@ -1,4 +1,7 @@
 package metahub.code.functions;
+import metahub.schema.Kind;
+
+import metahub.engine.Node;
 
 /**
  * ...
@@ -20,16 +23,40 @@ class Struct_Functions extends Function {
 		}
 	}
 
+	override private function reverse(new_value:Dynamic, args:Array<Dynamic>):Dynamic {
+		return new_value;
+	}
+
 	function add_forward(args:Array<Dynamic>) {
 		var trellis = signature[0].trellis;
-		trellis.total =
-		var total:Float = 0;
+		var result = hub.create_node(trellis);
+		var nodes = new Array<Node>();
 		for (arg in args) {
-			var value:Float = cast arg;
-			total += value;
+			nodes.push(hub.get_node(arg));
 		}
 
-		return total;
+		for (property in trellis.properties) {
+			if (property.name == "parent")
+				continue;
+
+			if (property.type == Kind.int) {
+				var value:Int = result.get_value(property.id);
+				for (node in nodes) {
+					value += node.get_value(property.id);
+				}
+				result.set_value(property.id, value);
+			}
+
+			if (property.type == Kind.float) {
+				var value:Float = result.get_value(property.id);
+				for (node in nodes) {
+					value += node.get_value(property.id);
+				}
+				result.set_value(property.id, value);
+			}
+		}
+
+		return result.id;
 	}
 
 	function subtract_forward(args:Array<Dynamic>):Dynamic {

@@ -28,13 +28,13 @@ class Type_Signature {
 
 	public function equals(other:Type_Signature):Bool {
 		if (this.type != other.type) {
-			if (check_numeric(this, other) || check_numeric(other, this))
-				return true;
-
 			return check_unknown(this, other) || check_unknown(other, this);
 		}
 
 		if (this.type == Kind.reference || this.type == Kind.list) {
+			if (check_numeric(this, other) || check_numeric(other, this))
+				return true;
+
 			return this.trellis == other.trellis || this.trellis == null || other.trellis == null;
 		}
 
@@ -93,7 +93,6 @@ class Type_Signature {
 			&& first.trellis != null
 			&& first.trellis.is_numeric
 			&& second.type == Kind.reference
-			&& second.is_numeric
 			&& (second.trellis == null || second.trellis == first.trellis);
 	}
 

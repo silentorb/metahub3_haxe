@@ -38,6 +38,12 @@ class Function_Library {
 		add(Functions.lesser_than, "Lesser_Than_Int", bool_int2);
 		add(Functions.count, "Count", [ type_int, type_list ]);
 
+		var struct_type = new Type_Signature(Kind.reference);
+		struct_type.is_numeric = true;
+		var struct3 = [ struct_type, struct_type, struct_type ];
+
+		add(Functions.add, "Struct_Functions", struct3);
+
 		var bool_float2 = hub.schema.get_trellis("float1", hub.metahub_namespace);
 		var float3 = hub.schema.get_trellis("float2", hub.metahub_namespace);
 
@@ -48,11 +54,6 @@ class Function_Library {
 		add2(Functions.greater_than, "Float_Functions", bool_float2);
 		add2(Functions.greater_than_or_equal_to, "Float_Functions", bool_float2);
 
-		var struct_type = new Type_Signature(Kind.reference);
-		struct_type.is_numeric = true;
-		var struct3 = [ struct_type, struct_type, struct_type ];
-
-		add(Functions.add, "Struct_Functions", struct3);
 	}
 
 	function add(func:metahub.code.functions.Functions, class_name:String, signature:Array<Type_Signature>) {

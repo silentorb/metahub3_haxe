@@ -101,7 +101,12 @@ typedef IProperty_Source = {
   }
 
 	public function get_signature() {
-		return new Type_Signature(type, other_trellis);
+		var result = new Type_Signature(type, other_trellis);
+
+		if (other_trellis != null && other_trellis.is_value)
+			result.is_numeric = other_trellis.is_numeric;
+
+		return result;
 	}
 
 }

@@ -33,7 +33,7 @@ class Coder {
         return create_general_reference(source, scope_definition);
       case 'function':
         return function_expression(source, scope_definition, type);
-			case 'node':
+			case 'create_node':
         return create_node(source, scope_definition);
     }
 
@@ -47,8 +47,8 @@ class Coder {
         return create_block(source, scope_definition);
       case 'symbol':
         return create_symbol(source, scope_definition);
-      //case 'set':
-        //return set(source, scope_definition);
+      case 'set_property':
+        return set_property(source, scope_definition);
 			case 'node_scope':
 				return node_scope(source, scope_definition);
 			case 'trellis_scope':
@@ -78,13 +78,13 @@ class Coder {
 		return new metahub.code.statements.Create_Constraint(reference, expression);
   }
 
-  function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression_Statement {
-    var new_scope_definition = new Scope_Definition(scope_definition);
-    var block = new metahub.code.statements.Block(new_scope_definition);
+  function create_block(source:Dynamic, scope_definition:Scope_Definition):Block {
+    //var new_scope_definition = new Scope_Definition(scope_definition);
+    var block = new metahub.code.statements.Block();
 
     for (e in Reflect.fields(source.expressions)) {
       var child = Reflect.field(source.expressions, e);
-      block.statements.push(convert_statement(child, new_scope_definition));
+      block.statements.push(convert_statement(child, scope_definition));
     }
 
     return block;
@@ -121,10 +121,12 @@ class Coder {
 
 		var namespace = get_namespace(path, hub.schema.root_namespace);
     var trellis = hub.schema.get_trellis(path[path.length - 1], namespace, true);
-    var result = new metahub.code.expressions.Create_Node(trellis);
+		var new_scope = new Scope_Definition(scope_definition);
+		new_scope.trellis = trellis;
+    var result = new metahub.code.expressions.Create_Node(trellis, new_scope);
 
     if (source.set != null) {
-			result.block = create_block(source.set, scope_definition, trellis);
+			result.block = create_block(source.set, new_scope);
       //for (key in Reflect.fields(source.set)) {
         //var property = trellis.get_property(key);
         //result.assignments[property.id] = convert_expression(Reflect.field(source.set, key), scope_definition);
@@ -168,6 +170,20 @@ class Coder {
     var expression = convert_expression(source.expression, scope_definition);
     var symbol = scope_definition.add_symbol(source.name, expression.get_types()[0][0]);
     return new metahub.code.statements.Create_Symbol(symbol, expression);
+  }
+
+	function set_property(source:Dynamic, scope_definition:Scope_Definition):Statement {
+		var reference = Reference.from_scope(source.path, scope_definition);
+    var expression = convert_expression(source.expression, scope_definition);
+
+		// Equavelent to += in other languages
+		if (Reflect.hasField(source, "modifier") && source.modifier != Functions.none) {
+			var func = Type.createEnum(Functions, source.modifier);
+			var inputs = [ new Expression_Reference(reference), expression ];
+			expression = new Function_Call(func, reference.get_type(), inputs, hub);
+		}
+
+		return new Assignment(reference, expression);
   }
 
   static function get_type(value:Dynamic):Type_Signature {
@@ -230,6 +246,14 @@ class Coder {
 
 		return result;
 	}*/
+
+	function node_scope(source:Dynamic, scope_definition:Scope_Definition):Statement {
+		var symbol = scope_definition.find(source.path);
+    var new_scope_definition = new Scope_Definition(scope_definition);
+		new_scope_definition.symbol = symbol;
+		new_scope_definition.trellis = symbol.get_trellis();
+		return new Node_Scope(create_block(source.block, new_scope_definition), new_scope_definition);
+}
 
 	function trellis_scope(source:Dynamic, scope_definition:Scope_Definition):Statement {
 		var path:Array<String> = source.path;

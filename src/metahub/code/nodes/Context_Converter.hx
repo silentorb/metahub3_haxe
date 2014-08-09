@@ -3,31 +3,43 @@ import metahub.code.Path;
 import metahub.engine.Context;
 import metahub.engine.INode;
 import metahub.engine.General_Port;
+import metahub.engine.Node;
 import metahub.engine.Node_Context;
 import metahub.schema.Kind;
 import metahub.schema.Property;
+import metahub.schema.Trellis;
 
 /**
  * ...
  * @author Christopher W. Johnson
  */
 class Context_Converter implements INode {
-	public var ports = new Array<General_Port>();
-	public var properties = new Array<Property>();
-	public var path:Path;
+	var ports = new Array<General_Port>();
+	var forward_path:Path;
+	var reverse_path:Path;
+	var trellis:Trellis;
 
-	public function new(path:Path) {
-		this.path = path;
-		properties.push(path.first());
-		properties.push(path.last());
+	public function new(path:Path, trellis:Trellis) {
+		this.trellis = trellis;
+		forward_path = path.slice(0, -1);
+		reverse_path = create_reverse(path);
 
 		ports.push(new General_Port(this, 0));
 		ports.push(new General_Port(this, 1));
 	}
 
-	function create_context(context:Context, node_id:Int) {
-		var node = context.hub.get_node(node_id);
-		return new Node_Context(node, context.hub);
+	static function create_reverse(path:Path):Path {
+		var reverse = new Array<Property>();
+		var i = path.length - 1;
+		while (--i >= 0) {
+			reverse.push(path.at(i).other_property);
+		}
+		return new Path(reverse);
+	}
+
+	function create_context(hub:Hub, node_id:Int) {
+		var node = hub.get_node(node_id);
+		return new Node_Context(node, hub);
 	}
 
 	public function get_port(index:Int):General_Port {
@@ -39,9 +51,36 @@ class Context_Converter implements INode {
 		return ports[index];
 	}
 
+	static function has_lists(path:Path) {
+		for (i in 0...path.length) {
+			if (path.at(i).type == Kind.list)
+				return true;
+		}
+
+		return false;
+	}
+
 	public function get_value(index:Int, context:Context):Dynamic {
-		//index = 1 - index;
+		//throw new Exception("Not implemented.");
 		var port = ports[1 - index];
+
+		var current_path = index == 0 ? forward_path : reverse_path;
+		if (has_lists(current_path))
+			throw new Exception("Not implemented.");
+
+		var nodes = follow_path(current_path, 0, context.node, index);
+		var property_id = current_path.last().id;
+
+		if (nodes.length == 0)
+			throw new Exception("Context_Converter cannot get value for null reference.");
+
+		return port.get_external_value(new Node_Context(nodes[0], context.hub));
+
+		//for (node in nodes) {
+			//port.set_external_value(value, new Node_Context(node, context.hub));
+		//}
+
+		/*var port = ports[1 - index];
 		var property = properties[index];
 		if (property.type == Kind.list) {
 			var list:Array<Dynamic> = cast context.node.get_value(property.id);
@@ -59,25 +98,61 @@ class Context_Converter implements INode {
 				throw new Exception("Context_Converter cannot get value for null reference.");
 
 			return port.get_external_value(create_context(context, node_id));
-		}
+		}*/
 	}
 
 	public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		//index = 1 - index;
 		var port = ports[1 - index];
-		var property = properties[index];
-		trace("set - Converting " + property.fullname() + " to " + property.other_property.fullname());
-		if (property.type == Kind.list) {
-			var ids:Array<Int> = cast context.node.get_value(property.id);
-			for (i in ids) {
-				if (i > 0)
-					port.set_external_value(value, create_context(context, i));
+
+		var current_path = index == 0 ? forward_path : reverse_path;
+		var nodes = follow_path(current_path, 0, context.node, index);
+		var property_id = current_path.last().id;
+		for (node in nodes) {
+			port.set_external_value(value, new Node_Context(node, context.hub));
+			//node.set_value(property_id, value);
+		}
+	}
+
+	function follow_path(path:Path, step:Int, node:Node, dir:Int):Array<Node>{
+		var property = path.at(step);
+		var result = new Array<Node>();
+
+		if (step < path.length - 1) {
+			if (property.type == Kind.list) {
+				var ids:Array<Int> = cast node.get_value(property.id);
+				for (i in ids) {
+					if (i > 0)
+						result = result.concat(follow_path(path, ++step, node.hub.get_node(i), dir));
+				}
+			}
+			else {
+				var node_id:Int = cast node.get_value(property.id);
+				if (node_id > 0)
+					result = result.concat(follow_path(path, ++step, node.hub.get_node(node_id), dir));
 			}
 		}
 		else {
-			var node_id:Int = cast context.node.get_value(property.id);
-			if (node_id > 0)
-				port.set_external_value(value, create_context(context, node_id));
+			if (property.type == Kind.list) {
+				var ids:Array<Int> = cast node.get_value(property.id);
+				for (i in ids) {
+					if (i > 0) {
+						var node = node.hub.get_node(i);
+						if (node.trellis.is_a(trellis))
+							result.push(node);
+					}
+				}
+			}
+			else {
+				var node_id:Int = cast node.get_value(property.id);
+				if (node_id > 0) {
+					var node = node.hub.get_node(node_id);
+					if (dir == 0 || node.trellis.is_a(trellis))
+							result.push(node);
+				}
+					//port.set_external_value(value, create_context(node.hub, node_id));
+			}
 		}
+
+		return result;
 	}
 }

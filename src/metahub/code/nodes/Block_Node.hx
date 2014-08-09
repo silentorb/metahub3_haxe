@@ -1,5 +1,8 @@
 package metahub.code.nodes;
+import metahub.code.Scope;
 import metahub.code.Setter;
+import metahub.code.statements.Block;
+import metahub.engine.Context;
 import metahub.engine.General_Port;
 import metahub.engine.INode;
 
@@ -7,15 +10,16 @@ import metahub.engine.INode;
  * ...
  * @author Christopher W. Johnson
  */
-class Setter_Node implements INode {
+
+class Block_Node implements INode {
 
 	var port:General_Port;
-	var setter:Setter;
+	var block:Block;
 	var scope:Scope;
 
-	public function new(setter:Setter, scope:Scope) {
+	public function new(block:Block, scope:Scope) {
 		port = new General_Port(this, 0);
-		this.setter = setter;
+		this.block = block;
 		this.scope = scope;
 	}
 
@@ -28,7 +32,16 @@ class Setter_Node implements INode {
 	}
 
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		setter.run(context.node, scope);
+		block.resolve(scope);
+	}
+
+	public function run() {
+		var nodes = scope.hub.get_nodes_by_trellis(scope.definition.trellis);
+		for (node in nodes) {
+			var node_scope = new Scope(scope.hub, scope.definition, scope.parent);
+			node_scope.node = node;
+			block.resolve(node_scope);
+		}
 	}
 
 }

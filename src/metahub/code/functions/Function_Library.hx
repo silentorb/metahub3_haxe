@@ -10,6 +10,7 @@ import metahub.code.functions.Greater_Than_Int;
 import metahub.code.functions.Lesser_Than_Int;
 
 import metahub.code.functions.Float_Functions;
+import metahub.code.functions.Struct_Functions;
 import metahub.code.functions.Count;
 
 /**
@@ -28,21 +29,30 @@ class Function_Library {
 		var type_float = new Type_Signature(Kind.float);
 		var type_bool = new Type_Signature(Kind.bool);
 		var type_list = new Type_Signature(Kind.list);
+		var int3 = [ type_int, type_int, type_int ];
+		var bool_int2 = [ type_bool, type_int, type_int ];
 
-		add(Functions.add, "Add_Int", [ type_int, type_int, type_int ]);
-		add(Functions.subtract, "Subtract_Int", [ type_int, type_int, type_int ]);
-		add(Functions.greater_than, "Greater_Than_Int", [ type_bool, type_int, type_int ]);
-		add(Functions.lesser_than, "Lesser_Than_Int", [ type_bool, type_int, type_int ]);
+		add(Functions.add, "Add_Int", int3);
+		add(Functions.subtract, "Subtract_Int", int3);
+		add(Functions.greater_than, "Greater_Than_Int", bool_int2);
+		add(Functions.lesser_than, "Lesser_Than_Int", bool_int2);
 		add(Functions.count, "Count", [ type_int, type_list ]);
 
-		var float1 = hub.schema.get_trellis("float1", hub.metahub_namespace);
-		var float2 = hub.schema.get_trellis("float2", hub.metahub_namespace);
-		add2(Functions.add, "Float_Functions", float2);
-		add2(Functions.subtract, "Float_Functions", float2);
-		add2(Functions.lesser_than, "Float_Functions", float1);
-		add2(Functions.lesser_than_or_equal_to, "Float_Functions", float1);
-		add2(Functions.greater_than, "Float_Functions", float1);
-		add2(Functions.greater_than_or_equal_to, "Float_Functions", float1);
+		var bool_float2 = hub.schema.get_trellis("float1", hub.metahub_namespace);
+		var float3 = hub.schema.get_trellis("float2", hub.metahub_namespace);
+
+		add2(Functions.add, "Float_Functions", float3);
+		add2(Functions.subtract, "Float_Functions", float3);
+		add2(Functions.lesser_than, "Float_Functions", bool_float2);
+		add2(Functions.lesser_than_or_equal_to, "Float_Functions", bool_float2);
+		add2(Functions.greater_than, "Float_Functions", bool_float2);
+		add2(Functions.greater_than_or_equal_to, "Float_Functions", bool_float2);
+
+		var struct_type = new Type_Signature(Kind.reference);
+		struct_type.is_numeric = true;
+		var struct3 = [ struct_type, struct_type, struct_type ];
+
+		add(Functions.add, "Struct_Functions", struct3);
 	}
 
 	function add(func:metahub.code.functions.Functions, class_name:String, signature:Array<Type_Signature>) {
@@ -79,7 +89,7 @@ class Function_Library {
 		return {
 			signature: signature,
 			type: type,
-			trellis: trellis != null ? trellis : hub.schema.get_trellis(class_name, hub.metahub_namespace, true)
+			trellis: trellis != null ? trellis : hub.schema.get_trellis(class_name, hub.metahub_namespace)
 		}
 	}
 

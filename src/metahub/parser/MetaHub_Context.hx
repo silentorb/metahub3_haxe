@@ -1,6 +1,13 @@
 package metahub.parser;
 import metahub.code.functions.Functions;
 
+typedef Assignment_Source = {
+	type:String,
+	path:Array<String>,
+	expression:Dynamic,
+	?modifier:String
+}
+
 @:expose class MetaHub_Context extends Context {
 
 	private static var function_map:Map<String, Functions>;
@@ -111,7 +118,7 @@ import metahub.code.functions.Functions;
     var operator:String = cast rep_match.dividers[0].matches[1].get_data();
     //trace('op', operator);
     var operators = {
-    '+': 'sum',
+    '+': 'add',
     '-': 'subtract'
     };
     return {
@@ -188,11 +195,16 @@ import metahub.code.functions.Functions;
   }
 
   static function set_property(data:Dynamic):Dynamic {
-    return {
-				path: data[0],
-				expression: data[6],
-				modifier: data[4]
+    var result:Assignment_Source = {
+			type: "set_property",
+			path: data[0],
+			expression: data[6],
 		};
+
+		if (data[4].length > 0)
+			result.modifier = Std.string(function_map[data[4][0]]);
+
+		return result;
   }
 
   static function node_scope(data:Dynamic):Dynamic {

@@ -76,6 +76,20 @@
         }
       }
     },
+		"struct2": {
+      "parent": "function",
+      "properties": {
+        "output": {
+          "type": "unknown"
+        },
+        "first": {
+          "type": "unknown"
+        },
+        "second": {
+          "type": "unknown"
+        }
+      }
+    },
     "Add_Int": {
       "parent": "int2"
     },

@@ -14,7 +14,7 @@ class Type_Signature {
 
 	function update_numeric() {
 		if (type != unknown) // Only update if the type is known
-			is_numeric = type == Kind.int || type == Kind.float;
+			is_numeric = type == Kind.int || type == Kind.float || (type == Kind.reference && trellis != null && trellis.is_numeric);
 	}
 
   //static function create_from_string(name:String):Type_Signature {
@@ -28,6 +28,9 @@ class Type_Signature {
 
 	public function equals(other:Type_Signature):Bool {
 		if (this.type != other.type) {
+			if (check_numeric(this, other) || check_numeric(other, this))
+				return true;
+
 			return check_unknown(this, other) || check_unknown(other, this);
 		}
 
@@ -64,6 +67,11 @@ class Type_Signature {
 				update_numeric();
 			}
 		}
+		else if (check_numeric(other, this)) {
+			type = Kind.reference;
+			is_numeric = true;
+			trellis = other.trellis;
+		}
 
 		if (type == Kind.list || type == Kind.reference) {
 			if (trellis == null && other.trellis != null)
@@ -78,6 +86,15 @@ class Type_Signature {
 		}
 
 		return result;
+	}
+
+	public static function check_numeric(first:Type_Signature, second:Type_Signature) {
+		return first.type == Kind.reference
+			&& first.trellis != null
+			&& first.trellis.is_numeric
+			&& second.type == Kind.reference
+			&& second.is_numeric
+			&& (second.trellis == null || second.trellis == first.trellis);
 	}
 
 	public static function check_unknown(first:Type_Signature, second:Type_Signature) {

@@ -1,4 +1,5 @@
 package metahub.engine;
+import metahub.code.nodes.Block_Node;
 import metahub.code.Path;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
@@ -57,6 +58,10 @@ class Node {
 			case Kind.reference:
 				if (property.other_trellis.is_value) {
 					var node = hub.create_node(property.other_trellis);
+					var parent_property = property.other_trellis.get_property("parent");
+					if (parent_property != null)
+						node.set_value(parent_property.id, id, null);
+
 					return node.id;
 				}
 				return 0;
@@ -66,6 +71,9 @@ class Node {
 
 			case Kind.bool:
 				return false;
+
+			case Kind.pulse:
+				return null;
 
 			default:
 				throw new Exception("No default is implemented for type " + property.type + ".");
@@ -175,13 +183,15 @@ class Node {
 		update_trellis_connections(index, value, source);
 
 		if (property.type == Kind.reference && !property.other_trellis.is_value) {
+			var other_node = hub.get_node(value);
       if (property.other_property.type == Kind.list) {
-        var other_node = hub.get_node(value);
-				other_node.add_item(property.other_property.id, id);
+				var list:Array<Dynamic> = other_node.get_value(property.other_property.id);
+				if (list.indexOf(id) == -1)
+					other_node.add_item(property.other_property.id, id);
       }
       else {
-				throw new Exception("Not implemented.");
-
+				if (other_node.get_value(property.other_property.id) != id)
+					other_node.set_value(property.other_property.id, id, source);
       }
     }
 
@@ -192,7 +202,8 @@ class Node {
 		var context = new Node_Context(this, hub);
 		var tree = trellis.get_tree();
 		for (t in tree) {
-			t.set_external_value(index, value, context, source);
+			if (t.properties.length > index)
+				t.set_external_value(index, value, context, source);
 		}
 	}
 
@@ -219,6 +230,18 @@ class Node {
 
 		}
   }
+
+  public function pulse(index:Int) {
+		var property = trellis.properties[index];
+		if (property.type != Kind.pulse)
+			throw new Exception("Property " + property.fullname() + " is not a pulse.");
+
+		var port = trellis.get_port(index);
+		for (other in port.connections) {
+			var block:Block_Node = cast other.node;
+			block.run();
+		}
+	}
 
 	public function copy(target:Node) {
 		for (i in 0...trellis.properties.length) {

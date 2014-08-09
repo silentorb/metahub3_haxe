@@ -1,10 +1,11 @@
 package metahub.code.expressions;
-import metahub.code.nodes.Setter_Node;
+import metahub.code.nodes.Block_Node;
 
 /**
  * ...
  * @author Christopher W. Johnson
  */
+/*
 class Set implements Expression {
 
 	public function new() {
@@ -32,4 +33,4 @@ class Set implements Expression {
 
 	}
 
-}
+}*/

@@ -27,6 +27,7 @@ class Trellis implements INode {
 	public var properties = new Array<Property>();
 	public var is_value:Bool = false;
 	public var events:Array<String>;
+	public var is_numeric:Bool = false;
 
   public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;
@@ -38,7 +39,7 @@ class Trellis implements INode {
   public function add_property(name:String, source:IProperty_Source):Property {
     var property = new Property(name, source, this);
     this.property_keys[name] = property;
-    property.id = this.core_properties.length;
+    property.id = 10000;
     core_properties.push(property);
     return property;
   }
@@ -51,9 +52,11 @@ class Trellis implements INode {
   public function get_all_properties() {
     var result = new Map<String, Property>();
     var tree = this.get_tree();
+		var index = 0;
     for (trellis in tree) {
       for (property in trellis.core_properties) {
         result[property.name] = property;
+				property.id = index++;
       }
     }
     return result;
@@ -179,7 +182,17 @@ class Trellis implements INode {
         property.initialize_link(Reflect.field(source.properties, j));
       }
     }
-  }
+
+		get_all_properties();
+
+		is_numeric = true;
+		for (p in properties) {
+			if (p.type != Kind.float && p.type != Kind.int) {
+				is_numeric = false;
+				break;
+			}
+		}
+	}
 
   function set_parent(parent:Trellis) {
     this.parent = parent;

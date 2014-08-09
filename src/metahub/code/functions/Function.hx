@@ -11,25 +11,20 @@ typedef Identity = UInt;
 class Function implements INode {
 	public var hub:Hub;
   var ports = new Array<General_Port>();
-  var trellis:Trellis;
 	var func:Functions;
 	public var id:Identity;
+	var signature:Array<Type_Signature>;
 
-	public function new(hub:Hub, id:Identity, trellis:Trellis, func:Functions) {
+	public function new(hub:Hub, id:Identity, func:Functions, signature:Array<Type_Signature>) {
     this.hub = hub;
     this.id = id;
-    this.trellis = trellis;
 		this.func = func;
+		this.signature = signature;
 
-		var properties = trellis.get_all_properties();
-
-    for (property in properties) {
-			if (property == trellis.identity_property)
-				continue;
-
-      var port = new General_Port(this, ports.length);
+		for (type in signature) {
+			var port = new General_Port(this, ports.length);
       ports.push(port);
-    }
+		}
 	}
 
 	public function get_value(index:Int, context:Context):Dynamic {
@@ -71,21 +66,13 @@ class Function implements INode {
 	}
 
   public function get_inputs():Array<General_Port> {
-		var properties = trellis.get_all_properties();
-    var result = new Array<General_Port>();
-    for (property in properties) {
-      if (property.name != "output") {
-        result.push(get_port(property.id));
-      }
-    }
-
-    return result;
+		return ports.slice(1);
   }
 
   public function get_port(index:Int):General_Port {
 #if debug
   if ((index < 0 && index >= ports.length) || ports[index] == null)
-  throw new Exception("Node " + trellis.name + " does not have a property index of " + index + ".");
+  throw new Exception("Node " + Std.string(func) + " does not have a property index of " + index + ".");
 #end
     return ports[index];
   }
@@ -101,7 +88,7 @@ class Function implements INode {
 
 	function run_forward(context:Context):Dynamic {
    var args = get_input_values(context);
-		context.hub.history.log("function " + trellis.name + " forward()" + args);
+		context.hub.history.log("function " + Std.string(func) + " forward()" + args);
 		return forward(args);
 
     //var result = Function_Calls.call(trellis.name, args, ports[0].get_type());
@@ -109,7 +96,7 @@ class Function implements INode {
 	}
 
 	function run_reverse(value:Dynamic, context:Context) {
-		context.hub.history.log("function " + trellis.name + " reverse()");
+		context.hub.history.log("function " + Std.string(func) + " reverse()");
 		//throw new Exception("Function.run_reverse Not implemented.");
 
 		return reverse(value, get_input_values(context));

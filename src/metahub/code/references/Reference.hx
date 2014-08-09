@@ -2,6 +2,7 @@ package metahub.code.references;
 import metahub.code.nodes.Context_Converter;
 import metahub.code.Layer;
 import metahub.schema.Trellis;
+import metahub.schema.Kind;
 
 import metahub.code.Type_Signature;
 import metahub.engine.General_Port;
@@ -38,8 +39,9 @@ class Reference {
 		else {
 			var property = path.last();
 			var port = property.trellis.get_port(property.id);
-			if (path.length >= 2) {
-				var converter = new Context_Converter(path);
+
+			if (property.type != Kind.pulse && (path.length >= 3 || (path.length == 2 && !property.trellis.is_value))) {
+				var converter = new Context_Converter(path, scope.definition.trellis);
 				port.connect(converter.get_port(1));
 				return converter.get_port(0);
 			}
@@ -50,7 +52,18 @@ class Reference {
 	}
 
 	public function resolve(scope:Scope):Dynamic {
-		throw new Exception("Not yet implemented.");
+		if (symbol != null) {
+			return symbol.resolve(scope);
+		}
+		else if (scope.node != null) {
+			return path.resolve(scope.node);
+		}
+		//else if (scope.definition.trellis != null) {
+			//var trellis = scope.definition.trellis;
+//
+		//}
+
+		throw new Exception("Not supported.");
 	}
 
 	public static function from_scope(source:Array<String>, scope_definition:Scope_Definition) {

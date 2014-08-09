@@ -1,12 +1,14 @@
 package metahub.code.statements;
 
 import metahub.code.expressions.Expression;
+import metahub.code.nodes.Path_Condition;
 import metahub.code.references.Property_Reference;
 import metahub.code.references.Reference;
 import metahub.code.symbols.Property_Symbol;
 import metahub.engine.Constraint_Operator;
 import metahub.engine.General_Port;
 import metahub.code.reference.*;
+import metahub.schema.Kind;
 
 class Create_Constraint implements Statement {
   public var type:Type_Signature;
@@ -29,8 +31,15 @@ class Create_Constraint implements Statement {
 		var signature = Type_Network.analyze(expression, reference.get_type(), scope);
 		var other_port = expression.to_port(scope, group, signature);
 
+		if (reference.path.length > 1 && reference.get_type().type != Kind.pulse) {
+			var condition = new Path_Condition(reference.path, scope.definition.trellis);
+			condition.get_port(1).connect(other_port);
+			port.connect(condition.get_port(0));
+		}
+		else {
+			port.connect(other_port);
+		}
 
-		port.connect(other_port);
 		return null;
   }
 

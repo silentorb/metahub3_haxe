@@ -2,6 +2,7 @@ package metahub.code.expressions;
 
 import metahub.code.functions.Functions;
 import metahub.code.Node_Signature;
+import metahub.engine.Node_Context;
 
 import metahub.code.Type_Signature;
 import metahub.schema.Trellis;
@@ -34,7 +35,7 @@ class Function_Call implements Expression {
 			return inputs[0].to_port(scope, group, node_signature);
 		}
 		var info = hub.function_library.get_function_info(func, node_signature.signature);
-		var node:Function = Type.createInstance(info.type, [hub, hub.get_node_count(), info.trellis, func]);
+		var node:Function = Type.createInstance(info.type, [hub, hub.get_node_count(), func, node_signature.signature]);
     hub.add_internal_node(node);
 		var expressions = inputs;
     var ports = node.get_inputs();
@@ -49,7 +50,9 @@ class Function_Call implements Expression {
     }
 
     var output = node.get_port(0);
-		group.nodes.unshift(node);
+		if (group != null)
+			group.nodes.unshift(node);
+
     return output;
   }
 
@@ -85,7 +88,8 @@ class Function_Call implements Expression {
 	}
 
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
-		throw new Exception("Not implemented");
+		var port = to_port(scope, null, node_signature);
+		return port.get_node_value(new Node_Context(scope.node, scope.node.hub));
 	}
 
 }

@@ -37,6 +37,7 @@ import haxe.Json;
 	public var function_library:Function_Library;
 	public var history = new History();
 	public var constraints = new Array<Group>();
+	var trellis_nodes:Map<String, Array<Node>> = null;
 	var queue = new Array<Change>();
 	var entry_node:Node = null;
 	public var max_steps = 100;
@@ -129,7 +130,19 @@ import haxe.Json;
 		if (nodes.exists(node.id))
 			throw new Exception("Node " + node.id + " already exists!");
 
+		if (trellis_nodes == null) {
+			trellis_nodes = new Map<String, Array<Node>>();
+			for (trellis in schema.trellises) {
+				trellis_nodes[trellis.name] = new Array<Node>();
+			}
+		}
+
     nodes[node.id] = node;
+
+		var tree = node.trellis.get_tree();
+		for (t in tree) {
+			trellis_nodes[t.name].push(node);
+		}
 	}
 
 	public function add_internal_node(node:INode) {
@@ -147,6 +160,12 @@ import haxe.Json;
   public function get_node_count() {
     return node_count;
   }
+
+	public function get_nodes_by_trellis(trellis:Trellis):Array<Node> {
+		return trellis_nodes.exists(trellis.name)
+			? trellis_nodes[trellis.name]
+			: [];
+	}
 
   public function load_schema_from_file(url:String, namespace:Namespace, auto_identity:Bool = false) {
     var data = Utility.load_json(url);

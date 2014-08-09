@@ -10,6 +10,7 @@ class Scope_Definition {
   var types = new Array<Symbol>();
   var symbols = new Map<String, Symbol>();
 	public var trellis:Trellis = null;
+	public var symbol:Symbol = null;
   public var depth:Int = 0;
 	public var hub:Hub;
 
@@ -17,6 +18,7 @@ class Scope_Definition {
 		this.parent = parent;
     if (parent != null) {
 			this.hub = parent.hub;
+			this.trellis = parent.trellis;
       this.depth = parent.depth + 1;
 		}
 		else {

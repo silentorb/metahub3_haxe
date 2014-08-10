@@ -53,7 +53,7 @@ class Create_Node implements Expression_Statement {
       //node.set_value(i, Expression_Utility.resolve(statement, input_type, scope));
     //}
 
-    return node.id;
+    return node;
 	}
 
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {

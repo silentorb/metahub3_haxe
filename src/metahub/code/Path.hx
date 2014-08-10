@@ -40,13 +40,14 @@ class Path {
 	}
 
 	public function resolve(node:Node):Dynamic {
+		if (properties.length == 0)
+			return node;
+
 		for (i in 0...(properties.length - 1)) {
 			var property = properties[i];
-			var node_id = node.get_value(property.id);
-			if (node_id == null || node_id == 0)
+			var node = node.get_value(property.id);
+			if (node == null)
 				return null;
-
-			node = node.hub.get_node(node_id);
 		}
 
 		return node.get_value(last().id);
@@ -66,9 +67,7 @@ class Path {
 			else {
 				var other_trellis = property.other_trellis;
 				if (other_trellis != null && other_trellis.is_value) {
-					var parent_property = other_trellis.get_property("parent");
-					if (parent_property != null)
-						chain.push(parent_property);
+					chain.push(other_trellis.properties[other_trellis.properties.length - 1]);
 				}
 			}
 

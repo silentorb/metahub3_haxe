@@ -20,6 +20,8 @@ typedef Assignment_Source = {
 			var map = {
 				"+": Functions.add,
 				"-": Functions.subtract,
+				"*": Functions.multiply,
+				"/": Functions.divide,
 
 				"=": Functions.equals,
 				"<": Functions.lesser_than,
@@ -118,13 +120,15 @@ typedef Assignment_Source = {
     var operator:String = cast rep_match.dividers[0].matches[1].get_data();
     //trace('op', operator);
     var operators = {
-    '+': 'add',
-    '-': 'subtract'
+			'+': 'add',
+			'-': 'subtract',
+			'*': 'multiply',
+			'/': 'divide'
     };
     return {
-    type: "function",
-    "name": Reflect.field(operators, operator),
-    "inputs": data
+			type: "function",
+			"name": Reflect.field(operators, operator),
+			"inputs": data
     }
   }
 

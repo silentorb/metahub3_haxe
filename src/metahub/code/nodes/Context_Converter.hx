@@ -37,11 +37,6 @@ class Context_Converter implements INode {
 		return new Path(reverse);
 	}
 
-	function create_context(hub:Hub, node_id:Int) {
-		var node = hub.get_node(node_id);
-		return new Node_Context(node, hub);
-	}
-
 	public function get_port(index:Int):General_Port {
 		#if debug
 		if (index <0 || index > 1)
@@ -119,33 +114,31 @@ class Context_Converter implements INode {
 
 		if (step < path.length - 1) {
 			if (property.type == Kind.list) {
-				var ids:Array<Int> = cast node.get_value(property.id);
+				var ids:Array<Node> = cast node.get_value(property.id);
 				for (i in ids) {
-					if (i > 0)
-						result = result.concat(follow_path(path, ++step, node.hub.get_node(i), dir));
+					if (i != null)
+						result = result.concat(follow_path(path, ++step, i, dir));
 				}
 			}
 			else {
-				var node_id:Int = cast node.get_value(property.id);
-				if (node_id > 0)
-					result = result.concat(follow_path(path, ++step, node.hub.get_node(node_id), dir));
+				var node_id:Node = node.get_value(property.id);
+				if (node_id != null)
+					result = result.concat(follow_path(path, ++step, node_id, dir));
 			}
 		}
 		else {
 			if (property.type == Kind.list) {
-				var ids:Array<Int> = cast node.get_value(property.id);
-				for (i in ids) {
-					if (i > 0) {
-						var node = node.hub.get_node(i);
+				var ids:Array<Node> = node.get_value(property.id);
+				for (node in ids) {
+					if (node != null) {
 						if (node.trellis.is_a(trellis))
 							result.push(node);
 					}
 				}
 			}
 			else {
-				var node_id:Int = cast node.get_value(property.id);
-				if (node_id > 0) {
-					var node = node.hub.get_node(node_id);
+				var node:Node = node.get_value(property.id);
+				if (node != null) {
 					if (dir == 0 || node.trellis.is_a(trellis))
 							result.push(node);
 				}

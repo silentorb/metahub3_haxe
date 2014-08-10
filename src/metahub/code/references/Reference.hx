@@ -1,6 +1,7 @@
 package metahub.code.references;
 import metahub.code.nodes.Context_Converter;
 import metahub.code.Layer;
+import metahub.code.nodes.Symbol_Node;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
 
@@ -34,7 +35,8 @@ class Reference {
 
 	public function to_port(scope:Scope):General_Port {
 		if (symbol != null) {
-			throw new Exception("Not supported.");
+			var node = symbol.resolve(scope);
+			return new Symbol_Node(node, path).get_port(0);
 		}
 		else {
 			var property = path.last();

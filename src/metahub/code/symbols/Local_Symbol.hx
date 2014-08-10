@@ -24,10 +24,11 @@ class Local_Symbol implements Symbol {
 		//symbol_type = Symbol_Type.local;
   }
 
-  public function get_node(scope:Scope):Node {
-    var id = resolve(scope);
-    return scope.hub.get_node(id);
-  }
+  //public function get_node(scope:Scope):Node {
+    ////var id = resolve(scope);
+    ////return scope.hub.get_node(id);
+		//return resolve(scope);
+  //}
 
 	public function get_trellis():Trellis {
 		return type.trellis;

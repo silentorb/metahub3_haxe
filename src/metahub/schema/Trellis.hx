@@ -50,16 +50,17 @@ class Trellis implements INode {
 	}
 
   public function get_all_properties() {
-    var result = new Map<String, Property>();
-    var tree = this.get_tree();
-		var index = 0;
-    for (trellis in tree) {
-      for (property in trellis.core_properties) {
-        result[property.name] = property;
-				property.id = index++;
-      }
-    }
-    return result;
+		return property_keys;
+    //var result = new Map<String, Property>();
+    //var tree = this.get_tree();
+		//var index = 0;
+    //for (trellis in tree) {
+      //for (property in trellis.core_properties) {
+        //result[property.name] = property;
+				//property.id = index++;
+      //}
+    //}
+    //return result;
   }
 
 	public function get_identity(seed:Dynamic) {
@@ -70,6 +71,10 @@ class Trellis implements INode {
 	}
 
   public function get_property(name:String):Property {
+    return property_keys[name];
+  }
+
+	public function get_property_or_error(name:String):Property {
     var properties = this.get_all_properties();
     if (!properties.exists(name))
       throw new Exception(this.name + ' does not contain a property named ' + name + '.');
@@ -161,9 +166,12 @@ class Trellis implements INode {
 		}
 
 		var tree = this.get_tree();
+		var index = 0;
     for (trellis in tree) {
       for (property in trellis.core_properties) {
+				property.id = index++;
         properties.push(property);
+				property_keys[property.name] = property;
 				ports.push(new General_Port(this, ports.length));
 			}
     }
@@ -183,7 +191,7 @@ class Trellis implements INode {
       }
     }
 
-		get_all_properties();
+		//get_all_properties();
 
 		is_numeric = true;
 		for (p in properties) {

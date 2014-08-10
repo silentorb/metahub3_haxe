@@ -3,6 +3,7 @@ import metahub.engine.Context;
 import metahub.code.Path;
 import metahub.engine.General_Port;
 import metahub.engine.INode;
+import metahub.engine.Node;
 import metahub.schema.Trellis;
 
 /**
@@ -13,9 +14,11 @@ class Path_Condition implements INode {
 	var ports = new Array<General_Port>();
 	var trellis:Trellis;
 	var path:Path;
+	var reverse_path:Path;
 
 	public function new(path:Path, trellis:Trellis) {
 		this.path = path;
+		this.reverse_path = path.reverse();
 		this.trellis = trellis;
 		ports.push(new General_Port(this, 0));
 		ports.push(new General_Port(this, 1));
@@ -35,18 +38,20 @@ class Path_Condition implements INode {
 	}
 
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		if (index == 1)
-			throw new Exception("Not implemented");
+		if (index == 1) {
+			ports[1 - index].set_external_value(value, context);
+			return;
+		}
+			//throw new Exception("Not implemented");
 
-		var reversed = path.reverse();
-		var node_id = reversed.resolve(context.node);
-		if (node_id == null || node_id == 0)
-			return null;
+		var node:Node = reverse_path.resolve(context.node);
+		if (node == null)
+			return;
 
-		var node = context.hub.get_node(node_id);
+		//var node = context.hub.get_node(node_id);
 		if (!node.trellis.is_a(trellis))
 			return;
 
-		ports[index - 1].set_external_value(value, context);
+		ports[1 - index].set_external_value(value, context);
 	}
 }

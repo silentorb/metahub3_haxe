@@ -18,6 +18,8 @@ enum Functions {
 	// Operators
   add;
   subtract;
+	multiply;
+	divide;
 	count;
 }
 

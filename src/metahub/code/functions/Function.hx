@@ -42,7 +42,7 @@ class Function implements INode {
 			return;
 		}
 
-		if (index == 1) {
+		if (index > 0) {
 			var new_value = run_forward(context);
 			//if (new_value != value) {
 				//hub.add_change(this, index, new_value, context, ports[0]);
@@ -88,7 +88,9 @@ class Function implements INode {
 
 	function run_forward(context:Context):Dynamic {
    var args = get_input_values(context);
+		#if log
 		context.hub.history.log("function " + Std.string(func) + " forward()" + args);
+		#end
 		return forward(args);
 
     //var result = Function_Calls.call(trellis.name, args, ports[0].get_type());
@@ -96,7 +98,9 @@ class Function implements INode {
 	}
 
 	function run_reverse(value:Dynamic, context:Context) {
+		#if log
 		context.hub.history.log("function " + Std.string(func) + " reverse()");
+		#end
 		//throw new Exception("Function.run_reverse Not implemented.");
 
 		return reverse(value, get_input_values(context));

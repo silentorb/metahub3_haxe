@@ -14,34 +14,34 @@ class Node {
   var ports = new Array<Port>();
   public var id:Identity;
   public var trellis:Trellis;
-	public var port_count(get, null):Int;
+	//public var port_count(get, null):Int;
 
   public function new(hub:Hub, id:Identity, trellis:Trellis) {
     this.hub = hub;
     this.id = id;
     this.trellis = trellis;
 
-		var properties = trellis.get_all_properties();
+		//var properties = trellis.get_all_properties();
 
-    for (property in properties) {
+    for (property in trellis.properties) {
 			values.push(get_default_value(property));
 			if (property == trellis.identity_property)
 				continue;
 
       //values.push(property.get_default());
-      var port = new Port(this, property.id);
-      ports.push(port);
+      //var port = new Port(this, property.id);
+      //ports.push(port);
     }
 
-    initialize();
+    //initialize();
   }
 
-	private function initialize() {
-
-	}
-	public function get_port_count():Int {
-		return ports.length;
-	}
+	//private function initialize() {
+//
+	//}
+	//public function get_port_count():Int {
+		//return ports.length;
+	//}
 
 	public function get_default_value(property:Property):Dynamic {
 		switch (property.type)
@@ -58,13 +58,10 @@ class Node {
 			case Kind.reference:
 				if (property.other_trellis.is_value) {
 					var node = hub.create_node(property.other_trellis);
-					var parent_property = property.other_trellis.get_property("parent");
-					if (parent_property != null)
-						node.set_value(parent_property.id, id, null);
-
-					return node.id;
+					node.set_value(property.other_trellis.properties.length - 1, this, null);
+					return node;
 				}
-				return 0;
+				return null;
 
 			case Kind.string:
 				return "";
@@ -75,23 +72,14 @@ class Node {
 			case Kind.pulse:
 				return null;
 
+			case Kind.any:
+				return null;
+
 			default:
 				throw new Exception("No default is implemented for type " + property.type + ".");
 		}
 	}
-
-  public function get_inputs():Array<Port> {
-		var properties = trellis.get_all_properties();
-    var result = new Array<Port>();
-    for (property in properties) {
-      if (property.name != "output") {
-        result.push(get_port(property.id));
-      }
-    }
-
-    return result;
-  }
-
+/*
   public function get_port(index:Int):Port {
 #if debug
   if ((index < 0 && index >= ports.length) || ports[index] == null)
@@ -104,30 +92,7 @@ class Node {
     var property = trellis.get_property(name);
     return get_port(property.id);
   }
-
-	//public function get_port_from_chain(chain:Path):Port {
-		//if (chain.length == 0)
-			//throw new Exception("Cannot follow empty property chain.");
-//
-		//var current_node = this;
-		//var i = 0;
-		//for (link in chain) {
-			//if (link.type == Kind.reference) {
-				//current_node = hub.get_node(link.id);
-			//}
-			//else {
-				//if (i < chain.length - 1)
-					//throw new Exception('Invalid chain. ' + link.fullname() + ' is not a reference.');
-//
-				//return current_node.get_port(link.id);
-			//}
-//
-			//++i;
-		//}
-//
-		//throw new Exception('Could not follow chain');
-	//}
-
+*/
   public function get_value(index:Int):Dynamic {
     return values[index];
   }
@@ -138,19 +103,25 @@ class Node {
   }
 
 	function equals(first:Dynamic, second:Dynamic, property:Property):Bool {
+		if (first == second)
+			return true;
+
+
 		if (property.other_trellis != null && property.other_trellis.is_value) {
-			var first_node = hub.get_node(first);
-			var second_node = hub.get_node(second);
+			if (first == null || second == null)
+				return false;
+
+			var first_node:Node = first;
+			var second_node:Node = second;
 			var properties = property.other_trellis.properties;
-			for (i in 0...properties.length) {
+			for (i in 0...(properties.length - 1)) {
 				if (!equals(first_node.get_value(i), second_node.get_value(i), properties[i]))
 					return false;
 			}
 			return true;
 		}
-		else {
-			return first == second;
-		}
+
+		return false;
 	}
 
   public function set_value(index:Int, value:Dynamic, source:General_Port = null) {
@@ -166,32 +137,41 @@ class Node {
 			throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
 
 		if (equals(old_value, value, property)) {
+			#if log
 			hub.history.log("attempted " + property.fullname() + "|set_value " + value);
+			#end
 			return;
 		}
-
+		//if (this.trellis.name == "Position" && this.values[2] != 0 && this.values[2].trellis.name == "Body") {
+			//var x1 = 1;
+		//}
 		hub.set_entry_node(this);
 
 		if (property.other_trellis != null && property.other_trellis.is_value) {
-			var mine = hub.get_node(old_value);
-			var other = hub.get_node(value);
+			var mine:Node = old_value;
+			var other:Node = value;
 			other.copy(mine);
 		}
-		values[index] = value;
+		else {
+			values[index] = value;
+		}
+
+		#if log
 		hub.history.log(property.fullname() + "|set_value " + value);
+		#end
 
 		update_trellis_connections(index, value, source);
 
 		if (property.type == Kind.reference && !property.other_trellis.is_value) {
-			var other_node = hub.get_node(value);
+			var other_node:Node = value;
       if (property.other_property.type == Kind.list) {
 				var list:Array<Dynamic> = other_node.get_value(property.other_property.id);
-				if (list.indexOf(id) == -1)
-					other_node.add_item(property.other_property.id, id);
+				if (list.indexOf(this) == -1)
+					other_node.add_item(property.other_property.id, this);
       }
       else {
-				if (other_node.get_value(property.other_property.id) != id)
-					other_node.set_value(property.other_property.id, id, source);
+				if (other_node.get_value(property.other_property.id) != this)
+					other_node.set_value(property.other_property.id, this, source);
       }
     }
 
@@ -215,15 +195,17 @@ class Node {
 
 		var list:Array<Dynamic> = cast values[index];
 		list.push(value);
+		#if log
 		hub.history.log(property.fullname() + "|add_item " + value);
+		#end
 
 		var context = new Node_Context(this, hub);
 		trellis.set_external_value(index, list, context, null);
 
 		if (property.other_property.type == Kind.reference) {
-			var other_node = hub.get_node(value);
-			if (other_node.get_value(property.other_property.id) != id)
-				other_node.set_value(property.other_property.id, id);
+			var other_node:Node = value;
+			if (other_node.get_value(property.other_property.id) != this)
+				other_node.set_value(property.other_property.id, this);
 		}
 		else {
 			throw new Exception("Not implemented.");
@@ -244,7 +226,7 @@ class Node {
 	}
 
 	public function copy(target:Node) {
-		for (i in 0...trellis.properties.length) {
+		for (i in 0...(trellis.properties.length - 1)) {
 			target.set_value(i, get_value(i));
 		}
 	}

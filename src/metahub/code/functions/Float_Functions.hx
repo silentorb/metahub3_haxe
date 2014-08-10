@@ -14,6 +14,12 @@ class Float_Functions extends Function {
 			case Functions.subtract:
 				return subtract_forward(args);
 
+			case Functions.multiply:
+				return multiply_forward(args);
+
+			case Functions.divide:
+				return divide_forward(args);
+
 			default:
 				throw new Exception("Invalid function.");
 
@@ -53,6 +59,16 @@ class Float_Functions extends Function {
 	function subtract_forward(args:Array<Dynamic>):Dynamic {
 		var first:Float = cast args[0], second:Float = cast args[1];
     return first - second;
+	}
+
+	function multiply_forward(args:Array<Dynamic>):Dynamic {
+		var first:Float = cast args[0], second:Float = cast args[1];
+    return first * second;
+	}
+
+	function divide_forward(args:Array<Dynamic>):Dynamic {
+		var first:Float = cast args[0], second:Float = cast args[1];
+    return first / second;
 	}
 
 	private function lesser_than_reverse(new_value:Dynamic, args:Array<Dynamic>):Dynamic {

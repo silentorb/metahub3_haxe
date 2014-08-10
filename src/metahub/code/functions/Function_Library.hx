@@ -11,6 +11,7 @@ import metahub.code.functions.Lesser_Than_Int;
 
 import metahub.code.functions.Float_Functions;
 import metahub.code.functions.Struct_Functions;
+import metahub.code.functions.Struct_Float_Functions;
 import metahub.code.functions.Count;
 
 /**
@@ -49,10 +50,17 @@ class Function_Library {
 
 		add2(Functions.add, "Float_Functions", float3);
 		add2(Functions.subtract, "Float_Functions", float3);
+		add2(Functions.multiply, "Float_Functions", float3);
+		add2(Functions.divide, "Float_Functions", float3);
+
 		add2(Functions.lesser_than, "Float_Functions", bool_float2);
 		add2(Functions.lesser_than_or_equal_to, "Float_Functions", bool_float2);
 		add2(Functions.greater_than, "Float_Functions", bool_float2);
 		add2(Functions.greater_than_or_equal_to, "Float_Functions", bool_float2);
+
+		var struct_float = [ struct_type, struct_type, type_float ];
+
+		add(Functions.multiply, "Struct_Float_Functions", struct_float);
 
 	}
 

@@ -111,8 +111,9 @@ import haxe.Json;
   }
 
   public function create_node(trellis:Trellis):Node {
+		var register = !trellis.is_value;
 		var node:Node = null;
-		var id = ++node_count;
+		var id = register ? ++node_count : 0;
 		for (factory in node_factories) {
 			node = factory(this, id, trellis);
 			if (node != null)
@@ -122,7 +123,9 @@ import haxe.Json;
 		if (node == null)
 			throw new Exception("Could not find valid factory to create node of type " + trellis.name + ".");
 
-		add_node(node);
+		if (register)
+			add_node(node);
+
     return node;
   }
 

@@ -60,8 +60,8 @@ typedef Assignment_Source = {
       case "reference":
         return reference(data);
 
-      case "set_property_block":
-        return set_property_block(data);
+      case "long_block":
+        return long_block(data);
 
       case "set_property":
         return set_property(data);
@@ -78,8 +78,14 @@ typedef Assignment_Source = {
       case "constraint":
         return constraint(data);
 
-//      case "path":
-//        return path(data);
+      case "condition":
+        return condition(data);
+
+      case "conditions":
+        return conditions(data, match);
+
+      case "if":
+        return if_statement(data);
 
       case "string":
         return data[1];
@@ -140,6 +146,36 @@ typedef Assignment_Source = {
     }
 	}
 
+	static function condition(data:Dynamic):Dynamic {
+		return {
+    type: "condition",
+    "path": data[0],
+    "operator": data[2],
+		"expression": data[4]
+    }
+	}
+
+	static function conditions(data:Dynamic, match:Match):Dynamic {
+		var rep_match:Repetition_Match = cast match;
+		var dividers = rep_match.dividers;
+		if (dividers.length > 0) {
+			dividers = Lambda.array(Lambda.map(dividers, function(d) { return d.matches[1].get_data(); } ));
+		}
+
+		return {
+			type: "conditions",
+			"conditions": data,
+			"operators": dividers
+    }
+	}
+
+	static function if_statement(data:Dynamic):Dynamic {
+		return {
+    type: "if",
+    "conditions": data[2]
+    }
+	}
+
   static function create_constraint(data:Dynamic):Dynamic {
     return {
     type: "specific_constraint",
@@ -183,7 +219,7 @@ typedef Assignment_Source = {
 		}
   }
 
-  static function set_property_block(data:Dynamic):Dynamic {
+  static function long_block(data:Dynamic):Dynamic {
 		return {
 			type: "block",
 			expressions: data[2]

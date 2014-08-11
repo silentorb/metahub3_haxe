@@ -55,6 +55,8 @@ class Coder {
 				return trellis_scope(source, scope_definition);
 			case 'create_node':
         return create_node(source, scope_definition);
+			case 'if':
+        return if_statement(source, scope_definition);
 		}
 
     throw new Exception("Invalid block: " + source.type);
@@ -91,6 +93,11 @@ class Coder {
   }
 
   function create_literal(source:Dynamic, scope_definition:Scope_Definition):Expression {
+    var type = get_type(source.value);
+    return new metahub.code.expressions.Literal(source.value, type);
+  }
+
+  function if_statement(source:Dynamic, scope_definition:Scope_Definition):Statement {
     var type = get_type(source.value);
     return new metahub.code.expressions.Literal(source.value, type);
   }

@@ -103,10 +103,10 @@ buster.testCase("Parser", {
     var keys = Object.keys(data)
     assert.greater(keys.length, 1)
   },
-  "parse shorthand": function () {
+  "=>parse shorthand": function () {
     var hub = create_hub();
     hub.load_parser();
-    var code = fs.readFileSync('test/scripts/boy.mh', { encoding: 'ascii' })
+    var code = fs.readFileSync('test/scripts/lab.mh', { encoding: 'ascii' })
 
     var result = hub.parse_code(code);
     console.log(render_info(result))
@@ -116,7 +116,7 @@ buster.testCase("Parser", {
     console.log(require('util').inspect(data, { showHidden: false, depth: 10 }));
     assert(data);
   },
-  "=>run shorthand": function () {
+  "run shorthand": function () {
     var hub = create_hub();
     hub.load_parser();
     var code = fs.readFileSync('test/scripts/boy.mh', { encoding: 'ascii' })

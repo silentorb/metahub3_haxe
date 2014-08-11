@@ -19,7 +19,6 @@ class Assignment implements Statement{
 
 	var output:General_Port = null;
 	var input:General_Port = null;
-	var context:Context;
 	var signature:Node_Signature;
 
   public function new(reference:Reference, expression:Expression) {
@@ -32,8 +31,9 @@ class Assignment implements Statement{
 			signature = Type_Network.analyze(expression, reference.get_type(), scope);
 			input = expression.to_port(scope, null, signature);
 			output = reference.to_port(scope);
-			context = new Node_Context(scope.node, scope.hub);
 		}
+
+		var context = new Node_Context(scope.node, scope.hub);
 		var value = input == null
 			? Expression_Utility.resolve(expression, reference.get_type(), scope)
 			: input.get_node_value(context);

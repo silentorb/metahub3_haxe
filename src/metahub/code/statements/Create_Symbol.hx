@@ -1,12 +1,14 @@
 package metahub.code.statements;
+import haxe.macro.Context;
 import metahub.code.expressions.Expression;
 import metahub.code.expressions.Expression_Utility;
+import metahub.code.nodes.Symbol_Node;
 import metahub.code.symbols.Local_Symbol;
 import metahub.code.Type_Signature;
 import metahub.engine.Empty_Context;
 import metahub.engine.General_Port;
 
-class Create_Symbol implements Statement {
+class Create_Symbol implements Expression {
   public var symbol:Local_Symbol;
   public var expression:Expression;
 
@@ -18,16 +20,33 @@ class Create_Symbol implements Statement {
     this.expression = expression;
   }
 
-  public function resolve(scope:Scope):Dynamic {
-		//throw new Exception("Create_Symbol is not implemented.");
-		//var port = expression.to_port(scope, null, null);
-    //var value = port.get_node_value(new Empty_Context(scope.hub));
-		var value = Expression_Utility.resolve(expression, symbol.get_type(), scope);
-    scope.set_value(symbol.index, value);
-    return value;
-  }
+  //public function resolve(scope:Scope):Dynamic {
+		//var value = Expression_Utility.resolve(expression, symbol.get_type(), scope);
+    //scope.set_value(symbol.index, value);
+    //return value;
+  //}
 
-	public function get_type():Type_Signature {
-		return symbol.get_type();
+	//public function get_type():Type_Signature {
+		//return symbol.get_type();
+	//}
+	
+	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+		var port = expression.to_port(scope, group, signature_node);
+		var value = port.get_node_value(new Empty_Context(scope.hub));
+		scope.set_value(symbol.index, value);
+		//return expression.to_port(scope, group, signature_node);
+		return null;
+	}
+	
+	public function get_types():Array<Array<Type_Signature>> {
+		return expression.get_types();
+	}
+
+	public function to_string():String {
+		return expression.to_string();
+	}
+
+	public function get_children():Array<Expression> {
+		return expression.get_children();
 	}
 }

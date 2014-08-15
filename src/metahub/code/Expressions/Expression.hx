@@ -11,5 +11,5 @@ interface Expression {
   function to_port(scope:Scope, group:Group, node_signature:Node_Signature):General_Port;
 	function to_string():String;
 	function get_children():Array<Expression>;
-	function get_value(scope:Scope, node_signature:Node_Signature):Dynamic;
+	//function get_value(scope:Scope, node_signature:Node_Signature):Dynamic;
 }

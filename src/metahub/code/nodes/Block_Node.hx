@@ -1,10 +1,14 @@
 package metahub.code.nodes;
 import metahub.code.Scope;
-import metahub.code.Setter;
-import metahub.code.statements.Block;
+import metahub.code.expressions.Block;
+import metahub.code.expressions.Expression;
+import metahub.code.expressions.Expression_Utility;
+import metahub.code.Type_Signature;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
 import metahub.engine.INode;
+import metahub.engine.Node_Context;
+import metahub.schema.Kind;
 
 /**
  * ...
@@ -12,19 +16,22 @@ import metahub.engine.INode;
  */
 
 class Block_Node implements INode {
-
-	var port:General_Port;
-	var block:Block;
+	var ports = new Array<General_Port>();
 	var scope:Scope;
 
-	public function new(block:Block, scope:Scope) {
-		port = new General_Port(this, 0);
-		this.block = block;
+	public function new(expressions:Array<Expression>, scope:Scope) {
+		ports.push(new General_Port(this, 0));
 		this.scope = scope;
+		var type = new Type_Signature(Kind.unknown);
+		for (expression in expressions) {
+			var signature = Type_Network.analyze(expression, type, scope); 
+			var port = expression.to_port(scope, null, signature);
+			ports.push(port);
+		}
 	}
 
 	public function get_port(index:Int):General_Port {
-		return port;
+		return ports[index];
 	}
 
   public function get_value(index:Int, context:Context):Dynamic{
@@ -32,16 +39,24 @@ class Block_Node implements INode {
 	}
 
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		block.resolve(scope);
+		throw new Exception("Not implemented.");
+		//block.resolve(scope);
 	}
 
 	public function run() {
 		var nodes = scope.hub.get_nodes_by_trellis(scope.definition.trellis);
 		for (node in nodes) {
-			var node_scope = new Scope(scope.hub, scope.definition, scope.parent);
-			node_scope.node = node;
-			block.resolve(node_scope);
+			var context = new Node_Context(node, scope.hub);
+			resolve(context);			
 		}
 	}
+	
+	function resolve(context:Context):Dynamic {		
+    for (i in 1...ports.length) {
+			ports[i].get_node_value(context);
+			//Expression_Utility.resolve(s, new Type_Signature(Kind.unknown), scope);
+    }
+    return null;
+  }
 
 }

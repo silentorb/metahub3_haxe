@@ -69,8 +69,8 @@ class Node {
 			case Kind.bool:
 				return false;
 
-			case Kind.pulse:
-				return null;
+			//case Kind.pulse:
+				//return null;
 
 			case Kind.any:
 				return null;
@@ -126,10 +126,10 @@ class Node {
 
   public function set_value(index:Int, value:Dynamic, source:General_Port = null) {
 		var property = trellis.properties[index];
-		if (property.type == Kind.pulse) {
-			update_trellis_connections(index, value, source);
-			return;
-		}
+		//if (property.type == Kind.pulse) {
+			//update_trellis_connections(index, value, source);
+			//return;
+		//}
 
 		var old_value = values[index];
 		var port = ports[index];
@@ -213,17 +213,17 @@ class Node {
 		}
   }
 
-  public function pulse(index:Int) {
-		var property = trellis.properties[index];
-		if (property.type != Kind.pulse)
-			throw new Exception("Property " + property.fullname() + " is not a pulse.");
-
-		var port = trellis.get_port(index);
-		for (other in port.connections) {
-			var block:Block_Node = cast other.node;
-			block.run();
-		}
-	}
+  //public function pulse(index:Int) {
+		//var property = trellis.properties[index];
+		//if (property.type != Kind.pulse)
+			//throw new Exception("Property " + property.fullname() + " is not a pulse.");
+//
+		//var port = trellis.get_port(index);
+		//for (other in port.connections) {
+			//var block:Block_Node = cast other.node;
+			//block.run();
+		//}
+	//}
 
 	public function copy(target:Node) {
 		for (i in 0...(trellis.properties.length - 1)) {

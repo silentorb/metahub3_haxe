@@ -14,7 +14,6 @@ abstract Kind(Int) {
   var float = 5;
   var bool = 6;
 	var unknown = 7;
-	var pulse = 8;
 
 	/*
 	static var name_map:Map <String, Kind>;
@@ -34,8 +33,7 @@ abstract Kind(Int) {
 			"list",
 			"float",
 			"bool",
-			"unknown",
-			"pulse"
+			"unknown"
 		];
 
 		static public function to_string(kind:Kind) {

@@ -4,7 +4,7 @@ package metahub.code.expressions;
  * ...
  * @author Christopher W. Johnson
  */
-class If_Statement extends Expression_Statement {
+class If_Statement extends Expression {
 
 	public function new() {
 
@@ -25,12 +25,4 @@ class If_Statement extends Expression_Statement {
 	public function get_children():Array<Expression> {
 		return [];
 	}
-
-  public function resolve(scope:Scope):Dynamic {
-    for (s in statements) {
-      s.resolve(scope);
-    }
-    return null;
-  }
-
 }

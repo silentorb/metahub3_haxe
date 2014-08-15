@@ -1,9 +1,12 @@
 package metahub;
 import haxe.xml.Parser;
 import metahub.code.expressions.Expression;
+import metahub.code.expressions.Expression_Utility;
 import metahub.code.functions.Function_Library;
 import metahub.code.statements.Statement;
+import metahub.code.Type_Signature;
 import metahub.engine.Context;
+import metahub.engine.Empty_Context;
 import metahub.engine.General_Port;
 import metahub.parser.Definition;
 import metahub.parser.Match;
@@ -15,6 +18,7 @@ import metahub.schema.Property;
 import metahub.code.Coder;
 import metahub.code.Scope_Definition;
 import metahub.code.Scope;
+import metahub.code.Type_Network;
 
 import metahub.engine.INode;
 import metahub.engine.Node;
@@ -184,7 +188,7 @@ import haxe.Json;
     schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
   }
 
-  public function run_data(source:Dynamic):Statement {
+  public function run_data(source:Dynamic):Expression {
     var coder = new Coder(this);
     return coder.convert_statement(source, root_scope_definition);
   }
@@ -196,7 +200,10 @@ import haxe.Json;
 		}
     var match:metahub.parser.Match = cast result;
 		var statement = run_data(match.get_data());
-    statement.resolve(root_scope);
+		var signature = Type_Network.analyze(statement, new Type_Signature(Kind.unknown), root_scope);
+		var port = statement.to_port(root_scope, null, signature);
+		port.get_node_value(new Empty_Context(this));
+		//Expression_Utility.resolve(statement, new Type_Signature(Kind.unknown), root_scope);
   }
 
 	public function parse_code(code:String) {

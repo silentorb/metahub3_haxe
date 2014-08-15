@@ -10,7 +10,7 @@ import metahub.engine.General_Port;
 import metahub.code.reference.*;
 import metahub.schema.Kind;
 
-class Create_Constraint implements Statement {
+class Create_Constraint implements Expression {
   public var type:Type_Signature;
   var reference:Reference;
   var expression:Expression;
@@ -31,7 +31,7 @@ class Create_Constraint implements Statement {
 		var signature = Type_Network.analyze(expression, reference.get_type(), scope);
 		var other_port = expression.to_port(scope, group, signature);
 
-		if (reference.path.length > 1 && reference.get_type().type != Kind.pulse) {
+		if (reference.path.length > 1) {
 			var condition = new Path_Condition(reference.path, scope.definition.trellis);
 			condition.get_port(1).connect(other_port);
 			port.connect(condition.get_port(0));

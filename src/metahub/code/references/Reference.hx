@@ -42,7 +42,7 @@ class Reference {
 			var property = path.last();
 			var port = property.trellis.get_port(property.id);
 
-			if (property.type != Kind.pulse && (path.length >= 3 || (path.length == 2 && !property.trellis.is_value))) {
+			if (path.length >= 3 || (path.length == 2 && !property.trellis.is_value)) {
 				var converter = new Context_Converter(path, scope.definition.trellis);
 				port.connect(converter.get_port(1));
 				return converter.get_port(0);

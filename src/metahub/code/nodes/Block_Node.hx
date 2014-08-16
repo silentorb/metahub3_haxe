@@ -26,7 +26,8 @@ class Block_Node implements INode {
 		for (expression in expressions) {
 			var signature = Type_Network.analyze(expression, type, scope); 
 			var port = expression.to_port(scope, null, signature);
-			ports.push(port);
+			if (port != null)
+				ports.push(port);
 		}
 	}
 
@@ -34,8 +35,19 @@ class Block_Node implements INode {
 		return ports[index];
 	}
 
-  public function get_value(index:Int, context:Context):Dynamic{
-		throw new Exception("Not implemented.");
+  public function get_value(index:Int, context:Context):Dynamic {
+		if (scope.definition.trellis == null) {
+			resolve(context);
+		}
+		else {
+			var nodes = scope.hub.get_nodes_by_trellis(scope.definition.trellis);
+			for (node in nodes) {
+				var node_context = new Node_Context(node, scope.hub);
+				resolve(node_context);			
+			}			
+		}
+
+		return null;
 	}
 
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {

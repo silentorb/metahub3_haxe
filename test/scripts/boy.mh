@@ -3,5 +3,5 @@ let boy = new Character { name: 'James' }
 let sword = new Item { name: 'Vorpal Sword', owner: boy }
 # testing
 boy.x = sword.y + 1
-set sword { y: 5 }
+sword { y: 5 }
 # assert boy.x = 6

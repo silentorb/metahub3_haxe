@@ -9,7 +9,7 @@ import metahub.schema.Kind;
 class Block implements Expression {
 
   var node:Block_Node;
-	var expressions:Array<Expression>;
+	var expressions = new Array<Expression>();
 	
 	public function new() {
 		

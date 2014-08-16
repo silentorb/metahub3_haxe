@@ -1,4 +1,4 @@
 Character (x < 10)
 
 let boy = new Character { }
-set boy { x: 16 }
+boy { x: 16 }

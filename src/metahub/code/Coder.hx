@@ -57,22 +57,24 @@ class Coder {
         return create_node(source, scope_definition);
 			case 'if':
         return if_statement(source, scope_definition);
-		}
-
-    throw new Exception("Invalid block: " + source.type);
-  }
-
-	public function convert_inside_trellis_scope(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature = null):Expression {
-
-    switch(source.type) {
       case 'constraint':
         return constraint(source, scope_definition);
-      case 'symbol':
-        return create_symbol(source, scope_definition);
 		}
 
     throw new Exception("Invalid block: " + source.type);
   }
+
+	//public function convert_inside_trellis_scope(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature = null):Expression {
+//
+    //switch(source.type) {
+      //case 'constraint':
+        //return constraint(source, scope_definition);
+      //case 'symbol':
+        //return create_symbol(source, scope_definition);
+		//}
+//
+    //throw new Exception("Invalid block: " + source.type);
+  //}
 
   function constraint(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		var reference = Reference.from_scope(source.path, scope_definition);
@@ -272,11 +274,12 @@ class Coder {
     var new_scope_definition = new Scope_Definition(scope_definition);
 		var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
 		new_scope_definition.trellis = trellis;
-		var statements = new Array<Expression>();
-		for (i in Reflect.fields(source.statements)) {
-      var statement = Reflect.field(source.statements, i);
-			statements.push(convert_inside_trellis_scope(statement, new_scope_definition));
-		}
-		return new Trellis_Scope(trellis, statements, new_scope_definition);
+		var expression = create_block(source, new_scope_definition);
+		//var statements = new Array<Expression>();
+		//for (i in Reflect.fields(source.statements)) {
+      //var statement = Reflect.field(source.statements, i);
+			//statements.push(convert_inside_trellis_scope(statement, new_scope_definition));
+		//}
+		return new Trellis_Scope(trellis, expression, new_scope_definition);
   }
 }

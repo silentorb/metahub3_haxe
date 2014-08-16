@@ -30,6 +30,7 @@ function pad(depth) {
 }
 
 function render_info(info, depth, prefix) {
+  return
   depth = depth || 0
   prefix = prefix || ""
   var additional = info.debug_info()
@@ -103,7 +104,7 @@ buster.testCase("Parser", {
     var keys = Object.keys(data)
     assert.greater(keys.length, 1)
   },
-  "=>parse shorthand": function () {
+  "parse shorthand": function () {
     var hub = create_hub();
     hub.load_parser();
     var code = fs.readFileSync('test/scripts/lab.mh', { encoding: 'ascii' })
@@ -134,6 +135,7 @@ buster.testCase("Parser", {
 
     var result = hub.parse_code(code);
     console.log(render_info(result))
+    console.log('end', result.end)
     assert(result.success, 'Match found.')
     var data = result.get_data()
     console.log(require('util').inspect(data, { showHidden: false, depth: 10 }));
@@ -153,12 +155,11 @@ buster.testCase("Parser", {
     assert.equals(sword.get_value_by_name('y'), 5)
     assert.equals(book.get_value_by_name('y'), 5)
     assert.equals(boy.get_value_by_name('item_count'), 2)
-
   },
   "lesser float": function () {
     var hub = run_file('test/scripts/lesser.mh')
 
-    var boy = hub.nodes[1]
+    var boy = hub.nodes.h[2]
     assert.greater(boy.get_value_by_name('x'), 9.9)
     assert.greater(10, boy.get_value_by_name('x'))
   },

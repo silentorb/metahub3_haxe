@@ -20,16 +20,6 @@ class Create_Symbol implements Expression {
     this.expression = expression;
   }
 
-  //public function resolve(scope:Scope):Dynamic {
-		//var value = Expression_Utility.resolve(expression, symbol.get_type(), scope);
-    //scope.set_value(symbol.index, value);
-    //return value;
-  //}
-
-	//public function get_type():Type_Signature {
-		//return symbol.get_type();
-	//}
-	
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
 		var port = expression.to_port(scope, group, signature_node);
 		var value = port.get_node_value(new Empty_Context(scope.hub));
@@ -43,7 +33,7 @@ class Create_Symbol implements Expression {
 	}
 
 	public function to_string():String {
-		return expression.to_string();
+		return "Create_Symbol";
 	}
 
 	public function get_children():Array<Expression> {

@@ -5,7 +5,7 @@ let boy = new Character { name: 'James' }
 let sword = new Item { name: 'Vorpal Sword', owner: boy }
 #let book2 = Item|filter(name == 'Marloth')|first
 let book = new Item { name: 'Marloth', owner: boy }
-set boy { x: 6 }
+boy { x: 6 }
 
 # assert:
 #  sword.y == 5

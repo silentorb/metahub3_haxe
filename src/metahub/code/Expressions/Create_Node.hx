@@ -21,7 +21,19 @@ class Create_Node implements Expression {
     trellis_type = new Type_Signature(Kind.reference, trellis);
 		this.scope_definition = scope_definition;
   }
-
+	
+	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+		var block_port:General_Port = null;
+		if (block != null) {
+			var new_scope = new Scope(scope.hub, scope_definition, scope);
+			//new_scope.node = node;
+			block_port = block.to_port(new_scope, group, signature_node); 
+		}
+		
+		var creator = new metahub.code.nodes.Create_Node(trellis, scope.hub, block_port);
+		return creator.get_port(0);
+	}
+	
 	public function get_types():Array<Array<Type_Signature>>{
 		return [ [ trellis_type ] ];
 	}
@@ -52,16 +64,5 @@ class Create_Node implements Expression {
 //
     //return node;
 	//}
-	
-	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-		var block_port:General_Port = null;
-		if (block != null) {
-			var new_scope = new Scope(scope.hub, scope_definition, scope);
-			//new_scope.node = node;
-			block_port = block.to_port(new_scope, group, signature_node); 
-		}
-		
-		var creator = new metahub.code.nodes.Create_Node(trellis, scope.hub, block_port);
-		return creator.get_port(0);
-	}
+
 }

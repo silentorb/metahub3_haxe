@@ -37,7 +37,7 @@ class Node_Scope implements Expression {
 	}
 
 	public function to_string():String {
-		return "Node Scope";
+		return block.to_string();
 	}
 
 	public function get_children():Array<Expression> {

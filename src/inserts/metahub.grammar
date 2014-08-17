@@ -61,9 +61,7 @@ set_property = path_or_id trim ":" trim @(operator, dummy, 0, 1) trim expression
 
 node_scope = path_or_id trim long_block
 
-trellis_scope = path_or_id trim constraint_block
-
-constraint_block = "(" trim @(constraint, comma_or_newline, 1, 0) trim ")"
+trellis_scope = path_or_id trim long_block
 
 constraint = path_or_id trim constraint_operator trim expression
 
@@ -79,4 +77,4 @@ single_line_block = /[\t \r]*\n\[\t \r]*/ trim @(set_property, comma_or_newline,
 
 if_block = long_block | single_line_block
 
-if = "if" ws conditions trim long_block
+if = "if" trim "(" ws conditions trim ")" long_block

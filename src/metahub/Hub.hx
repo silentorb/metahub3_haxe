@@ -23,7 +23,7 @@ import metahub.code.Type_Network;
 import metahub.engine.INode;
 import metahub.engine.Node;
 import metahub.engine.Change;
-import metahub.code.Group;
+import metahub.code.nodes.Group;
 import metahub.code.functions.Functions;
 import metahub.schema.Kind;
 import haxe.Json;

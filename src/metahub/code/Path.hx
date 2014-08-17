@@ -31,7 +31,7 @@ class Path {
 		var path = new Array<Property>();
 		for (i in 0...source.length) {
 			var token = source[i];
-			var property = trellis.get_property(token);
+			var property = trellis.get_property_or_error(token);
 			path.push(property);
 			if (i < source.length - 1)
 				trellis = property.other_trellis;

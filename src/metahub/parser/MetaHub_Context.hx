@@ -66,11 +66,8 @@ typedef Assignment_Source = {
       case "set_property":
         return set_property(data);
 
-      case "node_scope":
-        return node_scope(data);
-
-      case "trellis_scope":
-        return trellis_scope(data);
+      case "new_scope":
+        return new_scope(data);
 
       case "constraint_block":
         return constraint_block(data);
@@ -84,6 +81,9 @@ typedef Assignment_Source = {
       case "conditions":
         return conditions(data, match);
 
+      case "condition_block":
+        return condition_block(data);
+
       case "if":
         return if_statement(data);
 
@@ -95,6 +95,9 @@ typedef Assignment_Source = {
 
       case "value":
         return value(data);
+
+      case "optional_block":
+        return optional_block(data);
 
 //      default:
 //        throw new Exception("Invalid parser method: " + name + ".");
@@ -148,11 +151,15 @@ typedef Assignment_Source = {
 
 	static function condition(data:Dynamic):Dynamic {
 		return {
-    type: "condition",
-    "path": data[0],
-    "operator": data[2],
-		"expression": data[4]
+			type: "condition",
+			"path": data[0],
+			"operator": data[2],
+			"expression": data[4]
     }
+	}
+
+	static function optional_block(data:Dynamic):Dynamic {
+		return data[1];
 	}
 
 	static function conditions(data:Dynamic, match:Match):Dynamic {
@@ -169,25 +176,30 @@ typedef Assignment_Source = {
     }
 	}
 
+	static function condition_block(data:Dynamic):Dynamic {
+		return data[2];
+	}
+
 	static function if_statement(data:Dynamic):Dynamic {
 		return {
-    type: "if",
-    "conditions": data[4]
+			type: "if",
+			"conditions": data[2],
+			"expression": data[4]
     }
 	}
 
   static function create_constraint(data:Dynamic):Dynamic {
     return {
-    type: "specific_constraint",
-    path: data[0],
-    expression: data[4]
+			type: "specific_constraint",
+			path: data[0],
+			expression: data[4]
     };
   }
 
   static function create_node(data:Dynamic):Dynamic {
     var result:Dynamic = cast {
-    type: "create_node",
-    trellis: data[2]
+			type: "create_node",
+			trellis: data[2]
     };
 
     if (data[4] != null && data[4].length > 0) {
@@ -224,14 +236,6 @@ typedef Assignment_Source = {
 			type: "block",
 			expressions: data[2]
 		};
-    //var result = new Array<Dynamic>();
-    //var items:Array<Dynamic> = cast data[2];
-//
-    //for (item in items) {
-      //result[item[0]] = item[1];
-    //}
-//
-    //return result;
   }
 
   static function set_property(data:Dynamic):Dynamic {
@@ -247,14 +251,6 @@ typedef Assignment_Source = {
 		return result;
   }
 
-  static function node_scope(data:Dynamic):Dynamic {
-    return {
-    type: "node_scope",
-    "path": data[0],
-    "block": data[2]
-    };
-  }
-
   static function value(data:Dynamic):Dynamic {
     return {
     type: "literal",
@@ -262,9 +258,9 @@ typedef Assignment_Source = {
     };
   }
 
-	static function trellis_scope(data:Dynamic):Dynamic {
+	static function new_scope(data:Dynamic):Dynamic {
     return {
-			"type": "trellis_scope",
+			"type": "new_scope",
 			"path": data[0],
 			"statements": data[2]
 		};

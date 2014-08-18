@@ -30,7 +30,6 @@ function pad(depth) {
 }
 
 function render_info(info, depth, prefix) {
-  return
   depth = depth || 0
   prefix = prefix || ""
   var additional = info.debug_info()
@@ -104,10 +103,10 @@ buster.testCase("Parser", {
     var keys = Object.keys(data)
     assert.greater(keys.length, 1)
   },
-  "parse shorthand": function () {
+  "=>parse shorthand": function () {
     var hub = create_hub();
     hub.load_parser();
-    var code = fs.readFileSync('test/scripts/lab.mh', { encoding: 'ascii' })
+    var code = fs.readFileSync('../haxe/metalab/src/inserts/logic.mh', { encoding: 'ascii' })
 
     var result = hub.parse_code(code);
     console.log(render_info(result))

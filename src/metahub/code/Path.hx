@@ -19,6 +19,18 @@ class Path {
 		length = properties.length;
 	}
 
+	public function equals(other:Path):Bool {
+		if (length != other.length)
+			return false;
+
+		for (i in 0...properties.length) {
+			if (properties[i] != other.properties[i])
+				return false;
+		}
+
+		return true;
+	}
+
 	public function first() {
 		return properties[0];
 	}

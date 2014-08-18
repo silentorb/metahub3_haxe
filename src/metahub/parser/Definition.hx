@@ -8,6 +8,11 @@ typedef Group_Source = {
 	patterns:Array<Dynamic>
 }
 
+typedef Pattern_Source = {
+	type:String,
+	?backtrack:Bool
+}
+
 @:expose class Definition {
   public var patterns = new Array<Pattern>();
   public var pattern_keys = new Map<String, Pattern>();
@@ -62,7 +67,7 @@ typedef Group_Source = {
     throw new Exception("Invalid parser pattern type: " + source.type + ".");
   }
 
-  public function create_pattern(source:Dynamic, root = false):Pattern {
+  public function create_pattern(source:Pattern_Source, root = false):Pattern {
 		if (root && source.type == 'reference')
 			return new Wrapper(null, null);
 

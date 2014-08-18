@@ -21,15 +21,11 @@ method = "|" id
 statement =
     create_symbol
 	| if
-  | node_scope
-  | trellis_scope
-  | create_constraint
+  | constraint
+  | new_scope
 	| create_node
-	| set_property
 
 create_symbol = "let" ws id trim "=" trim expression
-
-create_constraint = path trim "=" trim expression
 
 expression =
     @(expression_part, operation_separator, 1, 0)
@@ -47,21 +43,19 @@ bool = "true" | "false"
 int = /-?[0-9]+/
 float = /-?([0-9]*\.)?[0-9]+f?/
 operator = '+' | '-' | '/' | '*' | '%'
-constraint_operator = '=' | '<' | '>' | '<=' | '>='
+constraint_operator = '=' | '<' | '>' | '<=' | '>=' | '+=' | '-=' | '*=' | '/='
 
 value = string | bool | int | float
 
 dummy = "@&^%"
 
-create_node = "new" ws path_or_id trim @(long_block, dummy, 0, 1)
+optional_block = trim long_block
+
+create_node = "new" ws path_or_id @(optional_block, dummy, 0, 1)
 
 long_block = "{" trim @(statement, comma_or_newline, 0, 0) trim "}"
 
-set_property = path_or_id trim ":" trim @(operator, dummy, 0, 1) trim expression
-
-node_scope = path_or_id trim long_block
-
-trellis_scope = path_or_id trim long_block
+new_scope = path_or_id trim long_block
 
 constraint = path_or_id trim constraint_operator trim expression
 
@@ -73,8 +67,6 @@ condition_join = trim condition_join_operators trim
 
 conditions = @(condition, condition_join, 1, 0)
 
-single_line_block = /[\t \r]*\n\[\t \r]*/ trim @(set_property, comma_or_newline, 0, 0)
+condition_block = "(" trim conditions trim ")"
 
-if_block = long_block | single_line_block
-
-if = "if" trim "(" ws conditions trim ")" long_block
+if = "if" trim condition_block trim long_block

@@ -1,4 +1,5 @@
 package metahub.code.expressions;
+import metahub.code.nodes.Group;
 import metahub.code.Scope;
 import metahub.code.Scope_Definition;
 import metahub.engine.General_Port;
@@ -24,7 +25,7 @@ class Trellis_Scope implements Expression {
     var new_scope = new Scope(scope.hub, scope_definition, scope);
 		return expression.to_port(new_scope, group, signature);
   }
-	
+
 	public function get_types():Array<Array<Type_Signature>> {
 		return expression.get_types();
 	}

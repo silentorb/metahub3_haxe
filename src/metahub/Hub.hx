@@ -3,6 +3,7 @@ import haxe.xml.Parser;
 import metahub.code.expressions.Expression;
 import metahub.code.expressions.Expression_Utility;
 import metahub.code.functions.Function_Library;
+import metahub.code.nodes.Block_Node;
 import metahub.code.statements.Statement;
 import metahub.code.Type_Signature;
 import metahub.engine.Context;
@@ -46,6 +47,7 @@ import haxe.Json;
 	var entry_node:Node = null;
 	public var max_steps = 100;
 	var node_count:Int;
+	var interval_node = null;
 
   public function new() {
     nodes[0] = null;
@@ -221,4 +223,22 @@ import haxe.Json;
     var data = haxe.Json.parse(functions);
     schema.load_trellises(data.trellises, new Load_Settings(metahub_namespace));
   }
+
+	function get_increment() {
+		if (interval_node == null) {
+			interval_node = new Block_Node(new Array<Expression>(), new Scope(this, root_scope_definition));
+		}
+
+		return interval_node;
+	}
+
+	public function connect_to_increment(port:General_Port) {
+		var node = get_increment();
+		node.get_port(0).connect(port);
+	}
+
+	public function increment(layer:Int = 10000) {
+		var node = get_increment();
+		node.get_value(0, new Empty_Context(this));
+	}
 }

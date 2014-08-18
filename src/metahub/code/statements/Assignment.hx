@@ -1,9 +1,10 @@
 package metahub.code.statements;
 import metahub.code.expressions.Expression;
+import metahub.code.nodes.Group;
 //import metahub.code.expressions.Expression_Utility;
 import metahub.code.functions.Functions;
 import metahub.code.nodes.Assignment_Node;
-import metahub.code.references.Reference;
+import metahub.code.Reference;
 import metahub.code.Type_Signature;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
@@ -41,14 +42,14 @@ class Assignment implements Expression{
 		//output.set_node_value(value, context, null);
 		//return value;
   //}
-	
+
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
 			signature = Type_Network.analyze(expression, reference.get_type(), scope);
 			var input = expression.to_port(scope, null, signature);
 			var output = reference.to_port(scope);
 			return new Assignment_Node(output, input).get_port(0);
   }
-	
+
 	public function get_types():Array<Array<Type_Signature>> {
 		return [ [ new Type_Signature(Kind.any) ] ];
 	}

@@ -1,4 +1,4 @@
-package metahub.code.references;
+package metahub.code;
 import metahub.code.nodes.Context_Converter;
 import metahub.code.Layer;
 import metahub.code.nodes.Symbol_Node;
@@ -20,6 +20,18 @@ class Reference {
 	public var path:Path = null;
 
 	public function new() {
+	}
+
+	public function equals(other:Reference):Bool {
+		if (symbol != null) {
+			if (other.symbol == null)
+				return false;
+
+			return symbol.equals(other.symbol) && trellis == other.trellis && path.equals(other.path);
+		}
+		else {
+			return trellis == other.trellis && path.equals(other.path);
+		}
 	}
 
 	public function get_type():Type_Signature {

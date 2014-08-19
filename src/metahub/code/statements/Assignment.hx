@@ -27,22 +27,6 @@ class Assignment implements Expression{
     this.expression = expression;
   }
 
-  //public function resolve(scope:Scope):Dynamic {
-		//if (output == null) {
-			//signature = Type_Network.analyze(expression, reference.get_type(), scope);
-			//input = expression.to_port(scope, null, signature);
-			//output = reference.to_port(scope);
-		//}
-//
-		//var context = new Node_Context(scope.node, scope.hub);
-		//var value = input == null
-			//? Expression_Utility.resolve(expression, reference.get_type(), scope)
-			//: input.get_node_value(context);
-//
-		//output.set_node_value(value, context, null);
-		//return value;
-  //}
-
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
 			signature = Type_Network.analyze(expression, reference.get_type(), scope);
 			var input = expression.to_port(scope, null, signature);

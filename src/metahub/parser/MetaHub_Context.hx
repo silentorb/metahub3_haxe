@@ -23,6 +23,11 @@ typedef Assignment_Source = {
 				"*": Functions.multiply,
 				"/": Functions.divide,
 
+				"+=": Functions.add_equals,
+				"-=": Functions.subtract_equals,
+				"*=": Functions.multiply_equals,
+				"/=": Functions.divide_equals,
+
 				"=": Functions.equals,
 				"<": Functions.lesser_than,
 				">": Functions.greater_than,
@@ -132,7 +137,11 @@ typedef Assignment_Source = {
 			'+': 'add',
 			'-': 'subtract',
 			'*': 'multiply',
-			'/': 'divide'
+			'/': 'divide',
+			'+=': 'add_equals',
+			'-=': 'subtract_equals',
+			'*=': 'multiply_equals',
+			'/=': 'divide_equals'
     };
     return {
 			type: "function",
@@ -262,7 +271,7 @@ typedef Assignment_Source = {
     return {
 			"type": "new_scope",
 			"path": data[0],
-			"statements": data[2]
+			"expression": data[2]
 		};
   }
 

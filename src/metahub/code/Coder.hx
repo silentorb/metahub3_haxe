@@ -46,8 +46,8 @@ class Coder {
         return create_block(source, scope_definition);
       case 'symbol':
         return create_symbol(source, scope_definition);
-      case 'set_property':
-        return set_property(source, scope_definition);
+      //case 'set_property':
+        //return set_property(source, scope_definition);
 			case 'new_scope':
 				return new_scope(source, scope_definition);
 			case 'create_node':
@@ -63,8 +63,14 @@ class Coder {
 
   function constraint(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		var reference = Reference.from_scope(source.path, scope_definition);
-		var expression = convert_expression(source.expression, scope_definition, reference.get_type());
-		return new metahub.code.statements.Create_Constraint(reference, expression);
+		var back_reference:Reference = null;
+		var name = source.expression.name;
+		if (['+=', '-=', '*=', '/='].indexOf(name) > -1) {
+			name = name.substring(0, 1);
+			back_reference = reference;
+		}
+		var expression = function_expression(source.expression, scope_definition, reference.get_type(), back_reference);
+		return new metahub.code.statements.Create_Constraint(reference, expression, back_reference != null);
   }
 
   function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -91,6 +97,25 @@ class Coder {
   function create_literal(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var type = get_type(source.value);
     return new metahub.code.expressions.Literal(source.value, type);
+  }
+
+  function function_expression(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature, reference:Reference = null):Expression {
+		if (type == null)
+			throw new Exception("Function expressions do not currently support unspecified return types.");
+
+		var name = source.name;
+    var expressions:Array<Dynamic> = source.inputs;
+    var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
+
+			// Equavelent to += in other languages
+		if (reference != null && ['+=', '-=', '*=', '/='].indexOf(name) > -1) {
+			name = name.substring(0, 1);
+			inputs.unshift(new Expression_Reference(reference));
+		}
+
+		var func = Type.createEnum(Functions, name);
+    //var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
+    return new metahub.code.expressions.Function_Call(func, type, inputs, hub);
   }
 
   function if_statement(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -190,34 +215,26 @@ class Coder {
     throw new Exception("Could not find type.");
   }
 
-  function function_expression(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature):Expression {
-		if (type == null)
-			throw new Exception("Function expressions do not currently support unspecified return types.");
-
-		var func = Type.createEnum(Functions, source.name);
-    var expressions:Array<Dynamic> = source.inputs;
-    var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
-    return new metahub.code.expressions.Function_Call(func, type, inputs, hub);
-  }
-
 	function new_scope(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		var path:Array<String> = source.path;
 		if (path.length == 0)
 			throw new Exception("Scope path is empty for node creation.");
 
+		var expression:Expression = null;
 		var new_scope_definition = new Scope_Definition(scope_definition);
-		var expression = create_block(source, new_scope_definition);
 		var namespace = get_namespace(path, hub.schema.root_namespace);
 		var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
 
 		if (trellis != null) {
 			new_scope_definition.trellis = trellis;
+			expression = convert_statement(source.expression, new_scope_definition);
 			return new Trellis_Scope(trellis, expression, new_scope_definition);
 		}
 		else {
 			var symbol = scope_definition.find(source.path);
 			new_scope_definition.symbol = symbol;
 			new_scope_definition.trellis = symbol.get_trellis();
+			expression = convert_statement(source.expression, new_scope_definition);
 			return new Node_Scope(expression, new_scope_definition);
 		}
 	}

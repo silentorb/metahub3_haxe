@@ -1,6 +1,7 @@
 package metahub.code.statements;
 
 import metahub.code.expressions.Expression;
+import metahub.code.nodes.Assignment_Node;
 import metahub.code.nodes.Group;
 import metahub.code.nodes.Path_Condition;
 import metahub.code.Reference;
@@ -12,55 +13,39 @@ class Create_Constraint implements Expression {
   public var type:Type_Signature;
   var reference:Reference;
   var expression:Expression;
+	var is_back_referencing = false;
 
-  public function new(reference:Reference, expression:Expression) {
+  public function new(reference:Reference, expression:Expression, is_back_referencing:Bool) {
     this.reference = reference;
     this.expression = expression;
+		this.is_back_referencing = is_back_referencing;
   }
-
-/*
-  public function resolve(scope:Scope):Dynamic {
-		//if (reference.get_layer() != Layer.schema)
-			//throw new Exception("Not implemented.");
-
-		var port = reference.to_port(scope);
-
-		var group = new Group();
-		scope.hub.constraints.push(group);
-		var signature = Type_Network.analyze(expression, reference.get_type(), scope);
-		var other_port = expression.to_port(scope, group, signature);
-
-		if (reference.path.length > 1) {
-			var condition = new Path_Condition(reference.path, scope.definition.trellis);
-			condition.get_port(1).connect(other_port);
-			port.connect(condition.get_port(0));
-		}
-		else {
-			port.connect(other_port);
-		}
-
-		return null;
-  }
-	*/
 
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-		var port = reference.to_port(scope);
+		var output = reference.to_port(scope);
 
-		var group = new Group();
-		scope.hub.constraints.push(group);
 		var signature = Type_Network.analyze(expression, reference.get_type(), scope);
-		var other_port = expression.to_port(scope, group, signature);
+		var group = new Group();
+		var input = expression.to_port(scope, group, signature);
+
+		if (is_back_referencing) {
+			var assignment = new Assignment_Node(output, input);
+			scope.hub.connect_to_increment(assignment.get_port(0));
+			return assignment.get_port(0);
+		}
+
+		scope.hub.constraints.push(group);
 
 		if (reference.path.length > 1) {
 			var condition = new Path_Condition(reference.path, scope.definition.trellis);
-			condition.get_port(1).connect(other_port);
-			port.connect(condition.get_port(0));
+			condition.get_port(1).connect(input);
+			output.connect(condition.get_port(0));
 		}
 		else {
-			port.connect(other_port);
+			output.connect(input);
 		}
 
-		return port;
+		return output;
   }
 
 	public function get_types():Array<Array<Type_Signature>> {

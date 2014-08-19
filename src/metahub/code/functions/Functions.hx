@@ -20,6 +20,12 @@ enum Functions {
   subtract;
 	multiply;
 	divide;
+
+	add_equals;
+  subtract_equals;
+	multiply_equals;
+	divide_equals;
+
 	count;
 }
 

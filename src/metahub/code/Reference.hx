@@ -15,8 +15,8 @@ import metahub.code.symbols.*;
  */
 class Reference {
 
-	public var symbol:Symbol = null;
-	public var trellis:Trellis = null;
+	var symbol:Symbol = null;
+	var trellis:Trellis = null;
 	public var path:Path = null;
 
 	public function new() {

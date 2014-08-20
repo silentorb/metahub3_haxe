@@ -181,7 +181,7 @@ typedef Assignment_Source = {
 		return {
 			type: "conditions",
 			"conditions": data,
-			"operators": dividers
+			"operator": dividers[0]
     }
 	}
 
@@ -192,7 +192,7 @@ typedef Assignment_Source = {
 	static function if_statement(data:Dynamic):Dynamic {
 		return {
 			type: "if",
-			"conditions": data[2],
+			"condition": data[2],
 			"expression": data[4]
     }
 	}

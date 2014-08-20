@@ -14,6 +14,12 @@ import metahub.code.functions.Functions;
 import metahub.code.statements.*;
 import metahub.code.Scope_Definition;
 
+typedef Conditions_Source = {
+	type:String,
+	conditions:Array<Dynamic>,
+	operator:String
+}
+
 class Coder {
   var hub:Hub;
 
@@ -34,6 +40,8 @@ class Coder {
         return function_expression(source, scope_definition, type);
 			case 'create_node':
         return create_node(source, scope_definition);
+			case 'conditions':
+        return conditions(source, scope_definition);
     }
 
     throw new Exception("Invalid block: " + source.type);
@@ -119,10 +127,19 @@ class Coder {
   }
 
   function if_statement(source:Dynamic, scope_definition:Scope_Definition):Expression {
-    var type = get_type(source.value);
-    return new metahub.code.expressions.Literal(source.value, type);
+		var condition = convert_expression(source.condition, scope_definition);
+		var expression = convert_expression(source.expression, scope_definition);
+		return new If_Statement(condition, expression);
   }
 
+  function conditions(source:Conditions_Source, scope_definition:Scope_Definition):Expression {
+		var conditions = new Array<Expression>();
+		for (i in source.conditions) {
+			conditions.push(convert_expression(i, scope_definition));
+		}
+		return new Condition_Group(conditions, Condition_Join.createByName(source.operator));
+  }
+	
 	function get_namespace(path:Array<String>, start:Namespace):Namespace {
 		var current_namespace = start;
 		var i = 0;

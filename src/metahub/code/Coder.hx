@@ -17,7 +17,7 @@ import metahub.code.Scope_Definition;
 typedef Conditions_Source = {
 	type:String,
 	conditions:Array<Dynamic>,
-	operator:String
+	mode:String
 }
 
 class Coder {
@@ -130,7 +130,7 @@ class Coder {
 
   function if_statement(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		var condition = convert_expression(source.condition, scope_definition);
-		var expression = convert_expression(source.expression, scope_definition);
+		var expression = convert_expression(source.action, scope_definition);
 		return new If_Statement(condition, expression);
   }
 
@@ -139,7 +139,9 @@ class Coder {
 		for (i in source.conditions) {
 			expressions.push(convert_expression(i, scope_definition));
 		}
-		return new Condition_Group(expressions, Condition_Join.createByName(source.operator));
+		return new Condition_Group(expressions, 
+			expressions.length > 1 ? Condition_Join.createByName(source.mode) : Condition_Join.and		
+		);
   }
 	
   function condition(source:Dynamic, scope_definition:Scope_Definition):Expression {

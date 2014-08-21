@@ -183,15 +183,12 @@ typedef Assignment_Source = {
 			}
 			return {
 				type: "conditions",
-				"condition": data,
-				"mode": symbol
+				"conditions": data,
+				"mode": divider
 			}
 		}
 		else {
-			return {
-				type: "condition",
-				"condition": data,
-			}
+			return data[0];
 		}
 	}
 
@@ -203,7 +200,7 @@ typedef Assignment_Source = {
 		return {
 			type: "if",
 			"condition": data[2],
-			"expression": data[4]
+			"action": data[4]
     }
 	}
 

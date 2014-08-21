@@ -42,6 +42,8 @@ class Coder {
         return create_node(source, scope_definition);
 			case 'conditions':
         return conditions(source, scope_definition);
+			case 'condition':
+        return condition(source, scope_definition);
     }
 
     throw new Exception("Invalid block: " + source.type);
@@ -133,11 +135,18 @@ class Coder {
   }
 
   function conditions(source:Conditions_Source, scope_definition:Scope_Definition):Expression {
-		var conditions = new Array<Expression>();
+		var expressions = new Array<Expression>();
 		for (i in source.conditions) {
-			conditions.push(convert_expression(i, scope_definition));
+			expressions.push(convert_expression(i, scope_definition));
 		}
-		return new Condition_Group(conditions, Condition_Join.createByName(source.operator));
+		return new Condition_Group(expressions, Condition_Join.createByName(source.operator));
+  }
+	
+  function condition(source:Dynamic, scope_definition:Scope_Definition):Expression {
+		return new Condition(
+			convert_expression(source.first, scope_definition), 
+			convert_expression(source.second, scope_definition), 
+			Functions.createByName(source.operator));
   }
 	
 	function get_namespace(path:Array<String>, start:Namespace):Namespace {

@@ -59,7 +59,7 @@ new_scope = path_or_id trim long_block
 
 constraint = path_or_id trim constraint_operator trim expression
 
-condition = path_or_id trim constraint_operator trim expression
+condition = expression trim constraint_operator trim expression
 
 condition_join_operators = "&&" | "||"
 

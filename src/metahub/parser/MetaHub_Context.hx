@@ -161,9 +161,9 @@ typedef Assignment_Source = {
 	static function condition(data:Dynamic):Dynamic {
 		return {
 			type: "condition",
-			"path": data[0],
+			"first": data[0],
 			"operator": data[2],
-			"expression": data[4]
+			"second": data[4]
     }
 	}
 

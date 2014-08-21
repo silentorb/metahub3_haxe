@@ -162,7 +162,7 @@ typedef Assignment_Source = {
 		return {
 			type: "condition",
 			"first": data[0],
-			"operator": data[2],
+			"operator": Std.string(function_map[data[2][0]]),
 			"second": data[4]
     }
 	}
@@ -173,16 +173,26 @@ typedef Assignment_Source = {
 
 	static function conditions(data:Dynamic, match:Match):Dynamic {
 		var rep_match:Repetition_Match = cast match;
-		var dividers = rep_match.dividers;
-		if (dividers.length > 0) {
-			dividers = Lambda.array(Lambda.map(dividers, function(d) { return d.matches[1].get_data(); } ));
+		if (data.length > 1) {
+			var symbol:String = rep_match.dividers[0].matches[1].get_data();
+			var divider:String = null;
+			switch(symbol) {
+				case "&&": divider = "and";
+				case "||": divider = "or";
+				default: throw new Exception("Invalid condition group joiner: " + symbol + ".");
+			}
+			return {
+				type: "conditions",
+				"condition": data,
+				"mode": symbol
+			}
 		}
-
-		return {
-			type: "conditions",
-			"conditions": data,
-			"operator": dividers[0]
-    }
+		else {
+			return {
+				type: "condition",
+				"condition": data,
+			}
+		}
 	}
 
 	static function condition_block(data:Dynamic):Dynamic {

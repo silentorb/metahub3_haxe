@@ -96,11 +96,6 @@ class Path {
 	}
 
 	public function to_string():String {
-		var result = "";
-		for (token in properties) {
-			result += token.name;
-		}
-
-		return result;
+		return Lambda.map(properties, function(i) { return i.name; }).join('.');
 	}
 }

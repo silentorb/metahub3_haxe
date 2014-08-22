@@ -18,6 +18,10 @@ class Group implements INode {
 		//return ports[index];
 		throw new Exception("Not implemented.");
 	}
+	
+	public function get_port_count():Int {
+		return 0;
+	}
 
   public function get_value(index:Int, context:Context):Dynamic {
 		//if (scope.definition.trellis == null) {
@@ -37,6 +41,10 @@ class Group implements INode {
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		throw new Exception("Not implemented.");
 		//block.resolve(scope);
+	}
+			
+	public function to_string():String {
+		return "group";
 	}
 
 }

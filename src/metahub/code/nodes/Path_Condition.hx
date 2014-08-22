@@ -32,7 +32,11 @@ class Path_Condition implements INode {
 
 		return ports[index];
 	}
-
+	
+	public function get_port_count():Int {
+		return ports.length;
+	}
+	
   public function get_value(index:Int, context:Context):Dynamic {
 		throw new Exception("Not implemented");
 	}
@@ -53,5 +57,9 @@ class Path_Condition implements INode {
 			return;
 
 		ports[1 - index].set_external_value(value, context);
+	}
+			
+	public function to_string():String {
+		return "path condition: " + path.to_string();
 	}
 }

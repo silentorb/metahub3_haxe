@@ -23,6 +23,9 @@ class Bool_Comparison implements Comparison
 			default: throw new Exception("Could not find a valid comparison operation.");
 		}
 	}
-
+			
+	public function to_string():String {
+		return "bool " + Std.string(type);
+	}
 
 }

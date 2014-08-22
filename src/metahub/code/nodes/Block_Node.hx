@@ -15,27 +15,25 @@ import metahub.schema.Kind;
  * @author Christopher W. Johnson
  */
 
-class Block_Node implements INode {
-	var ports = new Array<General_Port>();
+class Block_Node implements INode extends Standard_Node {
 	var scope:Scope;
 
 	public function new(expressions:Array<Expression>, scope:Scope) {
-		ports.push(new General_Port(this, 0));
+		for (i in 0...3) {
+		ports.push(new General_Port(this, i));
+		}
 		this.scope = scope;
 		var type = new Type_Signature(Kind.unknown);
 		for (expression in expressions) {
-			if (Type.getClassName(Type.getClass(expression)) == "metahub.code.expressions.Trellis_Scope")
-				continue;
-
 			var signature = Type_Network.analyze(expression, type, scope);
 			var port = expression.to_port(scope, null, signature);
-			if (port != null)
-				ports.push(port);
+			if (port != null) {
+				if (Type.getClassName(Type.getClass(expression)) != "metahub.code.expressions.Trellis_Scope")
+					ports[1].connect(port);
+				else
+					ports[2].connect(port);
+			}
 		}
-	}
-
-	public function get_port(index:Int):General_Port {
-		return ports[index];
 	}
 
   public function get_value(index:Int, context:Context):Dynamic {
@@ -67,11 +65,19 @@ class Block_Node implements INode {
 	}
 
 	function resolve(context:Context):Dynamic {
-    for (i in 1...ports.length) {
-			ports[i].get_node_value(context);
-			//Expression_Utility.resolve(s, new Type_Signature(Kind.unknown), scope);
-    }
+		if (ports[1].connections.length > 1)
+			ports[1].get_external_value(context);
+			
+    //for (i in 1...ports.length) {
+			//ports[i].get_node_value(context);
+    //}
     return null;
   }
-
+	
+	public function to_string():String {
+		if (scope.definition.trellis != null)
+			return "block " + scope.definition.trellis.name;
+			
+		return "block";
+	}
 }

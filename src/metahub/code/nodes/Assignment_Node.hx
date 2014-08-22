@@ -21,6 +21,10 @@ class Assignment_Node implements INode
 		this.input = input;
 	}
 	
+	public function get_port_count():Int {
+		return 1;
+	}
+	
 	public function get_port(index:Int):General_Port {
 		return trigger;
 	}
@@ -34,4 +38,8 @@ class Assignment_Node implements INode
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		throw new Exception("Not implemented");
 	}
+	
+	public function to_string():String {
+		return output.node.to_string() + " = " + input.node.to_string();
+	}	
 }

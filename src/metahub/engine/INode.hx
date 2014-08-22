@@ -6,7 +6,9 @@ import metahub.engine.Node.Identity;
  */
 
 interface INode {
+	function get_port_count():Int;
 	function get_port(index:Int):General_Port;
   function get_value(index:Int, context:Context):Dynamic;
   function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null):Void;
+	function to_string():String;
 }

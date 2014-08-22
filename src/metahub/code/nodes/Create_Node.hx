@@ -28,6 +28,10 @@ class Create_Node implements INode
 	public function get_port(index:Int):General_Port {
 		return output;
 	}
+	
+	public function get_port_count():Int {
+		return 1;
+	}
 
   public function get_value(index:Int, context:Context):Dynamic {
     var node = hub.create_node(trellis);
@@ -40,5 +44,9 @@ class Create_Node implements INode
 
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		throw new Exception("Not implemented");
+	}		
+	
+	public function to_string():String {
+		return "new " + trellis.name;
 	}
 }

@@ -214,4 +214,13 @@ class Trellis implements INode {
 	public function get_port(index:Int):General_Port {
 		return ports[index];
 	}
+		
+	public function get_port_count():Int {
+		return ports.length;
+	}
+	
+	public function to_string():String {
+		return name;
+	}
+	
 }

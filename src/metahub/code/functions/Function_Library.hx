@@ -31,7 +31,7 @@ class Function_Library {
 		var type_bool = new Type_Signature(Kind.bool);
 		var type_list = new Type_Signature(Kind.list);
 		var int3 = [ type_int, type_int, type_int ];
-		var bool_int2 = [ type_bool, type_int, type_int ];
+		var bool_int2 = [ type_int, type_int ];
 
 		add(Functions.add, "Add_Int", int3);
 		add(Functions.subtract, "Subtract_Int", int3);

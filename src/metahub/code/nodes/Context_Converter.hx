@@ -45,7 +45,11 @@ class Context_Converter implements INode {
 
 		return ports[index];
 	}
-
+	
+	public function get_port_count():Int {
+		return ports.length;
+	}
+	
 	static function has_lists(path:Path) {
 		for (i in 0...path.length) {
 			if (path.at(i).type == Kind.list)
@@ -147,5 +151,9 @@ class Context_Converter implements INode {
 		}
 
 		return result;
+	}
+			
+	public function to_string():String {
+		return "context converter";
 	}
 }

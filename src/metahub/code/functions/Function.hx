@@ -33,7 +33,11 @@ class Function implements INode {
 		else
 			throw new Exception("Not implemented.");
 	}
-
+		
+	public function get_port_count():Int {
+		return ports.length;
+	}
+	
 	public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		if (source == ports[0]) {
 			for (i in 0...ports.length) {
@@ -113,5 +117,9 @@ class Function implements INode {
 	private function reverse(new_value:Dynamic, args:Array<Dynamic>):Dynamic {
 		throw new Exception("Function.reverse is abstract.");
 	}
-
+	
+	public function to_string():String {
+		return Std.string(func);
+	}
+	
 }

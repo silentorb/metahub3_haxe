@@ -8,9 +8,8 @@ import metahub.engine.General_Port;
  * ...
  * @author Christopher W. Johnson
  */
-class Condition implements INode
+class Condition implements INode extends Standard_Node
 {
-	var ports = new Array<General_Port>();
 	var comparison:Comparison;
 	
 	public function new(comparison:Comparison) 
@@ -20,10 +19,6 @@ class Condition implements INode
 		for (i in 0...3) {
 			ports.push(new General_Port(this, i));
 		}
-	}
-	
-	public function get_port(index:Int):General_Port {
-		return ports[index];
 	}
 
   public function get_value(index:Int, context:Context):Dynamic {
@@ -35,5 +30,8 @@ class Condition implements INode
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		throw new Exception("Not implemented.");
 	}
-
+	
+	public function to_string():String {
+		return comparison.to_string();
+	}
 }

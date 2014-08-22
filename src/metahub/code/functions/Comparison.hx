@@ -7,4 +7,5 @@ package metahub.code.functions;
 interface Comparison
 {	
 	function compare(first:Dynamic, second:Dynamic):Bool;
+	function to_string():String;
 }

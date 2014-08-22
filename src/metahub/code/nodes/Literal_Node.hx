@@ -1,4 +1,7 @@
-package metahub.engine;
+package metahub.code.nodes ;
+import metahub.engine.Context;
+import metahub.engine.General_Port;
+import metahub.engine.INode;
 
 /**
  * ...
@@ -19,6 +22,10 @@ class Literal_Node implements INode
 		return output;
 	}
 	
+	public function get_port_count():Int {
+		return 1;
+	}
+	
   public function get_value(index:Int, context:Context):Dynamic {
 		return value;
 	}
@@ -26,4 +33,9 @@ class Literal_Node implements INode
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		
 	}
+				
+	public function to_string():String {
+		return 'literal "' + value + '"';
+	}
+
 }

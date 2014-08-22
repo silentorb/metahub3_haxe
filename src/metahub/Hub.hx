@@ -42,7 +42,7 @@ import haxe.Json;
 	public var function_library:Function_Library;
 	public var history = new History();
 	public var constraints = new Array<Group>();
-	var trellis_nodes:Map<String, Array<Node>> = null;
+	var trellis_nodes = new Map<String, Array<Node>>();
 	var queue = new Array<Change>();
 	var entry_node:Node = null;
 	public var max_steps = 100;
@@ -139,11 +139,8 @@ import haxe.Json;
 		if (nodes.exists(node.id))
 			throw new Exception("Node " + node.id + " already exists!");
 
-		if (trellis_nodes == null) {
-			trellis_nodes = new Map<String, Array<Node>>();
-			for (trellis in schema.trellises) {
-				trellis_nodes[trellis.name] = new Array<Node>();
-			}
+		for (trellis in schema.trellises) {
+			trellis_nodes[trellis.name] = new Array<Node>();
 		}
 
     nodes[node.id] = node;
@@ -195,7 +192,7 @@ import haxe.Json;
     return coder.convert_statement(source, root_scope_definition);
   }
 
-  public function run_code(code:String) {
+  public function run_code(code:String):General_Port {
 		var result = parse_code(code);
 		if (!result.success) {
        throw new Exception("Syntax Error at " + result.end.y + ":" + result.end.x);
@@ -205,6 +202,7 @@ import haxe.Json;
 		var signature = Type_Network.analyze(statement, new Type_Signature(Kind.unknown), root_scope);
 		var port = statement.to_port(root_scope, null, signature);
 		port.get_node_value(new Empty_Context(this));
+		return port;
 		//Expression_Utility.resolve(statement, new Type_Signature(Kind.unknown), root_scope);
   }
 
@@ -240,5 +238,42 @@ import haxe.Json;
 	public function increment(layer:Int = 10000) {
 		var node = get_increment();
 		node.get_value(0, new Empty_Context(this));
+	}
+	
+	public static function graph_nodes(node:INode, depth:Int = 0, used:Array<INode> = null):String {
+		if (used == null)
+			used = [];
+		
+		used.push(node);
+		
+		//var maximum_depth = 50;
+		var tabbing = " ";
+		var result = "";
+		var padding = "";
+		for (i in 0...depth) {
+			padding += tabbing;
+		}
+		result += padding + node.to_string() + "\n";
+		//if (depth > maximum_depth) {
+			//return result + padding + tabbing + "EXCEEDED MAXIMUM DEPTH OF " + maximum_depth + ".\n";
+		//}
+		for (i in 1...node.get_port_count()) {
+			var port = node.get_port(i);
+			var deeper = 0;
+			if (node.get_port_count() > 2) {
+				result += padding + tabbing + i + "\n";
+				deeper = 1;
+			}
+			for (connection in port.connections) {
+				if (used.indexOf(connection.node) == -1)
+					result += graph_nodes(connection.node, depth + 1 + deeper, used);
+			}
+		}
+		
+		if (depth == 0) {
+			result = "Graphed " + used.length + " nodes:\n\n" + result;
+		}
+		
+		return result;
 	}
 }

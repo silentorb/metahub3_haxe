@@ -23,12 +23,20 @@ class Symbol_Node implements INode{
 	public function get_port(index:Int):General_Port {
 		return port;
 	}
-
+	
+	public function get_port_count():Int {
+		return 1;
+	}
+	
   public function get_value(index:Int, context:Context):Dynamic{
 		return path.resolve(node);
 	}
 
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		//node.set_value(property.id, value, source);
+	}
+			
+	public function to_string():String {
+		return "@" + path.to_string();
 	}
 }

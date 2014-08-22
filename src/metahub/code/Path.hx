@@ -94,4 +94,13 @@ class Path {
 
 		return new Path(properties.slice(start, end));
 	}
+
+	public function to_string():String {
+		var result = "";
+		for (token in properties) {
+			result += token.name;
+		}
+
+		return result;
+	}
 }

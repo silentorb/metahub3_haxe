@@ -40,7 +40,7 @@ class Function_Library {
 		add(Functions.count, "Count", [ type_int, type_list ]);
 
 		var struct_type = new Type_Signature(Kind.reference);
-		struct_type.is_numeric = true;
+		struct_type.is_numeric = 1;
 		var struct3 = [ struct_type, struct_type, struct_type ];
 
 		add(Functions.add, "Struct_Functions", struct3);

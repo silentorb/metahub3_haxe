@@ -4,7 +4,7 @@ package metahub.code.functions;
  * ...
  * @author Christopher W. Johnson
  */
-class Float_Comparison implements Comparison
+class Int_Comparison implements Comparison
 {
 
 	var type:Functions;
@@ -15,8 +15,8 @@ class Float_Comparison implements Comparison
 	}
 
 	public function compare(f:Dynamic, s:Dynamic):Bool {
-		var first:Float = f;
-		var second:Float = s;
+		var first:Int = f;
+		var second:Int = s;
 
 		switch(type) {
 			case Functions.equals: return first == second;

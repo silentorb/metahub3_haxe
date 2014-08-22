@@ -37,7 +37,7 @@ class Coder {
       case 'reference':
         return create_general_reference(source, scope_definition);
       case 'function':
-        return function_expression(source, scope_definition, type);
+        return function_expression(source, scope_definition, type, source.name);
 			case 'create_node':
         return create_node(source, scope_definition);
 			case 'conditions':
@@ -75,11 +75,11 @@ class Coder {
 		var reference = Reference.from_scope(source.path, scope_definition);
 		var back_reference:Reference = null;
 		var name = source.expression.name;
-		if (['+=', '-=', '*=', '/='].indexOf(name) > -1) {
-			name = name.substring(0, 1);
+		if (['add_equals', 'subtract_equals', 'multiply_equals', 'divide_equals'].indexOf(name) > -1) {
+			name = name.substring(0, name.length - 7);
 			back_reference = reference;
 		}
-		var expression = function_expression(source.expression, scope_definition, reference.get_type(), back_reference);
+		var expression = function_expression(source.expression, scope_definition, reference.get_type(), name, back_reference);
 		return new metahub.code.statements.Create_Constraint(reference, expression, back_reference != null);
   }
 
@@ -109,17 +109,16 @@ class Coder {
     return new metahub.code.expressions.Literal(source.value, type);
   }
 
-  function function_expression(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature, reference:Reference = null):Expression {
+  function function_expression(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature, name:String, reference:Reference = null):Expression {
 		if (type == null)
 			throw new Exception("Function expressions do not currently support unspecified return types.");
 
-		var name = source.name;
     var expressions:Array<Dynamic> = source.inputs;
     var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
 
 			// Equavelent to += in other languages
-		if (reference != null && ['+=', '-=', '*=', '/='].indexOf(name) > -1) {
-			name = name.substring(0, 1);
+		if (reference != null) {
+			//name = name.substring(0, 1);
 			inputs.unshift(new Expression_Reference(reference));
 		}
 
@@ -139,18 +138,18 @@ class Coder {
 		for (i in source.conditions) {
 			expressions.push(convert_expression(i, scope_definition));
 		}
-		return new Condition_Group(expressions, 
-			expressions.length > 1 ? Condition_Join.createByName(source.mode) : Condition_Join.and		
+		return new Condition_Group(expressions,
+			expressions.length > 1 ? Condition_Join.createByName(source.mode) : Condition_Join.and
 		);
   }
-	
+
   function condition(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		return new Condition(
-			convert_expression(source.first, scope_definition), 
-			convert_expression(source.second, scope_definition), 
+			convert_expression(source.first, scope_definition),
+			convert_expression(source.second, scope_definition),
 			Functions.createByName(source.operator));
   }
-	
+
 	function get_namespace(path:Array<String>, start:Namespace):Namespace {
 		var current_namespace = start;
 		var i = 0;
@@ -227,7 +226,7 @@ class Coder {
   static function get_type(value:Dynamic):Type_Signature {
     if (Std.is(value, Int)) {
 			var result = new Type_Signature(Kind.unknown);
-			result.is_numeric = true;
+			result.is_numeric = 1;
       return result;
 		}
 

@@ -24,7 +24,10 @@ class Block_Node implements INode {
 		this.scope = scope;
 		var type = new Type_Signature(Kind.unknown);
 		for (expression in expressions) {
-			var signature = Type_Network.analyze(expression, type, scope); 
+			if (Type.getClassName(Type.getClass(expression)) == "metahub.code.expressions.Trellis_Scope")
+				continue;
+
+			var signature = Type_Network.analyze(expression, type, scope);
 			var port = expression.to_port(scope, null, signature);
 			if (port != null)
 				ports.push(port);
@@ -43,8 +46,8 @@ class Block_Node implements INode {
 			var nodes = scope.hub.get_nodes_by_trellis(scope.definition.trellis);
 			for (node in nodes) {
 				var node_context = new Node_Context(node, scope.hub);
-				resolve(node_context);			
-			}			
+				resolve(node_context);
+			}
 		}
 
 		return null;
@@ -59,11 +62,11 @@ class Block_Node implements INode {
 		var nodes = scope.hub.get_nodes_by_trellis(scope.definition.trellis);
 		for (node in nodes) {
 			var context = new Node_Context(node, scope.hub);
-			resolve(context);			
+			resolve(context);
 		}
 	}
-	
-	function resolve(context:Context):Dynamic {		
+
+	function resolve(context:Context):Dynamic {
     for (i in 1...ports.length) {
 			ports[i].get_node_value(context);
 			//Expression_Utility.resolve(s, new Type_Signature(Kind.unknown), scope);

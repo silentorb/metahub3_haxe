@@ -72,7 +72,7 @@ class Node {
 			//case Kind.pulse:
 				//return null;
 
-			case Kind.any:
+			case Kind.unknown:
 				return null;
 
 			default:

@@ -132,7 +132,7 @@ typedef Assignment_Source = {
 
     var rep_match:Repetition_Match = cast match;
     var operator:String = cast rep_match.dividers[0].matches[1].get_data();
-    //trace('op', operator);
+
     var operators = {
 			'+': 'add',
 			'-': 'subtract',

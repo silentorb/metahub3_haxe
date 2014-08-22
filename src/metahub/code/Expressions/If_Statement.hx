@@ -1,7 +1,9 @@
 package metahub.code.expressions;
 import metahub.code.nodes.Group;
 import metahub.code.nodes.If_Node;
+import metahub.code.Type_Signature;
 import metahub.engine.General_Port;
+import metahub.schema.Kind;
 
 /**
  * ...
@@ -10,7 +12,7 @@ import metahub.engine.General_Port;
 class If_Statement implements Expression {
 	var condition:Expression;
 	var expression:Expression;
-	
+
 	public function new(condition:Expression, expression:Expression) {
 		this.condition = condition;
 		this.expression = expression;
@@ -24,7 +26,7 @@ class If_Statement implements Expression {
   }
 
 	public function get_types():Array<Array<Type_Signature>>{
-		return [  ];
+		return [ [ new Type_Signature(Kind.none), new Type_Signature(Kind.unknown), new Type_Signature(Kind.unknown) ] ];
 	}
 
 	public function to_string():String {
@@ -32,6 +34,6 @@ class If_Statement implements Expression {
 	}
 
 	public function get_children():Array<Expression> {
-		return [];
+		return [ condition, expression ];
 	}
 }

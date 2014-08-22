@@ -35,7 +35,7 @@ class Assignment implements Expression{
   }
 
 	public function get_types():Array<Array<Type_Signature>> {
-		return [ [ new Type_Signature(Kind.any) ] ];
+		return [ [ new Type_Signature(Kind.none) ] ];
 	}
 
 	public function to_string():String {

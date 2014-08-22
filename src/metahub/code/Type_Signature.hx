@@ -4,7 +4,7 @@ import metahub.schema.*;
 class Type_Signature {
   public var trellis:Trellis;
   public var type:Kind;
-	public var is_numeric:Bool = false; // Only considered when type == unknown
+	public var is_numeric:Int = 2; // 0: No, 1: Yes, 2: Unknown
 
   public function new(type:Kind, trellis:Trellis = null) {
     this.type = type;
@@ -14,7 +14,8 @@ class Type_Signature {
 
 	function update_numeric() {
 		if (type != unknown) // Only update if the type is known
-			is_numeric = type == Kind.int || type == Kind.float || (type == Kind.reference && trellis != null && trellis.is_numeric);
+			if (type == Kind.int || type == Kind.float || (type == Kind.reference && trellis != null && trellis.is_numeric))
+				is_numeric = 1;
 	}
 
   //static function create_from_string(name:String):Type_Signature {
@@ -69,7 +70,7 @@ class Type_Signature {
 		}
 		else if (check_numeric(other, this)) {
 			type = Kind.reference;
-			is_numeric = true;
+			is_numeric = 1;
 			trellis = other.trellis;
 		}
 
@@ -98,7 +99,10 @@ class Type_Signature {
 
 	public static function check_unknown(first:Type_Signature, second:Type_Signature) {
 		if (first.type == Kind.unknown) {
-			return first.is_numeric == second.is_numeric;
+			return
+				first.is_numeric == 2 ||
+				second.is_numeric == 2 ||
+				first.is_numeric == second.is_numeric;
 		}
 
 		return false;

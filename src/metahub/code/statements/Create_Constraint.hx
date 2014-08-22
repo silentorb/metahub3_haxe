@@ -5,6 +5,7 @@ import metahub.code.nodes.Assignment_Node;
 import metahub.code.nodes.Group;
 import metahub.code.nodes.Path_Condition;
 import metahub.code.Reference;
+import metahub.code.Type_Signature;
 import metahub.engine.Constraint_Operator;
 import metahub.engine.General_Port;
 import metahub.schema.Kind;
@@ -48,15 +49,16 @@ class Create_Constraint implements Expression {
 		return output;
   }
 
-	public function get_types():Array<Array<Type_Signature>> {
-		return expression.get_types();
+	public function get_types():Array < Array < Type_Signature >> {
+
+		return [ [ new Type_Signature(Kind.none), reference.get_type() ] ];
 	}
 
 	public function to_string():String {
-		return expression.to_string();
+		return reference.to_string();
 	}
 
 	public function get_children():Array<Expression> {
-		return expression.get_children();
+		return [ expression ];
 	}
 }

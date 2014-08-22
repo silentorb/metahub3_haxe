@@ -65,6 +65,18 @@ class Reference {
 		}
 	}
 
+	public function to_string():String {
+		var result = "";
+		if (symbol != null) {
+			result = symbol.name;
+		}
+
+		if (path.length > 0)
+			return result + "." + path.to_string();
+
+		return result;
+	}
+
 	public function resolve(scope:Scope):Dynamic {
 		if (symbol != null) {
 			return symbol.resolve(scope);

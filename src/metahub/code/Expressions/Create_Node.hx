@@ -13,7 +13,7 @@ import metahub.schema.Kind;
 class Create_Node implements Expression {
   public var trellis:Trellis;
   //public var assignments = new Map<Int, Expression>();
-	public var expression:Expression;
+	public var block:Expression;
   public var trellis_type:Type_Signature;
 	var scope_definition:Scope_Definition;
 
@@ -25,13 +25,14 @@ class Create_Node implements Expression {
 
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
 		var block_port:General_Port = null;
-		if (expression != null) {
+		var creator = new metahub.code.nodes.Create_Node(trellis, scope.hub);
+		if (block != null) {
 			var new_scope = new Scope(scope.hub, scope_definition, scope);
 			//new_scope.node = node;
-			block_port = expression.to_port(new_scope, group, signature_node);
+			block_port = block.to_port(new_scope, group, signature_node);
+			creator.get_port(1).connect(block_port);
 		}
 
-		var creator = new metahub.code.nodes.Create_Node(trellis, scope.hub, block_port);
 		return creator.get_port(0);
 	}
 

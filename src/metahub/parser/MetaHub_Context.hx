@@ -218,8 +218,9 @@ typedef Assignment_Source = {
 			trellis: data[2]
     };
 
-    if (data[4] != null && data[4].length > 0) {
-      result.set = data[4][0];
+    if (data[3] != null && data[3].length > 0) {
+			result.block = data[3][0];
+      //result.set = data[4][0];
     }
 
     return result;

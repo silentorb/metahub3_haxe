@@ -10,43 +10,30 @@ import metahub.schema.Trellis;
  * ...
  * @author Christopher W. Johnson
  */
-class Create_Node implements INode
+class Create_Node implements INode extends Standard_Node
 {
-	var block_port:General_Port;
-	var output:General_Port;
+	//var block_port:General_Port;
+	//var output:General_Port;
 	var trellis:Trellis;
 	var hub:Hub;
-	
-	public function new(trellis:Trellis, hub:Hub, block_port:General_Port) 
+
+	public function new(trellis:Trellis, hub:Hub)
 	{
+		add_ports(2);
 		this.trellis = trellis;
 		this.hub = hub;
-		output = new General_Port(this, 0);
-		this.block_port = block_port;
-	}
-		
-	public function get_port(index:Int):General_Port {
-		return output;
-	}
-	
-	public function get_port_count():Int {
-		return 1;
 	}
 
-  public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Dynamic {
     var node = hub.create_node(trellis);
-		if (block_port != null) {
+		if (ports[1].connections.length > 0) {
 			var node_context = new Node_Context(node, hub);
-			block_port.get_node_value(node_context);
+			ports[1].get_external_value(node_context);
 		}
 		return node;
 	}
 
-  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		throw new Exception("Not implemented");
-	}		
-	
-	public function to_string():String {
+	override public function to_string():String {
 		return "new " + trellis.name;
 	}
 }

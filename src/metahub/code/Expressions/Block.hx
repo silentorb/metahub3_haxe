@@ -33,7 +33,22 @@ class Block implements Expression {
 	}
 
   public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-		var node = new Block_Node(expressions, scope);
+		var node = new Block_Node(scope);
+		var type = new Type_Signature(Kind.unknown);
+		for (expression in expressions) {
+			var signature = Type_Network.analyze(expression, type, scope);
+			var port = expression.to_port(scope, null, signature);
+			if (port != null) {
+				if (Type.getClassName(Type.getClass(expression)) != "metahub.code.expressions.Trellis_Scope")
+					node.get_port(1).connect(port);
+				else
+					node.get_port(2).connect(port);
+			}
+			else {
+				throw new Exception("Null port!");
+			}
+		}
+
 		return node.get_port(0);
   }
 

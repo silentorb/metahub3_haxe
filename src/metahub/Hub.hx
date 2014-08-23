@@ -149,7 +149,7 @@ import haxe.Json;
 		for (t in tree) {
 			if (!trellis_nodes.exists(t.name))
 				trellis_nodes[t.name] = new Array<Node>();
-				
+
 			trellis_nodes[t.name].push(node);
 		}
 	}
@@ -227,7 +227,7 @@ import haxe.Json;
 
 	public function get_increment():INode {
 		if (interval_node == null) {
-			interval_node = new Block_Node(new Array<Expression>(), new Scope(this, root_scope_definition));
+			interval_node = new Block_Node(new Scope(this, root_scope_definition));
 		}
 
 		return interval_node;
@@ -242,13 +242,13 @@ import haxe.Json;
 		var node = get_increment();
 		node.get_value(0, new Empty_Context(this));
 	}
-	
+
 	public static function graph_nodes(node:INode, depth:Int = 0, used:Array<INode> = null):String {
 		if (used == null)
 			used = [];
-		
+
 		used.push(node);
-		
+
 		//var maximum_depth = 50;
 		var tabbing = " ";
 		var result = "";
@@ -272,11 +272,11 @@ import haxe.Json;
 					result += graph_nodes(connection.node, depth + 1 + deeper, used);
 			}
 		}
-		
+
 		if (depth == 0) {
 			result = "Graphed " + used.length + " nodes:\n\n" + result;
 		}
-		
+
 		return result;
 	}
 }

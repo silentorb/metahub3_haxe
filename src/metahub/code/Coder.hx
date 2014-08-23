@@ -177,11 +177,12 @@ class Coder {
 		var namespace = get_namespace(path, hub.schema.root_namespace);
     var trellis = hub.schema.get_trellis(path[path.length - 1], namespace, true);
 		var new_scope = new Scope_Definition(scope_definition);
+		new_scope.is_particular_node = true;
 		new_scope.trellis = trellis;
     var result = new metahub.code.expressions.Create_Node(trellis, new_scope);
 
-    if (source.set != null) {
-			result.expression = create_block(source.set, new_scope);
+    if (source.block != null) {
+			result.block = create_block(source.block, new_scope);
       //for (key in Reflect.fields(source.set)) {
         //var property = trellis.get_property(key);
         //result.assignments[property.id] = convert_expression(Reflect.field(source.set, key), scope_definition);

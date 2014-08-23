@@ -13,6 +13,7 @@ class Scope_Definition {
 	public var symbol:Symbol = null;
   public var depth:Int = 0;
 	public var hub:Hub;
+	public var is_particular_node:Bool = false;
 
   public function new(parent:Scope_Definition = null, hub:Hub = null) {
 		this.parent = parent;

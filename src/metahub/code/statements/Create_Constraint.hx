@@ -2,6 +2,7 @@ package metahub.code.statements;
 
 import metahub.code.expressions.Expression;
 import metahub.code.nodes.Assignment_Node;
+import metahub.code.nodes.Block_Node;
 import metahub.code.nodes.Group;
 import metahub.code.nodes.Path_Condition;
 import metahub.code.Reference;
@@ -28,10 +29,18 @@ class Create_Constraint implements Expression {
 		var signature = Type_Network.analyze(expression, reference.get_type(), scope);
 		var group = new Group();
 		var input = expression.to_port(scope, group, signature);
+		var assignment:Assignment_Node = null;
 
 		if (is_back_referencing) {
-			var assignment = new Assignment_Node(output, input);
-			scope.hub.connect_to_increment(assignment.get_port(0));
+			assignment = new Assignment_Node(output, input);
+			//return assignment.get_port(0);
+			var block = new Block_Node(scope);
+			block.get_port(1).connect(assignment.get_port(0));
+			scope.hub.connect_to_increment(block.get_port(0));
+			return block.get_port(0);
+		}
+		if (scope.definition.is_particular_node) {
+			assignment = new Assignment_Node(output, input);
 			return assignment.get_port(0);
 		}
 

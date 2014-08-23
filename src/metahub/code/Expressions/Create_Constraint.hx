@@ -1,4 +1,4 @@
-package metahub.code.statements;
+package metahub.code.expressions ;
 
 import metahub.code.expressions.Expression;
 import metahub.code.nodes.Assignment_Node;
@@ -29,19 +29,19 @@ class Create_Constraint implements Expression {
 		var signature = Type_Network.analyze(expression, reference.get_type(), scope);
 		var group = new Group();
 		var input = expression.to_port(scope, group, signature);
-		var assignment:Assignment_Node = null;
 
-		if (is_back_referencing) {
-			assignment = new Assignment_Node(output, input);
-			//return assignment.get_port(0);
+		if (is_back_referencing || scope.definition.is_particular_node) {
+			var assignment = new Assignment_Node();
+			assignment.get_port(1).connect(output);
+			assignment.get_port(2).connect(input);
+			
+			if (scope.definition.is_particular_node) {
+				return assignment.get_port(0);			
+			}
 			var block = new Block_Node(scope);
 			block.get_port(1).connect(assignment.get_port(0));
 			scope.hub.connect_to_increment(block.get_port(0));
 			return block.get_port(0);
-		}
-		if (scope.definition.is_particular_node) {
-			assignment = new Assignment_Node(output, input);
-			return assignment.get_port(0);
 		}
 
 		scope.hub.constraints.push(group);

@@ -243,20 +243,31 @@ import haxe.Json;
 		node.get_value(0, new Empty_Context(this));
 	}
 
-	public static function graph_nodes(node:INode, depth:Int = 0, used:Array<INode> = null):String {
+	public static function graph_nodes(node:INode, depth:Int = 0, used:Array<INode> = null, port:General_Port = null):String {
 		if (used == null)
 			used = [];
 
-		used.push(node);
-
 		//var maximum_depth = 50;
+		var trellis:Trellis = Type.getClassName(Type.getClass(node)) == "metahub.schema.Trellis"
+			? cast node
+			: null;
+		
 		var tabbing = " ";
 		var result = "";
 		var padding = "";
 		for (i in 0...depth) {
 			padding += tabbing;
 		}
-		result += padding + node.to_string() + "\n";
+		var label = trellis != null && port != null
+			? trellis.properties[port.id].fullname()
+			: node.to_string();
+		result += padding + label + "\n";
+
+		if (used.indexOf(node) != -1 || trellis != null)
+			return result;
+
+		used.push(node);
+
 		//if (depth > maximum_depth) {
 			//return result + padding + tabbing + "EXCEEDED MAXIMUM DEPTH OF " + maximum_depth + ".\n";
 		//}
@@ -268,8 +279,7 @@ import haxe.Json;
 				deeper = 1;
 			}
 			for (connection in port.connections) {
-				if (used.indexOf(connection.node) == -1)
-					result += graph_nodes(connection.node, depth + 1 + deeper, used);
+				result += graph_nodes(connection.node, depth + 1 + deeper, used, connection);
 			}
 		}
 

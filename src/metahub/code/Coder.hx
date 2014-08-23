@@ -80,7 +80,7 @@ class Coder {
 			back_reference = reference;
 		}
 		var expression = function_expression(source.expression, scope_definition, reference.get_type(), name, back_reference);
-		return new metahub.code.statements.Create_Constraint(reference, expression, back_reference != null);
+		return new metahub.code.expressions.Create_Constraint(reference, expression, back_reference != null);
   }
 
   function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -210,19 +210,19 @@ class Coder {
     return new metahub.code.statements.Create_Symbol(symbol, expression);
   }
 
-	function set_property(source:Dynamic, scope_definition:Scope_Definition):Expression {
-		var reference = Reference.from_scope(source.path, scope_definition);
-    var expression = convert_expression(source.expression, scope_definition);
-
-		// Equavelent to += in other languages
-		if (Reflect.hasField(source, "modifier") && source.modifier != Functions.none) {
-			var func = Type.createEnum(Functions, source.modifier);
-			var inputs = [ new Expression_Reference(reference), expression ];
-			expression = new Function_Call(func, reference.get_type(), inputs, hub);
-		}
-
-		return new Assignment(reference, expression);
-  }
+	//function set_property(source:Dynamic, scope_definition:Scope_Definition):Expression {
+		//var reference = Reference.from_scope(source.path, scope_definition);
+    //var expression = convert_expression(source.expression, scope_definition);
+//
+		//// Equavelent to += in other languages
+		//if (Reflect.hasField(source, "modifier") && source.modifier != Functions.none) {
+			//var func = Type.createEnum(Functions, source.modifier);
+			//var inputs = [ new Expression_Reference(reference), expression ];
+			//expression = new Function_Call(func, reference.get_type(), inputs, hub);
+		//}
+//
+		//return new Assignment(reference, expression);
+  //}
 
   static function get_type(value:Dynamic):Type_Signature {
     if (Std.is(value, Int)) {

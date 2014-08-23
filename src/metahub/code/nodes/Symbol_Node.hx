@@ -35,8 +35,12 @@ class Symbol_Node implements INode{
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		//node.set_value(property.id, value, source);
 	}
-			
+
 	public function to_string():String {
-		return "@" + path.to_string();
+		var result = "@" + node.trellis.name;
+		if (path.length > 0)
+			result += "." + path.to_string();
+			
+		return result;
 	}
 }

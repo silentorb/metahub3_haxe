@@ -23,7 +23,14 @@ class Type_Network {
 		if (option == null)
 			throw new Exception("Type mismatch with type <" + start_type.type.to_string() + "> and expression <" + expression.to_string() + ">");
 
+		// Eventually this might need to be mixed in with get_match and allowed to try for other matches,
+		// but right now multiple options is not used much and none of them have a variable amount of parameters,
+		// so this error is currently only an internal bug and worth catching separately for debuggin purposes.
+		if (option.length < children.length + 1)
+			throw new Exception("Invalid number of parameters in type definition.");
+		
 		var result = new Node_Signature(option);
+			
 		var i = 1;
 		for (child in children) {
 			var child_result = analyze(child, result.signature[i++], scope);

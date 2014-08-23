@@ -8,38 +8,30 @@ import metahub.engine.Node_Context;
  * ...
  * @author Christopher W. Johnson
  */
-class Assignment_Node implements INode
+class Assignment_Node implements INode extends Standard_Node
 {
-	var trigger:General_Port;
-	var input:General_Port;
-	var output:General_Port;
-
-	public function new(output:General_Port, input:General_Port) 
+	//var trigger:General_Port;
+	//var input:General_Port;
+	//var output:General_Port;
+//
+	public function new() 
 	{
-		trigger = new General_Port(this, 0);
-		this.output = output;
-		this.input = input;
-	}
-	
-	public function get_port_count():Int {
-		return 1;
-	}
-	
-	public function get_port(index:Int):General_Port {
-		return trigger;
+		add_ports(3);
 	}
 
-  public function get_value(index:Int, context:Context):Dynamic {
-		var value = input.get_node_value(context);
-		output.set_node_value(value, context, null);
+  override public function get_value(index:Int, context:Context):Dynamic {
+		var value = ports[2].get_external_value(context);
+		ports[1].set_external_value(value, context);
 		return value;
 	}
-
-  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		throw new Exception("Not implemented");
-	}
 	
-	public function to_string():String {
-		return output.node.to_string() + " = " + input.node.to_string();
+	override public function to_string():String {
+		//return output.node.to_string() + " = " + input.node.to_string();
+		return "assignment";
 	}	
+	
+  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		
+	}
+
 }

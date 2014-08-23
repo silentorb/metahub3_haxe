@@ -15,6 +15,7 @@ import metahub.schema.Kind;
  * ...
  * @author Christopher W. Johnson
  */
+/*
 class Assignment implements Expression{
 	var reference:Reference;
   var expression:Expression;
@@ -49,4 +50,4 @@ class Assignment implements Expression{
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
 		throw new Exception("Not implemented.");
 	}
-}
+}*/

@@ -12,6 +12,7 @@ import metahub.code.functions.Lesser_Than_Int;
 import metahub.code.functions.Float_Functions;
 import metahub.code.functions.Struct_Functions;
 import metahub.code.functions.Struct_Float_Functions;
+import metahub.code.functions.List_Functions;
 import metahub.code.functions.Count;
 
 /**
@@ -26,10 +27,12 @@ class Function_Library {
 	public function new(hub:Hub) {
 		this.hub = hub;
 
+		// Int
 		var type_int = new Type_Signature(Kind.int);
 		var type_float = new Type_Signature(Kind.float);
 		var type_bool = new Type_Signature(Kind.bool);
 		var type_list = new Type_Signature(Kind.list);
+		var type_unknown = new Type_Signature(Kind.unknown);
 		var int3 = [ type_int, type_int, type_int ];
 		var bool_int2 = [ type_int, type_int ];
 
@@ -39,12 +42,14 @@ class Function_Library {
 		add(Functions.lesser_than, "Lesser_Than_Int", bool_int2);
 		add(Functions.count, "Count", [ type_int, type_list ]);
 
+		// Struct
 		var struct_type = new Type_Signature(Kind.reference);
 		struct_type.is_numeric = 1;
 		var struct3 = [ struct_type, struct_type, struct_type ];
 
 		add(Functions.add, "Struct_Functions", struct3);
 
+		// Float
 		var bool_float2 = hub.schema.get_trellis("float1", hub.metahub_namespace);
 		var float3 = hub.schema.get_trellis("float2", hub.metahub_namespace);
 
@@ -62,6 +67,9 @@ class Function_Library {
 
 		add(Functions.multiply, "Struct_Float_Functions", struct_float);
 
+		var list_any = [ type_list, type_list, type_unknown ];
+		add(Functions.add, "List_Functions", list_any);
+		
 	}
 
 	function add(func:metahub.code.functions.Functions, class_name:String, signature:Array<Type_Signature>) {

@@ -133,8 +133,8 @@ class Node {
 
 		var old_value = values[index];
 		var port = ports[index];
-		if (property.type == Kind.list)
-			throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
+		//if (property.type == Kind.list)
+			//throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
 
 		if (equals(old_value, value, property)) {
 			#if log

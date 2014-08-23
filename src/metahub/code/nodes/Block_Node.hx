@@ -33,6 +33,9 @@ class Block_Node implements INode extends Standard_Node {
 				else
 					ports[2].connect(port);
 			}
+			else {
+				throw new Exception("Null port!");
+			}
 		}
 	}
 
@@ -52,8 +55,7 @@ class Block_Node implements INode extends Standard_Node {
 	}
 
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		throw new Exception("Not implemented.");
-		//block.resolve(scope);
+		//throw new Exception("Not implemented.");
 	}
 
 	public function run() {
@@ -65,7 +67,7 @@ class Block_Node implements INode extends Standard_Node {
 	}
 
 	function resolve(context:Context):Dynamic {
-		if (ports[1].connections.length > 1)
+		if (ports[1].connections.length > 0)
 			ports[1].get_external_value(context);
 			
     //for (i in 1...ports.length) {

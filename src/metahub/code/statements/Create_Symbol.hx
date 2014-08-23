@@ -25,8 +25,7 @@ class Create_Symbol implements Expression {
 		var port = expression.to_port(scope, group, signature_node);
 		var value = port.get_node_value(new Empty_Context(scope.hub));
 		scope.set_value(symbol.index, value);
-		//return expression.to_port(scope, group, signature_node);
-		return null;
+		return port;
 	}
 
 	public function get_types():Array<Array<Type_Signature>> {

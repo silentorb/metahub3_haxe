@@ -139,14 +139,17 @@ import haxe.Json;
 		if (nodes.exists(node.id))
 			throw new Exception("Node " + node.id + " already exists!");
 
-		for (trellis in schema.trellises) {
-			trellis_nodes[trellis.name] = new Array<Node>();
-		}
+		//for (trellis in schema.trellises) {
+			//trellis_nodes[trellis.name] = new Array<Node>();
+		//}
 
     nodes[node.id] = node;
 
 		var tree = node.trellis.get_tree();
 		for (t in tree) {
+			if (!trellis_nodes.exists(t.name))
+				trellis_nodes[t.name] = new Array<Node>();
+				
 			trellis_nodes[t.name].push(node);
 		}
 	}
@@ -222,7 +225,7 @@ import haxe.Json;
     schema.load_trellises(data.trellises, new Load_Settings(metahub_namespace));
   }
 
-	function get_increment() {
+	public function get_increment():INode {
 		if (interval_node == null) {
 			interval_node = new Block_Node(new Array<Expression>(), new Scope(this, root_scope_definition));
 		}
@@ -232,7 +235,7 @@ import haxe.Json;
 
 	public function connect_to_increment(port:General_Port) {
 		var node = get_increment();
-		node.get_port(0).connect(port);
+		node.get_port(1).connect(port);
 	}
 
 	public function increment(layer:Int = 10000) {

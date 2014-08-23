@@ -33,7 +33,11 @@ class Symbol_Node implements INode{
 	}
 
   public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		//node.set_value(property.id, value, source);
+		if (path.length == 0)
+			throw new Exception("Not implemented yet.");
+			
+		var parent:Node = path.resolve(node, -1);
+		parent.set_value(path.last().id, value, source);
 	}
 
 	public function to_string():String {

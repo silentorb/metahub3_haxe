@@ -51,18 +51,27 @@ class Path {
 		return new Path(path);
 	}
 
-	public function resolve(node:Node):Dynamic {
+	public function resolve(node:Node, range:Int = 0):Dynamic {
 		if (properties.length == 0)
 			return node;
+			
+		var count = length;
+		if (range > 0)
+			count = range;
+		else if (range < 0)
+			count = length + range;
 
-		for (i in 0...(properties.length - 1)) {
+		for (i in 0...(count - 1)) {
 			var property = properties[i];
 			var node = node.get_value(property.id);
 			if (node == null)
 				return null;
 		}
+		
+		if (count < 1)
+			return node;
 
-		return node.get_value(last().id);
+		return node.get_value(properties[count - 1].id);
 	}
 
 	public function at(index:Int) {

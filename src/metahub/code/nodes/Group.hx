@@ -7,23 +7,14 @@ import metahub.engine.INode;
  * ...
  * @author Christopher W. Johnson
  */
-class Group implements INode {
+class Group implements INode extends Standard_Node {
 	public var nodes = new Array<INode>();
 
 	public function new() {
-
+		add_ports(2);
 	}
 
-	public function get_port(index:Int):General_Port {
-		//return ports[index];
-		throw new Exception("Not implemented.");
-	}
-	
-	public function get_port_count():Int {
-		return 0;
-	}
-
-  public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Dynamic {
 		//if (scope.definition.trellis == null) {
 			//resolve(context);
 		//}
@@ -38,12 +29,11 @@ class Group implements INode {
 		return null;
 	}
 
-  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		throw new Exception("Not implemented.");
-		//block.resolve(scope);
+  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		
 	}
-			
-	public function to_string():String {
+
+	override public function to_string():String {
 		return "group";
 	}
 

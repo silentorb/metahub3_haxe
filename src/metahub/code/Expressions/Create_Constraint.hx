@@ -24,16 +24,18 @@ class Create_Constraint implements Expression {
   }
 
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-		var output = reference.to_port(scope);
+		var target = reference.to_port(scope);
 
 		var signature = Type_Network.analyze(expression, reference.get_type(), scope);
 		var group = new Group();
-		var input = expression.to_port(scope, group, signature);
+		var source = expression.to_port(scope, group, signature);
+		group.get_port(1).connect(target);
+		group.get_port(1).connect(source);
 
 		if (is_back_referencing || scope.definition.is_particular_node) {
 			var assignment = new Assignment_Node();
-			assignment.get_port(1).connect(output);
-			assignment.get_port(2).connect(input);
+			assignment.get_port(1).connect(target);
+			assignment.get_port(2).connect(source);
 			
 			if (scope.definition.is_particular_node) {
 				return assignment.get_port(0);			
@@ -48,14 +50,14 @@ class Create_Constraint implements Expression {
 
 		if (reference.path.length > 1) {
 			var condition = new Path_Condition(reference.path, scope.definition.trellis);
-			condition.get_port(1).connect(input);
-			output.connect(condition.get_port(0));
+			condition.get_port(1).connect(source);
+			target.connect(condition.get_port(0));
 		}
 		else {
-			output.connect(input);
+			target.connect(source);
 		}
 
-		return output;
+		return group.get_port(0);
   }
 
 	public function get_types():Array < Array < Type_Signature >> {

@@ -120,8 +120,8 @@ import haxe.Json;
 		var register = !trellis.is_value;
 		var node:Node = null;
 		var id = register ? ++node_count : 0;
-		if (id != 0)
-			trace("Creating " + trellis.name + " : " + id);
+		//if (id != 0)
+			//trace("Creating " + trellis.name + " : " + id);
 		for (factory in node_factories) {
 			node = factory(this, id, trellis);
 			if (node != null)

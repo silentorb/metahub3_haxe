@@ -14,6 +14,7 @@ class Node {
   var ports = new Array<Port>();
   public var id:Identity;
   public var trellis:Trellis;
+	public var this_context:Context;
 	//public var port_count(get, null):Int;
 
   public function new(hub:Hub, id:Identity, trellis:Trellis) {
@@ -21,27 +22,15 @@ class Node {
     this.id = id;
     this.trellis = trellis;
 
-		//var properties = trellis.get_all_properties();
-
     for (property in trellis.properties) {
 			values.push(get_default_value(property));
 			if (property == trellis.identity_property)
 				continue;
 
-      //values.push(property.get_default());
-      //var port = new Port(this, property.id);
-      //ports.push(port);
     }
 
-    //initialize();
+		this_context = new Node_Context(this, hub);
   }
-
-	//private function initialize() {
-//
-	//}
-	//public function get_port_count():Int {
-		//return ports.length;
-	//}
 
 	public function get_default_value(property:Property):Dynamic {
 		switch (property.type)
@@ -124,25 +113,21 @@ class Node {
 		return false;
 	}
 
+	function copy_list(index:Int, new_list:Array<Dynamic>, old_list:Array<Dynamic>) {
+		for (item in new_list) {
+			if (old_list.indexOf(item) == -1) {
+				add_item(index, item);
+			}
+		}
+	}
+
   public function set_value(index:Int, value:Dynamic, source:General_Port = null) {
 		var property = trellis.properties[index];
-		//if (property.type == Kind.pulse) {
-			//update_trellis_connections(index, value, source);
-			//return;
-		//}
-
 		var old_value = values[index];
 		var port = ports[index];
 		if (property.type == Kind.list) {
-			var new_list:Array<Dynamic> = cast value;
-			var old_list:Array<Dynamic> = cast old_value;
-			for (item in new_list) {
-				if (old_list.indexOf(item) == -1) {
-					add_item(index, item);
-				}
-			}
+			copy_list(index, cast value, cast old_value);
 			return;
-			//throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
 		}
 
 		if (equals(old_value, value, property)) {
@@ -151,9 +136,7 @@ class Node {
 			#end
 			return;
 		}
-		//if (this.trellis.name == "Position" && this.values[2] != 0 && this.values[2].trellis.name == "Body") {
-			//var x1 = 1;
-		//}
+
 		hub.set_entry_node(this);
 
 		if (property.other_trellis != null && property.other_trellis.is_value) {
@@ -188,11 +171,10 @@ class Node {
   }
 
 	function update_trellis_connections(index:Int, value:Dynamic, source:General_Port = null) {
-		var context = new Node_Context(this, hub);
 		var tree = trellis.get_tree();
 		for (t in tree) {
 			if (t.properties.length > index)
-				t.set_external_value(index, value, context, source);
+				t.set_external_value(index, value, this_context, source);
 		}
 	}
 
@@ -221,18 +203,6 @@ class Node {
 
 		}
   }
-
-  //public function pulse(index:Int) {
-		//var property = trellis.properties[index];
-		//if (property.type != Kind.pulse)
-			//throw new Exception("Property " + property.fullname() + " is not a pulse.");
-//
-		//var port = trellis.get_port(index);
-		//for (other in port.connections) {
-			//var block:Block_Node = cast other.node;
-			//block.run();
-		//}
-	//}
 
 	public function copy(target:Node) {
 		for (i in 0...(trellis.properties.length - 1)) {

@@ -28,6 +28,7 @@ class Trellis implements INode {
 	public var is_value:Bool = false;
 	public var events:Array<String>;
 	public var is_numeric:Bool = false;
+	var _tree:Array<Trellis> = null;
 
   public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;
@@ -112,16 +113,18 @@ class Trellis implements INode {
 	}
 
   public function get_tree():Array<Trellis> {
-    var trellis = this;
-    var tree = new Array<Trellis>();
+		if (_tree == null) {
+			var trellis = this;
+			_tree = new Array<Trellis>();
 
-    do {
-      tree.unshift(trellis);
-      trellis = trellis.parent;
-    }
-    while (trellis != null);
+			do {
+				_tree.unshift(trellis);
+				trellis = trellis.parent;
+			}
+			while (trellis != null);
+		}
 
-    return tree;
+    return _tree;
   }
 
   public function is_a(trellis:Trellis):Bool {
@@ -214,13 +217,13 @@ class Trellis implements INode {
 	public function get_port(index:Int):General_Port {
 		return ports[index];
 	}
-		
+
 	public function get_port_count():Int {
 		return ports.length;
 	}
-	
+
 	public function to_string():String {
 		return name;
 	}
-	
+
 }

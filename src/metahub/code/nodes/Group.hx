@@ -8,12 +8,15 @@ import metahub.engine.INode;
  * @author Christopher W. Johnson
  */
 class Group implements INode extends Standard_Node {
-	public var nodes = new Array<INode>();
-	public var is_back_referencing:Bool;
+	//public var nodes = new Array<INode>();
+	public var is_back_referencing:Bool = false;
+	public var weight:Float = 1;
 
-	public function new(is_back_referencing = false) {
-		super();
-		this.is_back_referencing = is_back_referencing;
+	public function new(parent:Group) {
+		super(parent);
+		if (parent != null && parent.is_back_referencing != null)
+			is_back_referencing = parent.is_back_referencing;
+
 		add_ports(2);
 	}
 

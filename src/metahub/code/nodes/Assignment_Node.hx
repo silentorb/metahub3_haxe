@@ -14,9 +14,9 @@ class Assignment_Node implements INode extends Standard_Node
 	//var input:General_Port;
 	//var output:General_Port;
 //
-	public function new()
+	public function new(group:Group)
 	{
-		super();
+		super(group);
 		add_ports(3);
 	}
 

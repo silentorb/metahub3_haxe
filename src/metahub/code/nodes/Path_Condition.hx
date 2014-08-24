@@ -10,38 +10,24 @@ import metahub.schema.Trellis;
  * ...
  * @author Christopher W. Johnson
  */
-class Path_Condition implements INode {
-	var ports = new Array<General_Port>();
+class Path_Condition extends Standard_Node {
 	var trellis:Trellis;
 	var path:Path;
 	var reverse_path:Path;
 
-	public function new(path:Path, trellis:Trellis) {
+	public function new(path:Path, trellis:Trellis, group:Group) {
+		super(group);
 		this.path = path;
 		this.reverse_path = path.reverse();
 		this.trellis = trellis;
-		ports.push(new General_Port(this, 0));
-		ports.push(new General_Port(this, 1));
+		add_ports(2);
 	}
 
-	public function get_port(index:Int):General_Port {
-		#if debug
-		if (index <0 || index > 1)
-			throw new Exception("Invalid port id: " + index);
-		#end
-
-		return ports[index];
-	}
-	
-	public function get_port_count():Int {
-		return ports.length;
-	}
-	
-  public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Dynamic {
 		throw new Exception("Not implemented");
 	}
 
-  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		if (index == 1) {
 			ports[1 - index].set_external_value(value, context);
 			return;
@@ -58,8 +44,8 @@ class Path_Condition implements INode {
 
 		ports[1 - index].set_external_value(value, context);
 	}
-			
-	public function to_string():String {
+
+	override public function to_string():String {
 		return "path condition: " + path.to_string();
 	}
 }

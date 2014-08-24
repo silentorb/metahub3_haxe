@@ -15,7 +15,7 @@ class Function implements INode {
 	var func:Functions;
 	public var id:Identity;
 	var signature:Array<Type_Signature>;
-	var group:Group;
+	public var group:Group;
 
 	public function new(hub:Hub, id:Identity, func:Functions, signature:Array<Type_Signature>, group:Group) {
     this.hub = hub;

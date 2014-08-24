@@ -1,6 +1,7 @@
 package metahub.code;
 import metahub.code.nodes.Context_Converter;
 import metahub.code.Layer;
+import metahub.code.nodes.Group;
 import metahub.code.nodes.Symbol_Node;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
@@ -45,17 +46,17 @@ class Reference {
 		return path.last().get_signature();
 	}
 
-	public function to_port(scope:Scope):General_Port {
+	public function to_port(scope:Scope, group:Group):General_Port {
 		if (symbol != null) {
 			var node = symbol.resolve(scope);
-			return new Symbol_Node(node, path).get_port(0);
+			return new Symbol_Node(node, path, group).get_port(0);
 		}
 		else {
 			var property = path.last();
 			var port = property.trellis.get_port(property.id);
 
 			if (path.length >= 3 || (path.length == 2 && !property.trellis.is_value)) {
-				var converter = new Context_Converter(path, scope.definition.trellis);
+				var converter = new Context_Converter(path, scope.definition.trellis, group);
 				port.connect(converter.get_port(1));
 				return converter.get_port(0);
 			}

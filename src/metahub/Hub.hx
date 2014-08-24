@@ -229,7 +229,7 @@ import haxe.Json;
 
 	public function get_increment():INode {
 		if (interval_node == null) {
-			interval_node = new Block_Node(new Scope(this, root_scope_definition));
+			interval_node = new Block_Node(new Scope(this, root_scope_definition), new Group(null));
 		}
 
 		return interval_node;

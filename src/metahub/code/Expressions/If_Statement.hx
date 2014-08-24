@@ -20,11 +20,12 @@ class If_Statement implements Expression {
 	}
 
   public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-    var node = new If_Node();
-		var new_group = new Group(true);
+    var node = new If_Node(group);
+		var new_group = new Group(group);
+		new_group.is_back_referencing = true; // Temporary.  Will eventually need to check for self modification
 		node.get_port(1).connect(condition.to_port(scope, group, signature_node));
 		node.get_port(2).connect(expression.to_port(scope, new_group, signature_node));
-		var block = new Block_Node(scope);
+		var block = new Block_Node(scope, group);
 		block.get_port(1).connect(node.get_port(0));
 		scope.hub.connect_to_increment(block.get_port(0));
 		return block.get_port(0);

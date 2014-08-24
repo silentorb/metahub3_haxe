@@ -20,7 +20,7 @@ class Condition_Group implements Expression
 	}
 
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-    var node = new metahub.code.nodes.Condition_Group(join);
+    var node = new metahub.code.nodes.Condition_Group(join, group);
 		var input = node.get_port(1);
 		for (condition in conditions) {
 			input.connect(condition.to_port(scope, group, signature_node));

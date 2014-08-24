@@ -33,7 +33,7 @@ class Block implements Expression {
 	}
 
   public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-		var node = new Block_Node(scope);
+		var node = new Block_Node(scope, group);
 		var type = new Type_Signature(Kind.unknown);
 		for (expression in expressions) {
 			var signature = Type_Network.analyze(expression, type, scope);

@@ -13,19 +13,17 @@ import metahub.schema.Trellis;
  * ...
  * @author Christopher W. Johnson
  */
-class Context_Converter implements INode {
-	var ports = new Array<General_Port>();
+class Context_Converter extends Standard_Node {
 	var forward_path:Path;
 	var reverse_path:Path;
 	var trellis:Trellis;
 
-	public function new(path:Path, trellis:Trellis) {
+	public function new(path:Path, trellis:Trellis, group:Group) {
+		super(group);
 		this.trellis = trellis;
 		forward_path = path.slice(0, -1);
 		reverse_path = create_reverse(path);
-
-		ports.push(new General_Port(this, 0));
-		ports.push(new General_Port(this, 1));
+		add_ports(2);
 	}
 
 	static function create_reverse(path:Path):Path {
@@ -37,19 +35,6 @@ class Context_Converter implements INode {
 		return new Path(reverse);
 	}
 
-	public function get_port(index:Int):General_Port {
-		#if debug
-		if (index <0 || index > 1)
-			throw new Exception("Invalid port id: " + index);
-		#end
-
-		return ports[index];
-	}
-	
-	public function get_port_count():Int {
-		return ports.length;
-	}
-	
 	static function has_lists(path:Path) {
 		for (i in 0...path.length) {
 			if (path.at(i).type == Kind.list)
@@ -59,7 +44,7 @@ class Context_Converter implements INode {
 		return false;
 	}
 
-	public function get_value(index:Int, context:Context):Dynamic {
+	override public function get_value(index:Int, context:Context):Dynamic {
 		//throw new Exception("Not implemented.");
 		var port = ports[1 - index];
 
@@ -100,7 +85,7 @@ class Context_Converter implements INode {
 		}*/
 	}
 
-	public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+	override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		var port = ports[1 - index];
 
 		var current_path = index == 0 ? forward_path : reverse_path;
@@ -152,8 +137,8 @@ class Context_Converter implements INode {
 
 		return result;
 	}
-			
-	public function to_string():String {
+
+	override public function to_string():String {
 		return "context converter";
 	}
 }

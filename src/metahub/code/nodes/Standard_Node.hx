@@ -10,10 +10,12 @@ import metahub.engine.Context;
 class Standard_Node implements INode
 {
 	var ports = new Array<General_Port>();
+	public var group:Group;
 	var id:Int;
 	static var id_counter = 0;
 
-	function new() {
+	function new(group:Group) {
+		this.group = group;
 		id = id_counter++;
 	}
 

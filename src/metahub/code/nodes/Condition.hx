@@ -12,9 +12,9 @@ class Condition implements INode extends Standard_Node
 {
 	var comparison:Comparison;
 
-	public function new(comparison:Comparison)
+	public function new(comparison:Comparison, group:Group)
 	{
-		super();
+		super(group);
 		this.comparison = comparison;
 
 		for (i in 0...3) {

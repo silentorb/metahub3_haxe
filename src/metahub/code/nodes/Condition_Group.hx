@@ -12,9 +12,9 @@ class Condition_Group implements INode extends Standard_Node
 {
 	var join:Condition_Join;
 
-	public function new(join:Condition_Join)
+	public function new(join:Condition_Join, group:Group)
 	{
-		super();
+		super(group);
 		this.join = join;
 
 		for (i in 0...2) {

@@ -37,7 +37,7 @@ class Condition implements Expression
 
 		var comparison:Comparison = Type.createInstance(comparison_class, [operator]);
 
-    var node = new metahub.code.nodes.Condition(comparison);
+    var node = new metahub.code.nodes.Condition(comparison, group);
 		first.to_port(scope, group, signature_node).connect(node.get_port(1));
 		second.to_port(scope, group, signature_node).connect(node.get_port(2));
 

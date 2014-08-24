@@ -20,7 +20,7 @@ class Expression_Reference implements Expression {
   public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
 		//if (reference.get_layer() ==
 		//throw new Exception("Not supported");
-		return reference.to_port(scope);
+		return reference.to_port(scope, group);
   }
 
 	public function get_types():Array<Array<Type_Signature>> {

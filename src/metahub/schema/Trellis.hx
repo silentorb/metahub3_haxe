@@ -1,4 +1,5 @@
 package metahub.schema;
+import metahub.code.nodes.Group;
 import metahub.engine.Context;
 import metahub.engine.INode;
 import metahub.engine.General_Port;
@@ -29,6 +30,7 @@ class Trellis implements INode {
 	public var events:Array<String>;
 	public var is_numeric:Bool = false;
 	var _tree:Array<Trellis> = null;
+	public var group = new Group(null);
 
   public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;

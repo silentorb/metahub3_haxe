@@ -18,8 +18,8 @@ import metahub.schema.Kind;
 class Block_Node implements INode extends Standard_Node {
 	var scope:Scope;
 
-	public function new(scope:Scope) {
-		super();
+	public function new(scope:Scope, group:Group) {
+		super(group);
 		for (i in 0...3) {
 			ports.push(new General_Port(this, i));
 		}

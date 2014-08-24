@@ -24,25 +24,26 @@ class Create_Constraint implements Expression {
   }
 
 	public function to_port(scope:Scope, old_group:Group, signature_node:Node_Signature):General_Port {
-		var target = reference.to_port(scope);
+		var target = reference.to_port(scope, old_group);
 
-		var inside_back_reference = old_group != null && old_group.is_back_referencing;
+		var inside_back_reference = old_group.is_back_referencing;
 
 		var signature = Type_Network.analyze(expression, reference.get_type(), scope);
-		var group = new Group(is_back_referencing || inside_back_reference);
+		var group = new Group(old_group);
+		group.is_back_referencing = is_back_referencing || inside_back_reference;
 		var source = expression.to_port(scope, group, signature);
 		group.get_port(1).connect(target);
 		group.get_port(1).connect(source);
 
 		if (is_back_referencing || scope.definition.is_particular_node || inside_back_reference) {
-			var assignment = new Assignment_Node();
+			var assignment = new Assignment_Node(group);
 			assignment.get_port(1).connect(target);
 			assignment.get_port(2).connect(source);
 
 			if (scope.definition.is_particular_node || inside_back_reference) {
 				return assignment.get_port(0);
 			}
-			var block = new Block_Node(scope);
+			var block = new Block_Node(scope, group);
 			block.get_port(1).connect(assignment.get_port(0));
 			scope.hub.connect_to_increment(block.get_port(0));
 			return block.get_port(0);
@@ -51,7 +52,7 @@ class Create_Constraint implements Expression {
 		scope.hub.constraints.push(group);
 
 		if (reference.path.length > 1) {
-			var condition = new Path_Condition(reference.path, scope.definition.trellis);
+			var condition = new Path_Condition(reference.path, scope.definition.trellis, group);
 			condition.get_port(1).connect(source);
 			target.connect(condition.get_port(0));
 		}

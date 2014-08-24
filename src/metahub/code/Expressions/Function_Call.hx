@@ -51,9 +51,6 @@ class Function_Call implements Expression {
     }
 
     var output = node.get_port(0);
-		if (group != null)
-			group.nodes.unshift(node);
-
     return output;
   }
 

@@ -19,6 +19,7 @@ class Create_Node implements INode extends Standard_Node
 
 	public function new(trellis:Trellis, hub:Hub)
 	{
+		super();
 		add_ports(2);
 		this.trellis = trellis;
 		this.hub = hub;

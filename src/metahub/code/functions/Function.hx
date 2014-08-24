@@ -1,4 +1,5 @@
 package metahub.code.functions;
+import metahub.code.nodes.Group;
 import metahub.engine.*;
 import metahub.schema.Trellis;
 
@@ -14,12 +15,14 @@ class Function implements INode {
 	var func:Functions;
 	public var id:Identity;
 	var signature:Array<Type_Signature>;
+	var group:Group;
 
-	public function new(hub:Hub, id:Identity, func:Functions, signature:Array<Type_Signature>) {
+	public function new(hub:Hub, id:Identity, func:Functions, signature:Array<Type_Signature>, group:Group) {
     this.hub = hub;
     this.id = id;
 		this.func = func;
 		this.signature = signature;
+		this.group = group;
 
 		for (type in signature) {
 			var port = new General_Port(this, ports.length);
@@ -33,12 +36,15 @@ class Function implements INode {
 		else
 			throw new Exception("Not implemented.");
 	}
-		
+
 	public function get_port_count():Int {
 		return ports.length;
 	}
-	
+
 	public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		if (group.is_back_referencing)
+			return;
+
 		if (source == ports[0]) {
 			for (i in 0...ports.length) {
 				ports[i].set_external_value(value, context);
@@ -117,9 +123,9 @@ class Function implements INode {
 	private function reverse(new_value:Dynamic, args:Array<Dynamic>):Dynamic {
 		throw new Exception("Function.reverse is abstract.");
 	}
-	
+
 	public function to_string():String {
 		return Std.string(func);
 	}
-	
+
 }

@@ -14,6 +14,7 @@ class Condition_Group implements INode extends Standard_Node
 
 	public function new(join:Condition_Join)
 	{
+		super();
 		this.join = join;
 
 		for (i in 0...2) {

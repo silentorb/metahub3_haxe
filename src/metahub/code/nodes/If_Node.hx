@@ -12,6 +12,7 @@ class If_Node implements INode extends Standard_Node
 {
 	public function new()
 	{
+		super();
 		for (i in 0...3) {
 			ports.push(new General_Port(this, i));
 		}

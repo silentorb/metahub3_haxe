@@ -95,6 +95,9 @@ typedef Assignment_Source = {
       case "string":
         return data[1];
 
+			case "bool":
+				return data == "true" ? true : false;
+
       case "int":
         return Std.parseInt(data);
 

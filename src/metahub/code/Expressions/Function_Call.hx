@@ -36,7 +36,7 @@ class Function_Call implements Expression {
 			return inputs[0].to_port(scope, group, node_signature);
 		}
 		var info = hub.function_library.get_function_info(func, node_signature.signature);
-		var node:Function = Type.createInstance(info.type, [hub, hub.get_node_count(), func, node_signature.signature]);
+		var node:Function = Type.createInstance(info.type, [hub, hub.get_node_count(), func, node_signature.signature, group]);
     hub.add_internal_node(node);
 		var expressions = inputs;
     var ports = node.get_inputs();

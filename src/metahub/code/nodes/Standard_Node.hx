@@ -10,6 +10,12 @@ import metahub.engine.Context;
 class Standard_Node implements INode
 {
 	var ports = new Array<General_Port>();
+	var id:Int;
+	static var id_counter = 0;
+
+	function new() {
+		id = id_counter++;
+	}
 
 	public function get_port_count():Int {
 		return ports.length;

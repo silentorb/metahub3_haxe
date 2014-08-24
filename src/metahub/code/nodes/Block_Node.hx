@@ -19,19 +19,21 @@ class Block_Node implements INode extends Standard_Node {
 	var scope:Scope;
 
 	public function new(scope:Scope) {
+		super();
 		for (i in 0...3) {
-		ports.push(new General_Port(this, i));
+			ports.push(new General_Port(this, i));
 		}
 		this.scope = scope;
 
 	}
 
   override public function get_value(index:Int, context:Context):Dynamic {
-		if (scope.definition.trellis == null) {
+		var definition = scope.definition;
+		if (definition.trellis == null || definition.is_particular_node) {
 			resolve(context);
 		}
 		else {
-			var nodes = scope.hub.get_nodes_by_trellis(scope.definition.trellis);
+			var nodes = scope.hub.get_nodes_by_trellis(definition.trellis);
 			for (node in nodes) {
 				var node_context = new Node_Context(node, scope.hub);
 				resolve(node_context);

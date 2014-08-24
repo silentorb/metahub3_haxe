@@ -35,7 +35,7 @@ class Condition implements Expression
 		if (comparison_class == null)
 			throw new Exception("Could not find a comparison class for type " + Kind.to_string(type));
 
-		var comparison:Comparison = Type.createInstance(comparison_class, [type]);
+		var comparison:Comparison = Type.createInstance(comparison_class, [operator]);
 
     var node = new metahub.code.nodes.Condition(comparison);
 		first.to_port(scope, group, signature_node).connect(node.get_port(1));

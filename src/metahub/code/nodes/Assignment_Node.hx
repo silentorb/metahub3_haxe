@@ -14,8 +14,9 @@ class Assignment_Node implements INode extends Standard_Node
 	//var input:General_Port;
 	//var output:General_Port;
 //
-	public function new() 
+	public function new()
 	{
+		super();
 		add_ports(3);
 	}
 
@@ -24,14 +25,14 @@ class Assignment_Node implements INode extends Standard_Node
 		ports[1].set_external_value(value, context);
 		return value;
 	}
-	
+
 	override public function to_string():String {
 		//return output.node.to_string() + " = " + input.node.to_string();
 		return "assignment";
-	}	
-	
+	}
+
   override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		
+
 	}
 
 }

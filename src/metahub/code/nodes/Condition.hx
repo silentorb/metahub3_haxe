@@ -14,6 +14,7 @@ class Condition implements INode extends Standard_Node
 
 	public function new(comparison:Comparison)
 	{
+		super();
 		this.comparison = comparison;
 
 		for (i in 0...3) {
@@ -31,7 +32,7 @@ class Condition implements INode extends Standard_Node
 		// Right now only incremental conditions are supported, so this set_value should by empty.
 		// Once event-driven conditions are also supported, this should check which type of condition
 		// it is and either do nothing or update it's dependents.
-		
+
 	}
 
 	override public function to_string():String {

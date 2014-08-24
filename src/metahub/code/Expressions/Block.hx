@@ -37,7 +37,7 @@ class Block implements Expression {
 		var type = new Type_Signature(Kind.unknown);
 		for (expression in expressions) {
 			var signature = Type_Network.analyze(expression, type, scope);
-			var port = expression.to_port(scope, null, signature);
+			var port = expression.to_port(scope, group, signature);
 			if (port != null) {
 				if (Type.getClassName(Type.getClass(expression)) != "metahub.code.expressions.Trellis_Scope")
 					node.get_port(1).connect(port);

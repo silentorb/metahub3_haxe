@@ -120,6 +120,8 @@ import haxe.Json;
 		var register = !trellis.is_value;
 		var node:Node = null;
 		var id = register ? ++node_count : 0;
+		if (id != 0)
+			trace("Creating " + trellis.name + " : " + id);
 		for (factory in node_factories) {
 			node = factory(this, id, trellis);
 			if (node != null)
@@ -251,7 +253,7 @@ import haxe.Json;
 		var trellis:Trellis = Type.getClassName(Type.getClass(node)) == "metahub.schema.Trellis"
 			? cast node
 			: null;
-		
+
 		var tabbing = " ";
 		var result = "";
 		var padding = "";
@@ -261,6 +263,10 @@ import haxe.Json;
 		var label = trellis != null && port != null
 			? trellis.properties[port.id].fullname()
 			: node.to_string();
+
+		if (Reflect.hasField(node, 'id'))
+			label = "#" + Reflect.field(node, 'id') + " " + label;
+
 		result += padding + label + "\n";
 
 		if (used.indexOf(node) != -1 || trellis != null)

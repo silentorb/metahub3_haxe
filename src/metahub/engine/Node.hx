@@ -133,8 +133,17 @@ class Node {
 
 		var old_value = values[index];
 		var port = ports[index];
-		//if (property.type == Kind.list)
+		if (property.type == Kind.list) {
+			var new_list:Array<Dynamic> = cast value;
+			var old_list:Array<Dynamic> = cast old_value;
+			for (item in new_list) {
+				if (old_list.indexOf(item) == -1) {
+					add_item(index, item);
+				}
+			}
+			return;
 			//throw new Exception(property.fullname() + " is a list and cannot be directly assigned to.");
+		}
 
 		if (equals(old_value, value, property)) {
 			#if log
@@ -148,8 +157,8 @@ class Node {
 		hub.set_entry_node(this);
 
 		if (property.other_trellis != null && property.other_trellis.is_value) {
-			var mine:Node = old_value;
-			var other:Node = value;
+			var mine:Node = cast old_value;
+			var other:Node = cast value;
 			other.copy(mine);
 		}
 		else {

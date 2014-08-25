@@ -22,6 +22,7 @@ statement =
     create_symbol
 	| if
   | constraint
+	| set_weight
   | new_scope
 	| create_node
 
@@ -70,3 +71,5 @@ conditions = @(condition, condition_join, 1, 0)
 condition_block = "(" trim conditions trim ")"
 
 if = "if" trim condition_block trim long_block
+
+set_weight = /[\d\.]+/ trim "$" ws statement

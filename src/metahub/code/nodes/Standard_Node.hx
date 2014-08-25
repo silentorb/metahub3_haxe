@@ -29,7 +29,7 @@ class Standard_Node implements INode
 
 	public function add_ports(count:Int) {
 		for (i in 0...count) {
-			ports.push(new General_Port(this, ports.length - 1));
+			ports.push(new General_Port(this, ports.length));
 		}
 	}
 

@@ -20,14 +20,6 @@ class Block implements Expression {
 		expressions.push(expression);
 	}
 
-  //public function resolve(scope:Scope):Dynamic {
-    //for (s in expressions) {
-			//Expression_Utility.resolve(s, new Type_Signature(Kind.unknown), scope);
-      ////s.resolve(scope);
-    //}
-    //return null;
-  //}
-
 	public function get_type():Type_Signature {
 		throw new Exception("Block.get_type() is not implemented.");
 	}

@@ -66,6 +66,8 @@ class Coder {
         return if_statement(source, scope_definition);
       case 'constraint':
         return constraint(source, scope_definition);
+			case 'weight':
+        return weight(source, scope_definition);
 		}
 
     throw new Exception("Invalid block: " + source.type);
@@ -210,20 +212,6 @@ class Coder {
     return new metahub.code.statements.Create_Symbol(symbol, expression);
   }
 
-	//function set_property(source:Dynamic, scope_definition:Scope_Definition):Expression {
-		//var reference = Reference.from_scope(source.path, scope_definition);
-    //var expression = convert_expression(source.expression, scope_definition);
-//
-		//// Equavelent to += in other languages
-		//if (Reflect.hasField(source, "modifier") && source.modifier != Functions.none) {
-			//var func = Type.createEnum(Functions, source.modifier);
-			//var inputs = [ new Expression_Reference(reference), expression ];
-			//expression = new Function_Call(func, reference.get_type(), inputs, hub);
-		//}
-//
-		//return new Assignment(reference, expression);
-  //}
-
   static function get_type(value:Dynamic):Type_Signature {
     if (Std.is(value, Int)) {
 			var result = new Type_Signature(Kind.unknown);
@@ -266,4 +254,8 @@ class Coder {
 			return new Node_Scope(expression, new_scope_definition);
 		}
 	}
+
+	function weight(source:Dynamic, scope_definition:Scope_Definition):Expression {
+		return new Set_Weight(source.weight, convert_statement(source.statement, scope_definition));
+  }
 }

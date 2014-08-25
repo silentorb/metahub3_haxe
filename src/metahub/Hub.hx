@@ -205,7 +205,7 @@ import haxe.Json;
     var match:metahub.parser.Match = cast result;
 		var statement = run_data(match.get_data());
 		var signature = Type_Network.analyze(statement, new Type_Signature(Kind.unknown), root_scope);
-		var port = statement.to_port(root_scope, null, signature);
+		var port = statement.to_port(root_scope, new Group(null), signature);
 		port.get_node_value(new Empty_Context(this));
 		return port;
 		//Expression_Utility.resolve(statement, new Type_Signature(Kind.unknown), root_scope);

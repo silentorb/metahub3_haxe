@@ -107,6 +107,9 @@ typedef Assignment_Source = {
       case "optional_block":
         return optional_block(data);
 
+			case "set_weight":
+        return set_weight(data);
+
 //      default:
 //        throw new Exception("Invalid parser method: " + name + ".");
     }
@@ -270,6 +273,14 @@ typedef Assignment_Source = {
 
 		return result;
   }
+
+  static function set_weight(data:Dynamic):Dynamic {
+		return {
+			type: "weight",
+			weight: data[0],
+			statement: data[4]
+		}
+	}
 
   static function value(data:Dynamic):Dynamic {
     return {

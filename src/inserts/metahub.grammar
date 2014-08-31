@@ -58,7 +58,7 @@ long_block = "{" trim @(statement, comma_or_newline, 0, 0) trim "}"
 
 new_scope = path_or_id trim long_block
 
-constraint = path_or_id trim constraint_operator trim expression
+constraint = reference trim constraint_operator trim expression
 
 condition = expression trim constraint_operator trim expression
 

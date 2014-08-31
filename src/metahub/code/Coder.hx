@@ -27,7 +27,7 @@ class Coder {
     this.hub = hub;
   }
 
-  public function convert_expression(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature = null):Expression {
+  public function convert_expression(source:Dynamic, scope_definition:Scope_Definition):Expression {
 
     switch(source.type) {
 			case 'block':
@@ -37,7 +37,7 @@ class Coder {
       case 'reference':
         return create_general_reference(source, scope_definition);
       case 'function':
-        return function_expression(source, scope_definition, type, source.name);
+        return function_expression(source, scope_definition, source.name);
 			case 'create_node':
         return create_node(source, scope_definition);
 			case 'conditions':
@@ -74,14 +74,15 @@ class Coder {
   }
 
   function constraint(source:Dynamic, scope_definition:Scope_Definition):Expression {
-		var reference = Reference.from_scope(source.path, scope_definition);
-		var back_reference:Reference = null;
+		//var reference = Reference.from_scope(source.path, scope_definition);
+		var reference = convert_expression(source.reference, scope_definition);
+		var back_reference:Expression = null;
 		var name = source.expression.name;
 		if (['add_equals', 'subtract_equals', 'multiply_equals', 'divide_equals'].indexOf(name) > -1) {
 			name = name.substring(0, name.length - 7);
 			back_reference = reference;
 		}
-		var expression = function_expression(source.expression, scope_definition, reference.get_type(), name, back_reference);
+		var expression = function_expression(source.expression, scope_definition, name, back_reference);
 		return new metahub.code.expressions.Create_Constraint(reference, expression, back_reference != null);
   }
 
@@ -111,22 +112,22 @@ class Coder {
     return new metahub.code.expressions.Literal(source.value, type);
   }
 
-  function function_expression(source:Dynamic, scope_definition:Scope_Definition, type:Type_Signature, name:String, reference:Reference = null):Expression {
-		if (type == null)
-			throw new Exception("Function expressions do not currently support unspecified return types.");
+  function function_expression(source:Dynamic, scope_definition:Scope_Definition, name:String, reference:Expression = null):Expression {
+		//if (type == null)
+			//throw new Exception("Function expressions do not currently support unspecified return types.");
 
     var expressions:Array<Dynamic> = source.inputs;
-    var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
+    var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition)));
 
 			// Equavelent to += in other languages
 		if (reference != null) {
 			//name = name.substring(0, 1);
-			inputs.unshift(new Expression_Reference(reference));
+			inputs.unshift(reference);
 		}
 
 		var func = Type.createEnum(Functions, name);
     //var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
-    return new metahub.code.expressions.Function_Call(func, type, inputs, hub);
+    return new metahub.code.expressions.Function_Call(func, inputs, hub);
   }
 
   function if_statement(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -202,7 +203,7 @@ class Coder {
 		return result;
 	}
 
-  function create_general_reference(source:Dynamic, scope_definition:Scope_Definition):Expression {
+  function create_general_reference(source:Dynamic, scope_definition:Scope_Definition):Expression_Reference {
 		return new Expression_Reference(Reference.from_scope(source.path, scope_definition));
   }
 

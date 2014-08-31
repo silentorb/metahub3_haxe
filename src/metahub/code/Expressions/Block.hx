@@ -53,7 +53,7 @@ class Block implements Expression {
 	}
 
 	public function get_children():Array<Expression> {
-		return [];
+		return return expressions;
 	}
 
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {

@@ -304,7 +304,7 @@ typedef Assignment_Source = {
 	static function constraint(data:Dynamic):Dynamic {
     return {
 			type: "constraint",
-			path: data[0],
+			reference: data[0],
 			expression: {
 				type: "function",
 				"name": Std.string(function_map[data[2]]),

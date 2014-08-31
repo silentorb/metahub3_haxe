@@ -19,7 +19,7 @@ class Function_Call implements Expression {
 	var hub:Hub;
   //var func:Functions;
 
-  public function new(func:Functions, type:Type_Signature, inputs:Array<Expression>, hub:Hub) {
+  public function new(func:Functions, inputs:Array<Expression>, hub:Hub) {
 		this.hub = hub;
 		this.func = func;
     this.inputs = inputs;

@@ -5,6 +5,7 @@ import metahub.engine.General_Port;
 import metahub.code.nodes.Group;
 import metahub.schema.Trellis;
 import metahub.engine.Node;
+import metahub.code.nodes.Path_Condition;
 
 class Expression_Reference implements Expression {
   public var reference:Reference;
@@ -18,9 +19,14 @@ class Expression_Reference implements Expression {
   //}
 
   public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-		//if (reference.get_layer() ==
-		//throw new Exception("Not supported");
-		return reference.to_port(scope, group);
+		var result = reference.to_port(scope, group);
+		if (reference.path.length > 1) {
+			var condition = new Path_Condition(reference.path, scope.definition.trellis, group);
+			condition.get_port(0).connect(result);
+			return condition.get_port(1);
+		}
+		
+		return result;
   }
 
 	public function get_types():Array<Array<Type_Signature>> {
@@ -28,7 +34,7 @@ class Expression_Reference implements Expression {
 	}
 
 	public function to_string():String {
-		return "Expression_Reference";
+		return reference.to_string();
 	}
 
 	public function get_children():Array<Expression> {

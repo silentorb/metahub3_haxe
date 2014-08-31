@@ -204,6 +204,7 @@ import haxe.Json;
 		}
     var match:metahub.parser.Match = cast result;
 		var statement = run_data(match.get_data());
+		trace(graph_expressions(statement));
 		var signature = Type_Network.analyze(statement, new Type_Signature(Kind.unknown), root_scope);
 		var port = statement.to_port(root_scope, new Group(null), signature);
 		port.get_node_value(new Empty_Context(this));
@@ -291,6 +292,43 @@ import haxe.Json;
 
 		if (depth == 0) {
 			result = "Graphed " + used.length + " nodes:\n\n" + result;
+		}
+
+		return result;
+	}
+	
+	public static function graph_expressions(expression:Expression, depth:Int = 0, used:Array<Expression> = null):String {
+		if (used == null)
+			used = [];
+
+		//var maximum_depth = 50;
+
+		var tabbing = " ";
+		var result = "";
+		var padding = "";
+		for (i in 0...depth) {
+			padding += tabbing;
+		}
+
+		result += padding + expression.to_string() + "\n";
+		used.push(expression);
+
+		//if (depth > maximum_depth) {
+			//return result + padding + tabbing + "EXCEEDED MAXIMUM DEPTH OF " + maximum_depth + ".\n";
+		//}
+		for (child in expression.get_children()) {
+			//var deeper = 0;
+			//if (node.get_port_count() > 2) {
+				//result += padding + tabbing + i + "\n";
+				//deeper = 1;
+			//}
+			//for (connection in port.connections) {
+			result += graph_expressions(child, depth + 1, used);
+			//}
+		}
+
+		if (depth == 0) {
+			result = "Graphed " + used.length + " expressions:\n\n" + result;
 		}
 
 		return result;

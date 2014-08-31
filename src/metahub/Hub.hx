@@ -1,10 +1,8 @@
 package metahub;
 import haxe.xml.Parser;
 import metahub.code.expressions.Expression;
-import metahub.code.expressions.Expression_Utility;
 import metahub.code.functions.Function_Library;
 import metahub.code.nodes.Block_Node;
-import metahub.code.statements.Statement;
 import metahub.code.Type_Signature;
 import metahub.engine.Context;
 import metahub.engine.Empty_Context;
@@ -316,7 +314,7 @@ import haxe.Json;
 		//if (depth > maximum_depth) {
 			//return result + padding + tabbing + "EXCEEDED MAXIMUM DEPTH OF " + maximum_depth + ".\n";
 		//}
-		for (child in expression.get_children()) {
+		for (child in expression.children) {
 			//var deeper = 0;
 			//if (node.get_port_count() > 2) {
 				//result += padding + tabbing + i + "\n";

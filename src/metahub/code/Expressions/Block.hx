@@ -1,5 +1,4 @@
 package metahub.code.expressions;
-import metahub.code.expressions.Expression;
 import metahub.code.nodes.Block_Node;
 import metahub.code.Type_Signature;
 import metahub.schema.Property;
@@ -10,14 +9,14 @@ import metahub.code.nodes.Group;
 class Block implements Expression {
 
   var node:Block_Node;
-	var expressions = new Array<Expression>();
+	public var children = new Array<Expression>();
 
 	public function new() {
 
 	}
 
 	public function add(expression:Expression) {
-		expressions.push(expression);
+		children.push(expression);
 	}
 
 	public function get_type():Type_Signature {
@@ -27,11 +26,11 @@ class Block implements Expression {
   public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
 		var node = new Block_Node(scope, group);
 		var type = new Type_Signature(Kind.unknown);
-		for (expression in expressions) {
+		for (expression in children) {
 			var signature = Type_Network.analyze(expression, type, scope);
 			var port = expression.to_port(scope, group, signature);
 			if (port != null) {
-				if (Type.getClassName(Type.getClass(expression)) != "metahub.code.expressions.Trellis_Scope")
+				if (Type.getClassName(Type.getClass(expression)) != "metahub.code.children.Trellis_Scope")
 					node.get_port(1).connect(port);
 				else
 					node.get_port(2).connect(port);
@@ -53,7 +52,7 @@ class Block implements Expression {
 	}
 
 	public function get_children():Array<Expression> {
-		return return expressions;
+		return return children;
 	}
 
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {

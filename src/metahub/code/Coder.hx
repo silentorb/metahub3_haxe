@@ -182,16 +182,12 @@ class Coder {
 		var new_scope = new Scope_Definition(scope_definition);
 		new_scope.is_particular_node = true;
 		new_scope.trellis = trellis;
-    var result = new metahub.code.expressions.Create_Node(trellis, new_scope);
 
-    if (source.block != null) {
-			result.block = create_block(source.block, new_scope);
-      //for (key in Reflect.fields(source.set)) {
-        //var property = trellis.get_property(key);
-        //result.assignments[property.id] = convert_expression(Reflect.field(source.set, key), scope_definition);
-      //}
-    }
-    return result;
+		var block = source.block != null
+			? create_block(source.block, new_scope)
+			: null;
+			
+		return new metahub.code.expressions.Create_Node(trellis, new_scope, block);
   }
 
 	function extract_path(path:Dynamic):Array<String> {
@@ -210,7 +206,7 @@ class Coder {
   function create_symbol(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var expression = convert_expression(source.expression, scope_definition);
     var symbol = scope_definition.add_symbol(source.name, expression.get_types()[0][0]);
-    return new metahub.code.statements.Create_Symbol(symbol, expression);
+    return new metahub.code.expressions.Create_Symbol(symbol, expression);
   }
 
   static function get_type(value:Dynamic):Type_Signature {

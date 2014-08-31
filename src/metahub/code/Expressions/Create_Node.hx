@@ -4,7 +4,6 @@ import metahub.code.nodes.Group;
 import metahub.code.Scope;
 import metahub.code.Scope_Definition;
 import metahub.code.expressions.Block;
-import metahub.code.statements.Statement;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
 import metahub.engine.General_Port;
@@ -13,14 +12,17 @@ import metahub.schema.Kind;
 class Create_Node implements Expression {
   public var trellis:Trellis;
   //public var assignments = new Map<Int, Expression>();
-	public var block:Expression;
+	var block:Expression;
   public var trellis_type:Type_Signature;
 	var scope_definition:Scope_Definition;
+	public var children:Array<Expression>;
 
-  public function new(trellis:Trellis, scope_definition:Scope_Definition) {
+  public function new(trellis:Trellis, scope_definition:Scope_Definition, block:Expression) {
     this.trellis = trellis;
     trellis_type = new Type_Signature(Kind.reference, trellis);
 		this.scope_definition = scope_definition;
+		this.block = block;
+		children = [ block ];
   }
 
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {

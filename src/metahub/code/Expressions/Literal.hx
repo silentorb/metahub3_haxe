@@ -7,6 +7,7 @@ import metahub.code.nodes.Group;
 class Literal implements Expression {
   var value:Dynamic;
   public var possible_type:Type_Signature;
+	public var children = new Array<Expression>();
 
   public function new(value:Dynamic, type:Type_Signature) {
     this.value = value;

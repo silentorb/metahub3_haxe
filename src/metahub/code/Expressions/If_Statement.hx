@@ -13,10 +13,12 @@ import metahub.schema.Kind;
 class If_Statement implements Expression {
 	var condition:Expression;
 	var expression:Expression;
+	public var children:Array<Expression>;
 
 	public function new(condition:Expression, expression:Expression) {
 		this.condition = condition;
 		this.expression = expression;
+		children = [ condition, expression ];
 	}
 
   public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {

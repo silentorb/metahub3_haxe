@@ -9,10 +9,12 @@ import metahub.engine.General_Port;
 class Set_Weight implements Expression {
 	var weight:Float;
 	var statement:Expression;
+	public var children:Array<Expression>;
 
 	public function new(weight:Float, statement:Expression) {
 		this.weight = weight;
 		this.statement = statement;
+		children = [ statement ];
 	}
 
 	public function get_type():Type_Signature {
@@ -34,6 +36,6 @@ class Set_Weight implements Expression {
 	}
 
 	public function get_children():Array<Expression> {
-		return statement.get_children();
+		return statement.children;
 	}
 }

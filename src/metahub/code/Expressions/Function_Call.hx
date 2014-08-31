@@ -14,7 +14,7 @@ import metahub.engine.Constraint_Operator;
 import metahub.code.functions.Function;
 
 class Function_Call implements Expression {
-  var inputs:Array<Expression>;
+  public var children:Array<Expression>;
 	var func:Functions;
 	var hub:Hub;
   //var func:Functions;
@@ -22,7 +22,7 @@ class Function_Call implements Expression {
   public function new(func:Functions, inputs:Array<Expression>, hub:Hub) {
 		this.hub = hub;
 		this.func = func;
-    this.inputs = inputs;
+    this.children = inputs;
     //func = Type.createEnum(Functions, trellis.name);
   }
 
@@ -33,12 +33,12 @@ class Function_Call implements Expression {
 
   public function to_port(scope:Scope, group:Group, node_signature:Node_Signature):General_Port {
 		if (func == Functions.equals) {
-			return inputs[0].to_port(scope, group, node_signature);
+			return children[0].to_port(scope, group, node_signature);
 		}
 		var info = hub.function_library.get_function_info(func, node_signature.signature);
 		var node:Function = Type.createInstance(info.type, [hub, hub.get_node_count(), func, node_signature.signature, group]);
     hub.add_internal_node(node);
-		var expressions = inputs;
+		var expressions = children;
     var ports = node.get_inputs();
     var target:General_Port = null;
     for (i in 0...expressions.length) {
@@ -57,7 +57,7 @@ class Function_Call implements Expression {
 	function get_args(scope:Scope, group:Group, node_signature:Node_Signature) {
 		var result = new Array<General_Port>();
 		var x = 0;
-		for (i in inputs) {
+		for (i in children) {
 			result.push(i.to_port(scope, group, node_signature.children[x++]));
 		}
 
@@ -82,7 +82,7 @@ class Function_Call implements Expression {
 	}
 
 	public function get_children():Array<Expression> {
-		return inputs;
+		return children;
 	}
 
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {

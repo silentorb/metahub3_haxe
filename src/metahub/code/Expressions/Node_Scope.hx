@@ -2,7 +2,6 @@ package metahub.code.expressions;
 import metahub.code.nodes.Group;
 import metahub.code.Scope_Definition;
 import metahub.code.expressions.Block;
-import metahub.code.statements.Statement;
 import metahub.code.Type_Signature;
 import metahub.engine.General_Port;
 import metahub.schema.Trellis;
@@ -15,10 +14,12 @@ import metahub.schema.Kind;
 class Node_Scope implements Expression {
 	var scope_definition:Scope_Definition;
 	var expression:Expression;
+	public var children:Array<Expression>;
 
   public function new(expression:Expression, scope_definition:Scope_Definition) {
     this.expression = expression;
 		this.scope_definition = scope_definition;
+		children = [ expression ];
   }
 
   //public function resolve(scope:Scope):Dynamic {
@@ -42,6 +43,6 @@ class Node_Scope implements Expression {
 	}
 
 	public function get_children():Array<Expression> {
-		return expression.get_children();
+		return expression.children;
 	}
 }

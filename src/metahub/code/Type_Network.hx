@@ -10,10 +10,10 @@ class Type_Network {
 	public static function analyze(expression:Expression, start_type:Type_Signature, scope:Scope):Node_Signature {
 		start_type = start_type.copy();
 		var options = expression.get_types();
-		var children = expression.get_children();
+		var children = expression.children;
 		if (options == null) {
 			expression = children[0];
-			children = expression.get_children();
+			children = expression.children;
 			options = expression.get_types();
 			if (options == null)
 				throw new Exception("Error determining types.");

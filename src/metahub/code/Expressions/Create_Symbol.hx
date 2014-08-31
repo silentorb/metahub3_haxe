@@ -1,7 +1,6 @@
-package metahub.code.statements;
+package metahub.code.expressions ;
 import haxe.macro.Context;
 import metahub.code.expressions.Expression;
-import metahub.code.expressions.Expression_Utility;
 import metahub.code.nodes.Symbol_Node;
 import metahub.code.symbols.Symbol;
 import metahub.code.Type_Signature;
@@ -12,6 +11,7 @@ import metahub.code.nodes.Group;
 class Create_Symbol implements Expression {
   public var symbol:Symbol;
   public var expression:Expression;
+	public var children:Array<Expression>;
 
   public function new(symbol:Symbol, expression:Expression) {
 		if (symbol == null)
@@ -19,6 +19,7 @@ class Create_Symbol implements Expression {
 
     this.symbol = symbol;
     this.expression = expression;
+		children = [ expression ];
   }
 
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
@@ -37,6 +38,6 @@ class Create_Symbol implements Expression {
 	}
 
 	public function get_children():Array<Expression> {
-		return expression.get_children();
+		return expression.children;
 	}
 }

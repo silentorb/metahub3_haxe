@@ -9,6 +9,7 @@ import metahub.code.nodes.Path_Condition;
 
 class Expression_Reference implements Expression {
   public var reference:Reference;
+	public var children = new Array<Expression>();
 
   public function new(reference:Reference) {
     this.reference = reference;

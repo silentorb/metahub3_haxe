@@ -14,11 +14,13 @@ class Trellis_Scope implements Expression {
 	var expression:Expression;
   public var type:Type_Signature;
 	var scope_definition:Scope_Definition;
+	public var children :Array<Expression>;
 
   public function new(trellis:Trellis, expression:Expression, scope_definition:Scope_Definition) {
     this.trellis = trellis;
     this.expression = expression;
 		this.scope_definition = scope_definition;
+		children = [ expression ];
   }
 
   public function to_port(scope:Scope, group:Group, signature:Node_Signature):General_Port {
@@ -35,6 +37,6 @@ class Trellis_Scope implements Expression {
 	}
 
 	public function get_children():Array<Expression> {
-		return expression.get_children();
+		return expression.children;
 	}
 }

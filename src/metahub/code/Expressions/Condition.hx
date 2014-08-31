@@ -19,12 +19,14 @@ class Condition implements Expression
 	var first:Expression;
 	var second:Expression;
 	var operator:Functions;
+	public var children:Array<Expression>;
 
 	public function new(first:Expression, second:Expression, operator:Functions)
 	{
 		this.first = first;
 		this.second = second;
 		this.operator = operator;
+		children = [ first, second ];
 	}
 
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {

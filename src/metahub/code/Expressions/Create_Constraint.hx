@@ -15,11 +15,13 @@ class Create_Constraint implements Expression {
   var reference:Expression;
   var expression:Expression;
 	var is_back_referencing = false;
+	public var children:Array<Expression>;
 
   public function new(reference:Expression, expression:Expression, is_back_referencing:Bool) {
     this.reference = reference;
     this.expression = expression;
 		this.is_back_referencing = is_back_referencing;
+		children = [ reference, expression ];
   }
 
 	public function to_port(scope:Scope, old_group:Group, signature_node:Node_Signature):General_Port {

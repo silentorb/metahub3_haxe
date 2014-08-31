@@ -12,9 +12,10 @@ class Type_Network {
 		var options = expression.get_types();
 		var children = expression.children;
 		while (options == null) {
-			//if (children.length == 0)
-				//throw new Exception("Missing expression type information.");
-			return new Node_Signature([]);
+			if (children.length == 0)
+				throw new Exception("Missing expression type information.");
+
+			//return new Node_Signature([]);
 
 			expression = children[0];
 			children = expression.children;

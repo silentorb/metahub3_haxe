@@ -2,8 +2,10 @@ package metahub.code.expressions;
 import metahub.code.nodes.Group;
 import metahub.code.Scope;
 import metahub.code.Scope_Definition;
+import metahub.code.Type_Signature;
 import metahub.engine.General_Port;
 import metahub.schema.Trellis;
+import metahub.schema.Kind;
 
 /**
  * ...
@@ -29,14 +31,10 @@ class Trellis_Scope implements Expression {
   }
 
 	public function get_types():Array<Array<Type_Signature>> {
-		return expression.get_types();
+		return null;
 	}
 
 	public function to_string():String {
-		return expression.to_string();
-	}
-
-	public function get_children():Array<Expression> {
-		return expression.children;
+		return trellis.name;
 	}
 }

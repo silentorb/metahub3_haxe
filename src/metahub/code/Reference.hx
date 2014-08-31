@@ -73,7 +73,7 @@ class Reference {
 		}
 
 		if (path.length > 0)
-			return result + "." + path.to_string();
+			return [result, path.to_string()].join(".");
 
 		return result;
 	}

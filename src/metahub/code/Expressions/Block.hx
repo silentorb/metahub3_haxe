@@ -44,7 +44,7 @@ class Block implements Expression {
   }
 
 	public function get_types():Array<Array<Type_Signature>> {
-		return [ [ new Type_Signature(Kind.none)] ];
+		return null;
 	}
 
 	public function to_string():String {

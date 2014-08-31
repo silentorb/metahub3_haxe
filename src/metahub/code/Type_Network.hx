@@ -11,12 +11,14 @@ class Type_Network {
 		start_type = start_type.copy();
 		var options = expression.get_types();
 		var children = expression.children;
-		if (options == null) {
+		while (options == null) {
+			//if (children.length == 0)
+				//throw new Exception("Missing expression type information.");
+			return new Node_Signature([]);
+
 			expression = children[0];
 			children = expression.children;
 			options = expression.get_types();
-			if (options == null)
-				throw new Exception("Error determining types.");
 		}
 
 		var option = get_match(start_type, options);
@@ -28,9 +30,9 @@ class Type_Network {
 		// so this error is currently only an internal bug and worth catching separately for debuggin purposes.
 		if (option.length < children.length + 1)
 			throw new Exception("Invalid number of parameters in type definition.");
-		
+
 		var result = new Node_Signature(option);
-			
+
 		var i = 1;
 		for (child in children) {
 			var child_result = analyze(child, result.signature[i++], scope);

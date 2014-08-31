@@ -294,12 +294,10 @@ import haxe.Json;
 
 		return result;
 	}
-	
+
 	public static function graph_expressions(expression:Expression, depth:Int = 0, used:Array<Expression> = null):String {
 		if (used == null)
 			used = [];
-
-		//var maximum_depth = 50;
 
 		var tabbing = " ";
 		var result = "";
@@ -308,21 +306,14 @@ import haxe.Json;
 			padding += tabbing;
 		}
 
+		if (expression == null)
+			return padding + "null\n";
+
 		result += padding + expression.to_string() + "\n";
 		used.push(expression);
 
-		//if (depth > maximum_depth) {
-			//return result + padding + tabbing + "EXCEEDED MAXIMUM DEPTH OF " + maximum_depth + ".\n";
-		//}
 		for (child in expression.children) {
-			//var deeper = 0;
-			//if (node.get_port_count() > 2) {
-				//result += padding + tabbing + i + "\n";
-				//deeper = 1;
-			//}
-			//for (connection in port.connections) {
 			result += graph_expressions(child, depth + 1, used);
-			//}
 		}
 
 		if (depth == 0) {

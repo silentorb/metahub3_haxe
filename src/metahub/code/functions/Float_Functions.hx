@@ -52,7 +52,6 @@ class Float_Functions extends Function {
 			var value:Float = cast arg;
 			total += value;
 		}
-
 		return total;
 	}
 

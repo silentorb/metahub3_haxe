@@ -53,20 +53,28 @@ class Create_Constraint implements Expression {
 		scope.hub.constraints.push(group);
 
 		target.connect(source);
-		
+
 		return group.get_port(0);
   }
 
 	public function get_types():Array < Array < Type_Signature >> {
+		var result = new Array < Array < Type_Signature >> ();
+		var type_none = new Type_Signature(Kind.none);
 
-		return [ [ new Type_Signature(Kind.none), new Type_Signature(Kind.unknown), new Type_Signature(Kind.unknown) ] ];
+		var first = reference.get_types();
+		var second = expression.get_types();
+
+		for (a in first) {
+			for (b in second) {
+				if (a[0].equals(b[0]))
+				result.push([ type_none, a[0], b[0] ]);
+			}
+		}
+
+		return result;
 	}
 
 	public function to_string():String {
-		return reference.to_string();
-	}
-
-	public function get_children():Array<Expression> {
-		return [ reference, expression ];
+		return "Create_Constraint";
 	}
 }

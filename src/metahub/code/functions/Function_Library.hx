@@ -69,7 +69,8 @@ class Function_Library {
 
 		var list_any = [ type_list, type_list, type_unknown ];
 		add(Functions.add, "List_Functions", list_any);
-		
+		add(Functions.first, "List_Functions", [ type_unknown, type_list ]);
+
 	}
 
 	function add(func:metahub.code.functions.Functions, class_name:String, signature:Array<Type_Signature>) {

@@ -180,6 +180,11 @@ class Trellis implements INode {
 				ports.push(new General_Port(this, ports.length));
 			}
     }
+
+		for (j in Reflect.fields(source.properties)) {
+			var property:Property = this.get_property(j);
+			property.initialize_link1(Reflect.field(source.properties, j));
+		}
   }
 
 	public function initialize2(source:ITrellis_Source) {
@@ -190,9 +195,9 @@ class Trellis implements INode {
 		}
 
     if (source.properties != null) {
-      for (j in Reflect.fields(source.properties)) {
+			 for (j in Reflect.fields(source.properties)) {
         var property:Property = this.get_property(j);
-        property.initialize_link(Reflect.field(source.properties, j));
+        property.initialize_link2(Reflect.field(source.properties, j));
       }
     }
 

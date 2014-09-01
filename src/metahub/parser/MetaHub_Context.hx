@@ -119,16 +119,16 @@ typedef Assignment_Source = {
 
   static function start(data:Dynamic):Dynamic {
     return {
-    "type": "block",
-    "expressions": data[1]
+			"type": "block",
+			"expressions": data[1]
     };
   }
 
   static function create_symbol(data:Dynamic):Dynamic {
     return {
-    type: "symbol",
-    name: data[2],
-    expression: data[6]
+			type: "symbol",
+			name: data[2],
+			expression: data[6]
     };
   }
 
@@ -240,18 +240,20 @@ typedef Assignment_Source = {
   static function reference(data:Dynamic):Dynamic {
 		var reference = {
 			type: "reference",
-			path: data[0]
+			path: data
 		};
 
-		var methods:Array<Dynamic> = cast data[1];
-		if (methods.length > 0) {
-			var method = methods[0];
-			method.inputs.unshift(reference);
-			return method;
-		}
-		else {
-			return reference;
-		}
+		//var methods:Array<Dynamic> = cast data[1];
+		//if (methods.length > 0) {
+			//var method = methods[0];
+			//method.inputs.unshift(reference);
+			//return method;
+		//}
+		//else {
+			//return reference;
+		//}
+
+		return reference;
   }
 
   static function long_block(data:Dynamic):Dynamic {

@@ -26,7 +26,9 @@ enum Functions {
 	multiply_equals;
 	divide_equals;
 
+	// List Functions
 	count;
+	first;
 }
 
 class Function_Calls2 {

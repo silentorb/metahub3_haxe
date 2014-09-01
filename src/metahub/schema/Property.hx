@@ -77,11 +77,17 @@ typedef IProperty_Source = {
     }
   }
 
-  public function initialize_link(source:IProperty_Source) {
-    if (source.type != 'list' && source.type != 'reference')
+  public function initialize_link1(source:IProperty_Source) {
+		if (source.type != 'list' && source.type != 'reference')
       return;
 
     this.other_trellis = this.trellis.schema.get_trellis(source.trellis, trellis.namespace);
+	}
+
+  public function initialize_link2(source:IProperty_Source) {
+    if (source.type != 'list' && source.type != 'reference')
+      return;
+
     if (source.other_property != null)
       this.other_property = other_trellis.get_property(source.other_property);
     else {
@@ -97,6 +103,10 @@ typedef IProperty_Source = {
         this.other_property.other_trellis = this.trellis;
         this.other_property.other_property = this;
       }
+			else {
+				if (!other_trellis.is_value)
+					throw new Exception("Could not find other property for " + fullname());
+			}
     }
   }
 

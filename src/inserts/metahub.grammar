@@ -7,6 +7,7 @@ final_trim = /\s*$/
 newlines = /(\s*\n)+\s*/
 comma_or_newline = /\s*((\s*\n)+|,)\s*/
 dot = "."
+path_function_separator = "." | "|"
 
 id = /[a-zA-Z0-9_]+/
 
@@ -14,7 +15,7 @@ path = @(id, dot, 2, 0)
 
 path_or_id = @(id, dot, 1, 0)
 
-reference = path_or_id @(method, none, 0, 0)
+reference = @(id, path_function_separator, 1, 0)
 
 method = "|" id
 

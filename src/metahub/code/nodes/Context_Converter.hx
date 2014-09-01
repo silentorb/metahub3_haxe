@@ -30,7 +30,11 @@ class Context_Converter extends Standard_Node {
 		var reverse = new Array<Property>();
 		var i = path.length - 1;
 		while (--i >= 0) {
-			reverse.push(path.at(i).other_property);
+			var property = path.at(i);
+			if (property.other_property == null)
+				throw new Exception(property.fullname() + " is missing a backreference.");
+
+			reverse.push(property.other_property);
 		}
 		return new Path(reverse);
 	}
@@ -56,7 +60,8 @@ class Context_Converter extends Standard_Node {
 		var property_id = current_path.last().id;
 
 		if (nodes.length == 0)
-			throw new Exception("Context_Converter cannot get value for null reference.");
+			return null;
+			//throw new Exception("Context_Converter cannot get value for null reference.");
 
 		return port.get_external_value(new Node_Context(nodes[0], context.hub));
 

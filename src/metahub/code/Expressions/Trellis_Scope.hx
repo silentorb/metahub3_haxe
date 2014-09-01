@@ -27,7 +27,8 @@ class Trellis_Scope implements Expression {
 
   public function to_port(scope:Scope, group:Group, signature:Node_Signature):General_Port {
     var new_scope = new Scope(scope.hub, scope_definition, scope);
-		return expression.to_port(new_scope, group, signature);
+		var new_signature = Type_Network.analyze(expression, scope);
+		return expression.to_port(new_scope, group, new_signature);
   }
 
 	public function get_types():Array<Array<Type_Signature>> {

@@ -21,18 +21,19 @@ class Create_Constraint implements Expression {
     this.reference = reference;
     this.expression = expression;
 		this.is_back_referencing = is_back_referencing;
-		children = [ reference, expression ];
+		//children = [ reference, expression ];
+		children = [];
   }
 
 	public function to_port(scope:Scope, old_group:Group, signature_node:Node_Signature):General_Port {
-		var target = reference.to_port(scope, old_group, signature_node.children[0]);
+		var signature = Type_Network.analyze(expression, scope, reference.get_types()[0][0]);
+		var target = reference.to_port(scope, old_group, signature);
 
 		var inside_back_reference = old_group.is_back_referencing;
 
-		//var signature = Type_Network.analyze(expression, reference.get_type(), scope);
 		var group = new Group(old_group);
 		group.is_back_referencing = is_back_referencing || inside_back_reference;
-		var source = expression.to_port(scope, group, signature_node.children[1]);
+		var source = expression.to_port(scope, group, signature);
 		group.get_port(1).connect(target);
 		group.get_port(1).connect(source);
 
@@ -57,7 +58,13 @@ class Create_Constraint implements Expression {
 		return group.get_port(0);
   }
 
+	function process_self_modifying() {
+
+	}
+
 	public function get_types():Array < Array < Type_Signature >> {
+return [ [ new Type_Signature(Kind.none), reference.get_types()[0][0] ] ];
+
 		var result = new Array < Array < Type_Signature >> ();
 		var type_none = new Type_Signature(Kind.none);
 
@@ -67,7 +74,7 @@ class Create_Constraint implements Expression {
 		for (a in first) {
 			for (b in second) {
 				if (a[0].equals(b[0]))
-				result.push([ type_none, a[0], b[0] ]);
+					result.push([ type_none, a[0], b[0] ]);
 			}
 		}
 

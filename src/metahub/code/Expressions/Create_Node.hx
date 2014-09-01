@@ -4,6 +4,7 @@ import metahub.code.nodes.Group;
 import metahub.code.Scope;
 import metahub.code.Scope_Definition;
 import metahub.code.expressions.Block;
+import metahub.code.Type_Signature;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
 import metahub.engine.General_Port;
@@ -22,7 +23,9 @@ class Create_Node implements Expression {
     trellis_type = new Type_Signature(Kind.reference, trellis);
 		this.scope_definition = scope_definition;
 		this.block = block;
-		children = [ block ];
+		children = block != null
+			? [ block ]
+			: [];
   }
 
 	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
@@ -39,34 +42,10 @@ class Create_Node implements Expression {
 	}
 
 	public function get_types():Array<Array<Type_Signature>>{
-		return [ [ trellis_type ] ];
+		return [ [ trellis_type, new Type_Signature(Kind.none) ] ];
 	}
 
 	public function to_string():String {
 		return "new " + trellis.name;
 	}
-
-	public function get_children():Array<Expression> {
-		return [];
-	}
-//
-	//public function resolve(scope:Scope):Dynamic {
-		//trace('create node', trellis.name);
-    //var node = scope.hub.create_node(trellis);
-		//var new_scope = new Scope(scope.hub, scope_definition, scope);
-		//new_scope.node = node;
-		//if (block != null) {
-			//var block_port = block.to_port(scope,
-			//block.resolve(new_scope);
-		//}
-//
-    ////for (i in assignments.keys()) {
-      ////var statement = assignments[i];
-			////var input_type = Type_Signature.from_property(trellis.properties[i]);
-      ////node.set_value(i, Expression_Utility.resolve(statement, input_type, scope));
-    ////}
-//
-    //return node;
-	//}
-
 }

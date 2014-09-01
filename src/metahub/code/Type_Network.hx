@@ -1,5 +1,6 @@
 package metahub.code;
 import metahub.code.expressions.Expression;
+import metahub.schema.Kind;
 
 /**
  * ...
@@ -7,19 +8,23 @@ import metahub.code.expressions.Expression;
  */
 class Type_Network {
 
-	public static function analyze(expression:Expression, start_type:Type_Signature, scope:Scope):Node_Signature {
+	public static function analyze(expression:Expression, scope:Scope, start_type:Type_Signature = null):Node_Signature {
+		if (start_type == null)
+			start_type = new Type_Signature(Kind.unknown);
+
 		start_type = start_type.copy();
 		var options = expression.get_types();
 		var children = expression.children;
 		while (options == null) {
-			if (children.length == 0)
-				throw new Exception("Missing expression type information.");
-
-			//return new Node_Signature([]);
-
-			expression = children[0];
-			children = expression.children;
-			options = expression.get_types();
+			//if (children.length == 0)
+				//throw new Exception("Missing expression type information.");
+//
+			////return new Node_Signature([]);
+//
+			//expression = children[0];
+			//children = expression.children;
+			//options = expression.get_types();
+			return null;
 		}
 
 		var option = get_match(start_type, options);
@@ -36,8 +41,9 @@ class Type_Network {
 
 		var i = 1;
 		for (child in children) {
-			var child_result = analyze(child, result.signature[i++], scope);
-			result.children.push(child_result);
+			var child_result = analyze(child, scope, result.signature[i++]);
+			if (child_result != null)
+				result.children.push(child_result);
 		}
 
 		return result;

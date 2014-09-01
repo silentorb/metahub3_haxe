@@ -30,14 +30,11 @@ class Create_Symbol implements Expression {
 	}
 
 	public function get_types():Array<Array<Type_Signature>> {
-		return expression.get_types();
+		var type = expression.get_types()[0][0];
+		return [ [ type, type ] ];
 	}
 
 	public function to_string():String {
 		return "Create_Symbol";
-	}
-
-	public function get_children():Array<Expression> {
-		return expression.children;
 	}
 }

@@ -17,18 +17,11 @@ class Function_Call implements Expression {
   public var children:Array<Expression>;
 	var func:Functions;
 	var hub:Hub;
-  //var func:Functions;
 
   public function new(func:Functions, inputs:Array<Expression>, hub:Hub) {
 		this.hub = hub;
 		this.func = func;
     this.children = inputs;
-    //func = Type.createEnum(Functions, trellis.name);
-  }
-
-  public function resolve(scope:Scope):Dynamic {
-		throw new Exception("Code not written for imperative function calls.");
-    //return to_port(scope).parent.id;
   }
 
   public function to_port(scope:Scope, group:Group, node_signature:Node_Signature):General_Port {
@@ -65,8 +58,10 @@ class Function_Call implements Expression {
 	}
 
 	public function get_types():Array < Array < Type_Signature >> {
-		if (func == Functions.equals)
-			return null;
+		if (func == Functions.equals) {
+			var type = children[0].get_types()[0][0];
+			return [ [ type, type ] ];
+		}
 
 		var options = hub.function_library.get_function_options(func);
 		var result = new Array < Array < Type_Signature >> ();
@@ -79,10 +74,6 @@ class Function_Call implements Expression {
 
 	public function to_string():String {
 		return Std.string(func);
-	}
-
-	public function get_children():Array<Expression> {
-		return children;
 	}
 
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {

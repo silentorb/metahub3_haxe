@@ -30,7 +30,7 @@ class Function_Call implements Expression {
 		}
 		var function_signature = determine_signature(node_signature);
 		var info = hub.function_library.get_function_info(func, function_signature);
-		var node:Function = Type.createInstance(info.type, [hub, hub.get_node_count(), func, function_signature, group]);
+		var node:Function = Type.createInstance(info.type, [hub, func, function_signature, group]);
     hub.add_internal_node(node);
 		var expressions = children;
     var ports = node.get_inputs();

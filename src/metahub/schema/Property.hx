@@ -32,8 +32,8 @@ typedef IProperty_Source = {
 		#end
 			this.type = cast Reflect.field(Kind, source.type);
 
-    if (source.default_value != null)
-      this.default_value = source.default_value;
+    if (Reflect.hasField(source, 'default'))
+      this.default_value = Reflect.field(source, 'default');
 
     if (source.allow_null != null)
       this.allow_null = source.allow_null;

@@ -1,5 +1,6 @@
 package metahub.code.functions;
 import metahub.code.nodes.Group;
+import metahub.code.nodes.Standard_Node;
 import metahub.engine.*;
 import metahub.schema.Trellis;
 
@@ -9,48 +10,38 @@ typedef Identity = UInt;
  * ...
  * @author Christopher W. Johnson
  */
-class Function implements INode {
+class Function extends Standard_Node {
 	public var hub:Hub;
-  var ports = new Array<General_Port>();
 	var func:Functions;
-	public var id:Identity;
 	var signature:Array<Type_Signature>;
-	public var group:Group;
 
-	public function new(hub:Hub, id:Identity, func:Functions, signature:Array<Type_Signature>, group:Group) {
+	public function new(hub:Hub, func:Functions, signature:Array < Type_Signature > , group:Group) {
+		super(group);
     this.hub = hub;
-    this.id = id;
 		this.func = func;
 		this.signature = signature;
-		this.group = group;
 
-		for (type in signature) {
-			var port = new General_Port(this, ports.length);
-      ports.push(port);
-		}
+		add_ports(signature.length);
 	}
 
-	public function get_value(index:Int, context:Context):Dynamic {
+	override public function get_value(index:Int, context:Context):Dynamic {
 		if (index == 0)
 			return run_forward(context);
 		else
 			throw new Exception("Not implemented.");
 	}
 
-	public function get_port_count():Int {
-		return ports.length;
-	}
-
-	public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+	override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		if (group.is_back_referencing)
 			return;
 
-		if (source == ports[0]) {
-			for (i in 0...ports.length) {
-				ports[i].set_external_value(value, context);
-			}
-			return;
-		}
+		//if (source == ports[0]) {
+			//for (i in 0...ports.length) {
+				////var new_value = run_reverse(value, context);
+				//ports[i].set_external_value(value, context);
+			//}
+			//return;
+		//}
 
 		if (index > 0) {
 			var new_value = run_forward(context);
@@ -79,13 +70,13 @@ class Function implements INode {
 		return ports.slice(1);
   }
 
-  public function get_port(index:Int):General_Port {
-#if debug
-  if ((index < 0 && index >= ports.length) || ports[index] == null)
-  throw new Exception("Node " + Std.string(func) + " does not have a property index of " + index + ".");
-#end
-    return ports[index];
-  }
+  //public function get_port(index:Int):General_Port {
+//#if debug
+  //if ((index < 0 && index >= ports.length) || ports[index] == null)
+  //throw new Exception("Node " + Std.string(func) + " does not have a property index of " + index + ".");
+//#end
+    //return ports[index];
+  //}
 
 	public function get_input_values(context:Context):Array<Dynamic> {
 		var result = new Array<Dynamic>();
@@ -124,7 +115,7 @@ class Function implements INode {
 		throw new Exception("Function.reverse is abstract.");
 	}
 
-	public function to_string():String {
+	override public function to_string():String {
 		return Std.string(func);
 	}
 

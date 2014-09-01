@@ -34,6 +34,12 @@ class Create_Node implements INode extends Standard_Node
 		return node;
 	}
 
+  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		//throw new Exception("Not implemented");
+		if (value == null)
+			hub.add_change(source.node, source.id, hub.create_node(trellis), context, source);
+	}
+
 	override public function to_string():String {
 		return "new " + trellis.name;
 	}

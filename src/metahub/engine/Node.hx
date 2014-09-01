@@ -24,15 +24,17 @@ class Node {
 
     for (property in trellis.properties) {
 			values.push(get_default_value(property));
-			if (property == trellis.identity_property)
-				continue;
-
+			//if (property == trellis.identity_property)
+				//continue;
     }
 
 		this_context = new Node_Context(this, hub);
   }
 
 	public function get_default_value(property:Property):Dynamic {
+		if (property.default_value != null)
+			return property.default_value;
+
 		switch (property.type)
 		{
 			case Kind.list:
@@ -68,20 +70,13 @@ class Node {
 				throw new Exception("No default is implemented for type " + property.type + ".");
 		}
 	}
-/*
-  public function get_port(index:Int):Port {
-#if debug
-  if ((index < 0 && index >= ports.length) || ports[index] == null)
-  throw new Exception("Node " + trellis.name + " does not have a property index of " + index + ".");
-#end
-    return ports[index];
-  }
 
-  public function get_port_by_name(name:String):Port {
-    var property = trellis.get_property(name);
-    return get_port(property.id);
-  }
-*/
+	public function update_values() {
+		for (property in trellis.properties) {
+			update_value(property, values[property.id]);
+		}
+	}
+
   public function get_value(index:Int):Dynamic {
     return values[index];
   }
@@ -137,24 +132,34 @@ class Node {
 			return;
 		}
 
-		hub.set_entry_node(this);
-
 		if (property.other_trellis != null && property.other_trellis.is_value) {
 			var mine:Node = cast old_value;
 			var other:Node = cast value;
-			other.copy(mine);
+			other.copy_without_update(mine);
+			update_value(property, old_value, source);
 		}
 		else {
-			values[index] = value;
+			values[property.id] = value;
+			update_value(property, value, source);
+		}
+
+  }
+
+	function update_value(property:Property, value:Dynamic, source:General_Port = null) {
+		hub.set_entry_node(this);
+
+		if (property.other_trellis != null && property.other_trellis.is_value) {
+			var other:Node = cast value;
+			other.update_values();
 		}
 
 		#if log
 		hub.history.log(property.fullname() + "|set_value " + value);
 		#end
 
-		update_trellis_connections(index, value, source);
+		update_trellis_connections(property.id, value, source);
 
-		if (property.type == Kind.reference && !property.other_trellis.is_value) {
+		if (property.type == Kind.reference && !property.other_trellis.is_value && value != null) {
 			var other_node:Node = value;
       if (property.other_property.type == Kind.list) {
 				var list:Array<Dynamic> = other_node.get_value(property.other_property.id);
@@ -168,7 +173,7 @@ class Node {
     }
 
 		hub.run_change_queue(this);
-  }
+	}
 
 	function update_trellis_connections(index:Int, value:Dynamic, source:General_Port = null) {
 		var tree = trellis.get_tree();
@@ -204,9 +209,10 @@ class Node {
 		}
   }
 
-	public function copy(target:Node) {
+	public function copy_without_update(target:Node) {
 		for (i in 0...(trellis.properties.length - 1)) {
-			target.set_value(i, get_value(i));
+			//target.set_value(i, get_value(i));
+			target.values[i] = get_value(i);
 		}
 	}
 

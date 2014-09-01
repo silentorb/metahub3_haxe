@@ -27,13 +27,14 @@ class Create_Constraint implements Expression {
 
 	public function to_port(scope:Scope, old_group:Group, signature_node:Type_Signature):General_Port {
 		//var signature = Type_Network.analyze(expression, scope, reference.get_types()[0][0]);
-		var target = reference.to_port(scope, old_group, null);
+		var type_unknown = new Type_Signature(Kind.unknown);
+		var target = reference.to_port(scope, old_group, type_unknown);
 
 		var inside_back_reference = old_group.is_back_referencing;
 
 		var group = new Group(old_group);
 		group.is_back_referencing = is_back_referencing || inside_back_reference;
-		var source = expression.to_port(scope, group, reference.get_type()[0]);
+		var source = expression.to_port(scope, group, reference.get_type(type_unknown)[0]);
 		group.get_port(1).connect(target);
 		group.get_port(1).connect(source);
 

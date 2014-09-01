@@ -7,36 +7,27 @@ import metahub.engine.INode;
  * ...
  * @author Christopher W. Johnson
  */
-class Literal_Node implements INode
+class Literal_Node extends Standard_Node
 {
 	public var value:Dynamic;
-	public var output:General_Port;
-	public var group:Group;
 
 	public function new(value:Dynamic, group:Group)
 	{
+		super(group);
 		this.value = value;
-		this.group = group;
-		output = new General_Port(this, 0);
+		add_ports(1);
 	}
 
-	public function get_port(index:Int):General_Port {
-		return output;
-	}
-
-	public function get_port_count():Int {
-		return 1;
-	}
-
-  public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Dynamic {
 		return value;
 	}
 
-  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-
+  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		//if (value != this.value)
+			//context.hub.add_change(source.node, source.id, this.value, context, source);
 	}
 
-	public function to_string():String {
+	override public function to_string():String {
 		return 'literal "' + value + '"';
 	}
 

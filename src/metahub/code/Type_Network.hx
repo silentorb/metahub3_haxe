@@ -7,8 +7,8 @@ import metahub.schema.Kind;
  * @author Christopher W. Johnson
  */
 class Type_Network {
-
-	public static function analyze(expression:Expression, scope:Scope, start_type:Type_Signature = null):Node_Signature {
+/*
+	public static function analyze2(expression:Expression, scope:Scope, start_type:Type_Signature = null):Node_Signature {
 		if (start_type == null)
 			start_type = new Type_Signature(Kind.unknown);
 
@@ -41,15 +41,15 @@ class Type_Network {
 
 		var i = 1;
 		for (child in children) {
-			var child_result = analyze(child, scope, result.signature[i++]);
+			var child_result = analyze2(child, scope, result.signature[i++]);
 			if (child_result != null)
 				result.children.push(child_result);
 		}
 
 		return result;
 	}
-
-	static function get_match(start_type:Type_Signature, options:Array<Array<Type_Signature>>) {
+*/
+	public static function get_match(start_type:Type_Signature, options:Array<Array<Type_Signature>>) {
 		for (option in options) {
 			//trace("Comparing " + option[0].to_string() + " and " + start_type.to_string());
 			if (option[0].equals(start_type)) {
@@ -61,5 +61,17 @@ class Type_Network {
 		}
 
 		return null;
+	}
+
+	public static function signatures_match(first: Array < Type_Signature > , second: Array < Type_Signature > ) {
+		if (first.length != second.length)
+			return false;
+
+		for (i in 0...first.length) {
+			if (!first[i].equals(second[i]))
+				return false;
+		}
+
+		return true;
 	}
 }

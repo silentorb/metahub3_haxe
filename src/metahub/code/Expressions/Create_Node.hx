@@ -28,7 +28,7 @@ class Create_Node implements Expression {
 			: [];
   }
 
-	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+	public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		var block_port:General_Port = null;
 		var creator = new metahub.code.nodes.Create_Node(trellis, scope.hub, group);
 		if (block != null) {
@@ -41,8 +41,8 @@ class Create_Node implements Expression {
 		return creator.get_port(0);
 	}
 
-	public function get_types():Array<Array<Type_Signature>>{
-		return [ [ trellis_type, new Type_Signature(Kind.none) ] ];
+	public function get_type(out_type:Type_Signature = null):Array<Type_Signature> {
+		return [ trellis_type, new Type_Signature(Kind.none) ];
 	}
 
 	public function to_string():String {

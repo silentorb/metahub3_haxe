@@ -20,7 +20,7 @@ class Condition_Group implements Expression
 		this.join = join;
 	}
 
-	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+	public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
     var node = new metahub.code.nodes.Condition_Group(join, group);
 		var input = node.get_port(1);
 		for (condition in children) {
@@ -29,12 +29,13 @@ class Condition_Group implements Expression
 		return node.get_port(0);
   }
 
-	public function get_types():Array < Array < Type_Signature >> {
-		var list = [ new Type_Signature(Kind.bool) ];
-		for (condition in children) {
-			list.push(list[0]);
-		}
-		return [ list ];
+	public function get_type(out_type:Type_Signature = null):Array < Type_Signature > {
+		return [ new Type_Signature(Kind.bool) ];
+		//var list = [ new Type_Signature(Kind.bool) ];
+		//for (condition in children) {
+			//list.push(list[0]);
+		//}
+		//return list;
 	}
 
 	public function to_string():String {

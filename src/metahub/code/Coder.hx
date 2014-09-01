@@ -186,7 +186,7 @@ class Coder {
 		var block = source.block != null
 			? create_block(source.block, new_scope)
 			: null;
-			
+
 		return new metahub.code.expressions.Create_Node(trellis, new_scope, block);
   }
 
@@ -205,7 +205,7 @@ class Coder {
 
   function create_symbol(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var expression = convert_expression(source.expression, scope_definition);
-    var symbol = scope_definition.add_symbol(source.name, expression.get_types()[0][0]);
+    var symbol = scope_definition.add_symbol(source.name, expression.get_type()[0]);
     return new metahub.code.expressions.Create_Symbol(symbol, expression);
   }
 

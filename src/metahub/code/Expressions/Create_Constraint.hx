@@ -25,15 +25,15 @@ class Create_Constraint implements Expression {
 		children = [];
   }
 
-	public function to_port(scope:Scope, old_group:Group, signature_node:Node_Signature):General_Port {
-		var signature = Type_Network.analyze(expression, scope, reference.get_types()[0][0]);
-		var target = reference.to_port(scope, old_group, signature);
+	public function to_port(scope:Scope, old_group:Group, signature_node:Type_Signature):General_Port {
+		//var signature = Type_Network.analyze(expression, scope, reference.get_types()[0][0]);
+		var target = reference.to_port(scope, old_group, null);
 
 		var inside_back_reference = old_group.is_back_referencing;
 
 		var group = new Group(old_group);
 		group.is_back_referencing = is_back_referencing || inside_back_reference;
-		var source = expression.to_port(scope, group, signature);
+		var source = expression.to_port(scope, group, reference.get_type()[0]);
 		group.get_port(1).connect(target);
 		group.get_port(1).connect(source);
 
@@ -62,23 +62,8 @@ class Create_Constraint implements Expression {
 
 	}
 
-	public function get_types():Array < Array < Type_Signature >> {
-return [ [ new Type_Signature(Kind.none), reference.get_types()[0][0] ] ];
-
-		var result = new Array < Array < Type_Signature >> ();
-		var type_none = new Type_Signature(Kind.none);
-
-		var first = reference.get_types();
-		var second = expression.get_types();
-
-		for (a in first) {
-			for (b in second) {
-				if (a[0].equals(b[0]))
-					result.push([ type_none, a[0], b[0] ]);
-			}
-		}
-
-		return result;
+	public function get_type(out_type:Type_Signature = null):Array<Type_Signature> {
+		return null;
 	}
 
 	public function to_string():String {

@@ -19,27 +19,23 @@ class Expression_Reference implements Expression {
     //return reference.resolve(scope).id;
   //}
 
-  public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+  public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		var result = reference.to_port(scope, group);
 		if (reference.path.length > 1) {
 			var condition = new Path_Condition(reference.path, scope.definition.trellis, group);
 			condition.get_port(0).connect(result);
 			return condition.get_port(1);
 		}
-		
+
 		return result;
   }
 
-	public function get_types():Array<Array<Type_Signature>> {
-		return [ [ reference.get_type() ] ];
+	public function get_type(out_type:Type_Signature = null):Array<Type_Signature> {
+		return [ reference.get_type() ];
 	}
 
 	public function to_string():String {
 		return reference.to_string();
-	}
-
-	public function get_children():Array<Expression> {
-		return [];
 	}
 
 	public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {

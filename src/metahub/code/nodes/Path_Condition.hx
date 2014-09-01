@@ -24,6 +24,9 @@ class Path_Condition extends Standard_Node {
 	}
 
   override public function get_value(index:Int, context:Context):Dynamic {
+		if (index == 1)
+			return ports[1 - index].get_external_value(context);
+
 		throw new Exception("Not implemented");
 	}
 
@@ -32,7 +35,6 @@ class Path_Condition extends Standard_Node {
 			ports[1 - index].set_external_value(value, context);
 			return;
 		}
-			//throw new Exception("Not implemented");
 
 		var node:Node = reverse_path.resolve(context.node);
 		if (node == null)

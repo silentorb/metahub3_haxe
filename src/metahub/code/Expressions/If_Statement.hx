@@ -21,7 +21,7 @@ class If_Statement implements Expression {
 		children = [ condition, expression ];
 	}
 
-  public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+  public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
     var node = new If_Node(group);
 		var new_group = new Group(group);
 		new_group.is_back_referencing = true; // Temporary.  Will eventually need to check for self modification
@@ -33,8 +33,8 @@ class If_Statement implements Expression {
 		return block.get_port(0);
   }
 
-	public function get_types():Array<Array<Type_Signature>>{
-		return [ [ new Type_Signature(Kind.none), new Type_Signature(Kind.unknown), new Type_Signature(Kind.unknown) ] ];
+	public function get_type(out_type:Type_Signature = null):Array<Type_Signature> {
+		return [ new Type_Signature(Kind.none), new Type_Signature(Kind.unknown), new Type_Signature(Kind.unknown) ];
 	}
 
 	public function to_string():String {

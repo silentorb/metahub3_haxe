@@ -25,13 +25,13 @@ class Trellis_Scope implements Expression {
 		children = [ expression ];
   }
 
-  public function to_port(scope:Scope, group:Group, signature:Node_Signature):General_Port {
+  public function to_port(scope:Scope, group:Group, signature:Type_Signature):General_Port {
     var new_scope = new Scope(scope.hub, scope_definition, scope);
-		var new_signature = Type_Network.analyze(expression, scope);
-		return expression.to_port(new_scope, group, new_signature);
+		//var new_signature = Type_Network.analyze(expression, scope);
+		return expression.to_port(new_scope, group, null);
   }
 
-	public function get_types():Array<Array<Type_Signature>> {
+	public function get_type(out_type:Type_Signature = null):Array<Type_Signature> {
 		return null;
 	}
 

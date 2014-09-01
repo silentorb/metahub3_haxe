@@ -19,15 +19,11 @@ class Block implements Expression {
 		children.push(expression);
 	}
 
-	public function get_type():Type_Signature {
-		throw new Exception("Block.get_type() is not implemented.");
-	}
-
-  public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+  public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		var node = new Block_Node(scope, group);
 		for (expression in children) {
-			var signature = Type_Network.analyze(expression, scope);
-			var port = expression.to_port(scope, group, signature);
+			//var signature = Type_Network.analyze(expression, scope);
+			var port = expression.to_port(scope, group, null);
 			if (port != null) {
 				if (Type.getClassName(Type.getClass(expression)) != "metahub.code.children.Trellis_Scope")
 					node.get_port(1).connect(port);
@@ -42,7 +38,7 @@ class Block implements Expression {
 		return node.get_port(0);
   }
 
-	public function get_types():Array<Array<Type_Signature>> {
+	public function get_type(out_type:Type_Signature = null):Array<Type_Signature> {
 		return null;
 	}
 

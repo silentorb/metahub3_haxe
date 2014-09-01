@@ -6,8 +6,8 @@ import metahub.Hub;
 import metahub.engine.General_Port;
 
 interface Expression {
-	function get_types():Array<Array<Type_Signature>>;
-  function to_port(scope:Scope, group:Group, node_signature:Node_Signature):General_Port;
+	function get_type(out_type:Type_Signature = null):Array<Type_Signature>;
+  function to_port(scope:Scope, group:Group, node_signature:Type_Signature):General_Port;
 	function to_string():String;
 	var children:Array<Expression>;
 }

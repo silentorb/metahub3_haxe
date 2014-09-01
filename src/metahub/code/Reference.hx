@@ -57,7 +57,7 @@ class Reference {
 
 			if (path.length >= 3 || (path.length == 2 && !property.trellis.is_value)) {
 				var converter = new Context_Converter(path, scope.definition.trellis, group);
-				port.connect(converter.get_port(1));
+				port.connect(converter.get_port(1));  // At this point I'm confused which direction the converter should be facing.
 				return converter.get_port(0);
 			}
 			else {

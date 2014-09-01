@@ -22,16 +22,15 @@ class Create_Symbol implements Expression {
 		children = [ expression ];
   }
 
-	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+	public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		var port = expression.to_port(scope, group, signature_node);
 		var value = port.get_node_value(new Empty_Context(scope.hub));
 		scope.set_value(symbol.index, value);
 		return port;
 	}
 
-	public function get_types():Array<Array<Type_Signature>> {
-		var type = expression.get_types()[0][0];
-		return [ [ type, type ] ];
+	public function get_type(out_type:Type_Signature = null):Array < Type_Signature > {
+		return [ symbol.get_type() ];
 	}
 
 	public function to_string():String {

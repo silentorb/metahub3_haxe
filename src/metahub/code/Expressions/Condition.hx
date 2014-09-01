@@ -29,9 +29,8 @@ class Condition implements Expression
 		children = [ first, second ];
 	}
 
-	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
-		var types = first.get_types();
-		var type = types[0][0].type;
+	public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
+		var type = first.get_type()[0].type;
 		var class_name = get_comparison_class(type);
 		var comparison_class = Type.resolveClass(class_name);
 		if (comparison_class == null)
@@ -46,8 +45,8 @@ class Condition implements Expression
 		return node.get_port(0);
   }
 
-	public function get_types():Array<Array<Type_Signature>>{
-		return [ [ new Type_Signature(Kind.bool), new Type_Signature(Kind.unknown), new Type_Signature(Kind.unknown) ] ];
+	public function get_type(out_type:Type_Signature = null):Array < Type_Signature > {
+		return [ new Type_Signature(Kind.bool), new Type_Signature(Kind.unknown), new Type_Signature(Kind.unknown) ];
 	}
 
 	public function to_string():String {

@@ -18,7 +18,7 @@ class Literal implements Expression {
     return value;
   }
 
-  public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+  public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		//var trellis = type.trellis;
 		//var trellis = scope.hub.schema.get_trellis(get_type_string(type.type), scope.hub.metahub_namespace);
     //var trellis = scope.hub.schema.get_trellis(Std.string(type.type));
@@ -33,8 +33,8 @@ class Literal implements Expression {
 		//return fields[index + 1];
 	//}
 
-	public function get_types():Array<Array<Type_Signature>> {
-		return [ [ possible_type ] ];
+	public function get_type(out_type:Type_Signature = null):Array<Type_Signature> {
+		return [ possible_type ];
 	}
 
 	public function to_string():String {

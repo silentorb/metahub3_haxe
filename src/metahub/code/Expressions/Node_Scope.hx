@@ -28,14 +28,14 @@ class Node_Scope implements Expression {
 		//return block.resolve(new_scope);
   //}
 
-	public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+	public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		var new_scope = new Scope(scope.hub, scope_definition, scope);
 		new_scope.node = scope_definition.symbol.resolve(scope);
 		return expression.to_port(new_scope, group, signature_node);
   }
 
-	public function get_types():Array<Array<Type_Signature>> {
-		return expression.get_types();
+	public function get_type(out_type:Type_Signature = null):Array < Type_Signature > {
+		return null;
 	}
 
 	public function to_string():String {

@@ -17,19 +17,15 @@ class Set_Weight implements Expression {
 		children = [ statement ];
 	}
 
-	public function get_type():Type_Signature {
-		throw new Exception("Block.get_type() is not implemented.");
+	public function get_type(out_type:Type_Signature = null):Array < Type_Signature > {
+		return null;
 	}
 
-  public function to_port(scope:Scope, group:Group, signature_node:Node_Signature):General_Port {
+  public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		var new_group = new Group(group);
 		new_group.weight = weight;
 		return statement.to_port(scope, new_group, signature_node);
   }
-
-	public function get_types():Array<Array<Type_Signature>> {
-		return statement.get_types();
-	}
 
 	public function to_string():String {
 		return statement.to_string();

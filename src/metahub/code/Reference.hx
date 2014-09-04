@@ -46,10 +46,12 @@ class Reference {
 		return path.last().get_signature();
 	}
 
-	public function to_port(scope:Scope, group:Group):General_Port {
+	public function to_port(scope:Scope, group:Group, input:General_Port):General_Port {
 		if (symbol != null) {
 			var node = symbol.resolve(scope);
-			return new Symbol_Node(node, path, group).get_port(0);
+			var result = new Symbol_Node(node, path, group);
+			result.get_port(1).connections(
+			return .get_port(0);
 		}
 		else {
 			var property = path.last();
@@ -93,12 +95,16 @@ class Reference {
 		throw new Exception("Not supported.");
 	}
 
-	public static function from_scope(source:Array<String>, scope_definition:Scope_Definition) {
+	public static function from_scope(source:Array<String>, scope_definition:Scope_Definition, trellis:Trellis) {
 		var result = new Reference();
 		var symbol = scope_definition.find(source[0]);
 		if (symbol != null) {
 			result.symbol = symbol;
 			result.path = Path.from_array(source.slice(1), symbol.get_trellis());
+		}
+		else if (trellis != null) {
+			result.path = Path.from_array(source, trellis);
+			result.trellis = trellis;
 		}
 		else if (scope_definition.trellis != null) {
 			result.path = Path.from_array(source, scope_definition.trellis);

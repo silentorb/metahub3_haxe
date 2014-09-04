@@ -8,6 +8,14 @@ typedef Assignment_Source = {
 	?modifier:String
 }
 
+typedef Reference_Or_Function = {
+	type:String,
+	?path:Array<String>,
+	?name:String,
+	?expression:Dynamic,
+	?inputs:Array<Dynamic>
+}
+
 @:expose class MetaHub_Context extends Context {
 
 	private static var function_map:Map<String, Functions>;
@@ -63,7 +71,7 @@ typedef Assignment_Source = {
         return method(data);
 
       case "reference":
-        return reference(data);
+        return reference(data, cast match);
 
       case "long_block":
         return long_block(data);
@@ -232,28 +240,38 @@ typedef Assignment_Source = {
     return result;
   }
 
-//  static function path(data:Dynamic):Dynamic {
-//    trace('data', data);
-//    return data;
-//  }
-
-  static function reference(data:Dynamic):Dynamic {
-		var reference = {
+  static function reference(data:Dynamic, match:Repetition_Match):Dynamic {
+		var dividers = Lambda.array(Lambda.map(match.dividers, function(d) { return d.matches[0].get_data(); } ));
+		var result:Reference_Or_Function = {
 			type: "reference",
-			path: data
+			path: [ data[0] ]
 		};
 
-		//var methods:Array<Dynamic> = cast data[1];
-		//if (methods.length > 0) {
-			//var method = methods[0];
-			//method.inputs.unshift(reference);
-			//return method;
-		//}
-		//else {
-			//return reference;
-		//}
+		for (i in 1...data.length) {
+			var token = data[i];
+			var divider = dividers[i - 1];
+			if (divider == '.') {
+				if (result.type == 'reference') {
+					result.path.push(token);
+				}
+				else {
+					result = {
+						type: "reference",
+						expression: result,
+						path: [ token ]
+					}
+				}
+			}
+			else {
+				result = {
+					type: "function",
+					name: token,
+					inputs: [ result ]
+				}
+			}
+		}
 
-		return reference;
+		return result;
   }
 
   static function long_block(data:Dynamic):Dynamic {

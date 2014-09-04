@@ -200,7 +200,13 @@ class Coder {
 	}
 
   function create_general_reference(source:Dynamic, scope_definition:Scope_Definition):Expression_Reference {
-		return new Expression_Reference(Reference.from_scope(source.path, scope_definition));
+		var trellis:Trellis = null;
+		var expression:Expression = null;
+		if (Reflect.hasField(source, "expression")) {
+			expression = convert_expression(source.expression);
+			trellis = expression.get_type()[0];
+		}
+		return new Expression_Reference(Reference.from_scope(source.path, scope_definition, trellis), expression);
   }
 
   function create_symbol(source:Dynamic, scope_definition:Scope_Definition):Expression {

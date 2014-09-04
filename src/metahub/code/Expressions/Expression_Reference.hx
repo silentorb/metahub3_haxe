@@ -11,16 +11,21 @@ class Expression_Reference implements Expression {
   public var reference:Reference;
 	public var children = new Array<Expression>();
 
-  public function new(reference:Reference) {
+  public function new(reference:Reference, expression:Expression) {
     this.reference = reference;
+		if (expression != null)
+			children.push(expression);
   }
 
-  //public function resolve(scope:Scope):Dynamic {
-    //return reference.resolve(scope).id;
-  //}
-
   public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
-		var result = reference.to_port(scope, group);
+		var input:General_Port = null;
+		if (children.length > 0) {
+			var additional = children[0].to_port(scope, group);
+			input = additional.get_port(0);
+		}
+
+		var result = reference.to_port(scope, group, input);
+
 		if (reference.path.length > 1) {
 			var condition = new Path_Condition(reference.path, scope.definition.trellis, group);
 			condition.get_port(0).connect(result);

@@ -28,6 +28,10 @@ class Function_Call implements Expression {
 		if (func == Functions.equals) {
 			return children[0].to_port(scope, group, node_signature);
 		}
+
+		if (node_signature == null) {
+			node_signature = get_type()[0];
+		}
 		var function_signature = determine_signature(node_signature);
 		var info = hub.function_library.get_function_info(func, function_signature);
 		var node:Function = Type.createInstance(info.type, [hub, func, function_signature, group]);
@@ -85,10 +89,23 @@ class Function_Call implements Expression {
 			return [ type ];
 		}
 
-		if (out_type == null)
-			throw new Exception("out_type required for determining function type.");
-
 		var options = hub.function_library.get_function_options(func);
+
+		if (out_type == null) {
+			//throw new Exception("out_type required for determining function type.");
+			var signature:Array<Type_Signature> = [ new Type_Signature(Kind.unknown) ];
+			for (child in children) {
+				signature.push(child.get_type()[0]);
+			}
+
+			for (option in options) {
+				if (Type_Signature.arrays_match(option.signature, signature))
+					return [signature[1]];
+			}
+
+			throw new Exception("out_type required for determining function type.");
+		}
+
 		for (option in options) {
 			if (out_type.equals(option.signature[0]))
 				return option.signature;

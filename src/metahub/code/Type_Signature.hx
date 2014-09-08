@@ -107,4 +107,16 @@ class Type_Signature {
 
 		return false;
 	}
+
+	public static function arrays_match(first: Array < Type_Signature > , second: Array < Type_Signature > ) {
+		if (first.length != second.length)
+			return false;
+
+		for (i in 0...first.length) {
+			if (!first[i].equals(second[i]))
+				return false;
+		}
+
+		return true;
+	}
 }

@@ -9,6 +9,7 @@ import metahub.schema.Kind;
 import metahub.code.Type_Signature;
 import metahub.engine.General_Port;
 import metahub.code.symbols.*;
+import metahub.code.nodes.Path_Node;
 
 /**
  * ...
@@ -47,11 +48,14 @@ class Reference {
 	}
 
 	public function to_port(scope:Scope, group:Group, input:General_Port):General_Port {
-		if (symbol != null) {
+		if (input != null) {
+			var step = new Path_Node(path.at(0), group);
+			input.connect(step.get_port(1));
+			return step.get_port(0);
+		}
+		else if (symbol != null) {
 			var node = symbol.resolve(scope);
-			var result = new Symbol_Node(node, path, group);
-			result.get_port(1).connections(
-			return .get_port(0);
+			return new Symbol_Node(node, path, group).get_port(0);
 		}
 		else {
 			var property = path.last();
@@ -59,7 +63,7 @@ class Reference {
 
 			if (path.length >= 3 || (path.length == 2 && !property.trellis.is_value)) {
 				var converter = new Context_Converter(path, scope.definition.trellis, group);
-				port.connect(converter.get_port(1));  // At this point I'm confused which direction the converter should be facing.
+				port.connect(converter.get_port(1));
 				return converter.get_port(0);
 			}
 			else {

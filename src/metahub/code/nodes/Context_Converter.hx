@@ -19,10 +19,16 @@ class Context_Converter extends Standard_Node {
 	var trellis:Trellis;
 
 	public function new(path:Path, trellis:Trellis, group:Group) {
+		if (path.length == 0)
+			throw new Exception("Context_Converter requires a path length greater than 0");
+
 		super(group);
 		this.trellis = trellis;
 		forward_path = path.slice(0, -1);
 		reverse_path = create_reverse(path);
+		//if (reverse_path.length == 0)
+			//throw new Exception("Context_Converter requires a reverse_path length greater than 0");
+
 		add_ports(2);
 	}
 

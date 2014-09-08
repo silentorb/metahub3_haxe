@@ -203,8 +203,8 @@ class Coder {
 		var trellis:Trellis = null;
 		var expression:Expression = null;
 		if (Reflect.hasField(source, "expression")) {
-			expression = convert_expression(source.expression);
-			trellis = expression.get_type()[0];
+			expression = convert_expression(source.expression, scope_definition);
+			trellis = expression.get_type()[0].trellis;
 		}
 		return new Expression_Reference(Reference.from_scope(source.path, scope_definition, trellis), expression);
   }

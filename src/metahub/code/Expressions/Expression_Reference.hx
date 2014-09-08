@@ -20,8 +20,8 @@ class Expression_Reference implements Expression {
   public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		var input:General_Port = null;
 		if (children.length > 0) {
-			var additional = children[0].to_port(scope, group);
-			input = additional.get_port(0);
+			input = children[0].to_port(scope, group, null);
+			//input = additional.get_port(0);
 		}
 
 		var result = reference.to_port(scope, group, input);

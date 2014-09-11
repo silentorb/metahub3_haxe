@@ -10,14 +10,13 @@ import metahub.engine.Node_Context;
  */
 class Assignment_Node implements INode extends Standard_Node
 {
-	//var trigger:General_Port;
-	//var input:General_Port;
-	//var output:General_Port;
-//
-	public function new(group:Group)
+	var is_immediate:Bool;
+
+	public function new(group:Group, is_immediate:Bool)
 	{
 		super(group);
 		add_ports(3);
+		this.is_immediate = is_immediate;
 	}
 
   override public function get_value(index:Int, context:Context):Dynamic {
@@ -32,7 +31,11 @@ class Assignment_Node implements INode extends Standard_Node
 	}
 
   override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+		if (is_immediate)
+			return;
 
+		var port = ports[index == 1 ? 2 : 1];
+		port.set_external_value(value, context);
 	}
 
 }

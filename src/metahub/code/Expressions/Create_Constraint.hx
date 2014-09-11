@@ -29,17 +29,17 @@ class Create_Constraint implements Expression {
 		//var signature = Type_Network.analyze(expression, scope, reference.get_types()[0][0]);
 		var type_unknown = new Type_Signature(Kind.unknown);
 		var target = reference.to_port(scope, old_group, type_unknown);
-
+		var assignment:Assignment_Node;
 		var inside_back_reference = old_group.is_back_referencing;
 
 		var group = new Group(old_group);
 		group.is_back_referencing = is_back_referencing || inside_back_reference;
 		var source = expression.to_port(scope, group, reference.get_type(type_unknown)[0]);
-		group.get_port(1).connect(target);
-		group.get_port(1).connect(source);
+		//group.get_port(1).connect(target);
+		//group.get_port(1).connect(source);
 
 		if (is_back_referencing || scope.definition.is_particular_node || inside_back_reference) {
-			var assignment = new Assignment_Node(group);
+			assignment = new Assignment_Node(group, true);
 			assignment.get_port(1).connect(target);
 			assignment.get_port(2).connect(source);
 
@@ -51,6 +51,13 @@ class Create_Constraint implements Expression {
 			scope.hub.connect_to_increment(block.get_port(0));
 			return block.get_port(0);
 		}
+		else {
+			assignment = new Assignment_Node(group, false);
+			group.get_port(1).connect(assignment.get_port(0));
+		}
+
+		assignment.get_port(1).connect(target);
+		assignment.get_port(2).connect(source);
 
 		scope.hub.constraints.push(group);
 

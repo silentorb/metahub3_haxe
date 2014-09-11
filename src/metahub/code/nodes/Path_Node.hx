@@ -30,7 +30,7 @@ class Path_Node extends Standard_Node {
 	}
 
   override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		throw new Exception("Not implemented.");
+		//throw new Exception("Not implemented.");
 		//if (index == 1) {
 			//ports[1 - index].set_external_value(value, context);
 			//return;

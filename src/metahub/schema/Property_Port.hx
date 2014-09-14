@@ -1,7 +1,7 @@
 package metahub.schema;
 import metahub.engine.Constraint_Operator;
 import metahub.engine.Context;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.engine.Node;
 
 /**
@@ -14,7 +14,7 @@ import metahub.engine.Node;
 	*  Property, since there are cases where Property is simply used for schema definition.
 	*
 	*/
- 
+
  /*
 class Property_Port implements IPort {
 	var property:Property;

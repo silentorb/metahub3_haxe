@@ -1,5 +1,7 @@
 package metahub.engine;
 
+import metahub.code.nodes.INode;
+import metahub.code.nodes.IResolution;
 import metahub.schema.Kind;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
@@ -57,5 +59,20 @@ class General_Port {
 		for (connection in connections) {
 			connection.set_node_value(value, context, this);
 		}
+	}
+
+	public function resolve_node(context:Context):IResolution {
+		return node.resolve(context);
+	}
+
+	public function resolve_external(context:Context):IResolution {
+		if (connections.length > 1) {
+			throw new Exception("Resolving multiple connections not yet supported.");
+		}
+
+		if (connections.length == 0)
+			throw new Exception("Cannot get_external_value from an unconnected port.");
+
+		return connections[0].node.resolve(context);
 	}
 }

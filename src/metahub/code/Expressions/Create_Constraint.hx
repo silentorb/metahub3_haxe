@@ -21,8 +21,8 @@ class Create_Constraint implements Expression {
     this.reference = reference;
     this.expression = expression;
 		this.is_back_referencing = is_back_referencing;
-		//children = [ reference, expression ];
-		children = [];
+		children = [ reference, expression ];
+		//children = [];
   }
 
 	public function to_port(scope:Scope, old_group:Group, signature_node:Type_Signature):General_Port {
@@ -33,6 +33,7 @@ class Create_Constraint implements Expression {
 		var inside_back_reference = old_group.is_back_referencing;
 
 		var group = new Group(old_group);
+		scope.hub.constraints.push(group);
 		group.is_back_referencing = is_back_referencing || inside_back_reference;
 		var source = expression.to_port(scope, group, reference.get_type(type_unknown)[0]);
 		//group.get_port(1).connect(target);
@@ -51,15 +52,11 @@ class Create_Constraint implements Expression {
 			scope.hub.connect_to_increment(block.get_port(0));
 			return block.get_port(0);
 		}
-		else {
-			assignment = new Assignment_Node(group, false);
-			group.get_port(1).connect(assignment.get_port(0));
-		}
 
+		assignment = new Assignment_Node(group, false);
+		group.get_port(1).connect(assignment.get_port(0));
 		assignment.get_port(1).connect(target);
 		assignment.get_port(2).connect(source);
-
-		scope.hub.constraints.push(group);
 
 		target.connect(source);
 

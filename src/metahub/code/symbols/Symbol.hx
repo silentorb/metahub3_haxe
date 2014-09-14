@@ -1,7 +1,7 @@
 package metahub.code.symbols;
 
 import metahub.code.references.*;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.engine.Node;
 import metahub.engine.Port;
 import metahub.schema.Trellis;

@@ -1,6 +1,6 @@
 package metahub.schema;
 import metahub.code.functions.Functions;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.schema.Trellis;
 import metahub.code.Type_Signature;
 

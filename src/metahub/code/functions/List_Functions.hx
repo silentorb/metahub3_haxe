@@ -1,4 +1,6 @@
 package metahub.code.functions;
+import metahub.code.nodes.Property_Node;
+import metahub.engine.Node;
 
 /**
  * ...
@@ -33,5 +35,42 @@ class List_Functions extends Function {
 
 		}
 		return null;
+	}
+
+	override public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Dynamic {
+		var property_node:Property_Node = cast previous;
+		var property = property_node.property;
+
+		switch (func) {
+			case Functions.first:
+				var node:Node = cast value;
+				var list:Array<Dynamic> = node.get_value(property.other_property.id);
+				if (list == null)
+					return null;
+
+				if (list.indexOf(node) > -1)
+					return list;
+
+				return null;
+
+			default:
+				throw new Exception("Invalid function.");
+
+		}
+	}
+
+	override public function resolve_token(value:Dynamic):Dynamic {
+		switch (func) {
+			case Functions.first:
+				var list:Array<Dynamic> = cast value;
+				if (list.length == 0)
+					return null;
+
+				return list[0];
+
+			default:
+				throw new Exception("Invalid function.");
+
+		}
 	}
 }

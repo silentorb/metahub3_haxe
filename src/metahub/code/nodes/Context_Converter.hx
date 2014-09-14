@@ -1,7 +1,7 @@
 package metahub.code.nodes;
 import metahub.code.Path;
 import metahub.engine.Context;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.engine.General_Port;
 import metahub.engine.Node;
 import metahub.engine.Node_Context;

@@ -13,7 +13,7 @@ import metahub.engine.General_Port;
 import metahub.engine.Constraint_Operator;
 import metahub.code.functions.Function;
 
-class Function_Call implements Expression {
+class Function_Call implements Token_Expression {
   public var children:Array<Expression>;
 	var func:Functions;
 	var hub:Hub;
@@ -28,11 +28,14 @@ class Function_Call implements Expression {
 		if (func == Functions.equals) {
 			return children[0].to_port(scope, group, node_signature);
 		}
-
 		if (node_signature == null) {
 			node_signature = get_type()[0];
 		}
-		var function_signature = determine_signature(node_signature);
+		return _to_port(scope, group, [ node_signature ] );
+	}
+
+  function _to_port(scope:Scope, group:Group, signature:Array<Type_Signature>):General_Port {
+		var function_signature = determine_signature(signature);
 		var info = hub.function_library.get_function_info(func, function_signature);
 		var node:Function = Type.createInstance(info.type, [hub, func, function_signature, group]);
     hub.add_internal_node(node);
@@ -52,19 +55,12 @@ class Function_Call implements Expression {
     return output;
   }
 
-	//function get_args(scope:Scope, group:Group, node_signature:Node_Signature) {
-		//var result = new Array<General_Port>();
-		//var x = 0;
-		//for (i in children) {
-			//result.push(i.to_port(scope, group, node_signature.children[x++]));
-		//}
-//
-		//return result;
-	//}
+  public function to_token_port(scope:Scope, group:Group, signature:Array<Type_Signature>, is_last:Bool):General_Port {
+		return _to_port(scope, group, signature);
+  }
 
-	public function determine_signature(out_type:Type_Signature) {
+	public function determine_signature(requirement:Array<Type_Signature>) {
 		var options = hub.function_library.get_function_options(func);
-		var requirement = [ out_type ];
 		for (child in children) {
 			requirement.push(child.get_type()[0]);
 		}

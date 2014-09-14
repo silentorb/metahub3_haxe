@@ -1,5 +1,5 @@
 package metahub.code;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import haxe.ds.Vector;
 import metahub.engine.Node;
 

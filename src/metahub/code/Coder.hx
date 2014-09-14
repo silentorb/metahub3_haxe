@@ -34,8 +34,10 @@ class Coder {
         return create_block(source, scope_definition);
       case 'literal':
         return create_literal(source, scope_definition);
-      case 'reference':
-        return create_general_reference(source, scope_definition);
+      case 'path':
+        return create_path(source, scope_definition);
+			//case 'reference':
+        //return create_general_reference(source, scope_definition);
       case 'function':
         return function_expression(source, scope_definition, source.name);
 			case 'create_node':
@@ -113,9 +115,6 @@ class Coder {
   }
 
   function function_expression(source:Dynamic, scope_definition:Scope_Definition, name:String, reference:Expression = null):Expression {
-		//if (type == null)
-			//throw new Exception("Function expressions do not currently support unspecified return types.");
-
     var expressions:Array<Dynamic> = source.inputs;
     var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition)));
 
@@ -199,15 +198,32 @@ class Coder {
 		return result;
 	}
 
-  function create_general_reference(source:Dynamic, scope_definition:Scope_Definition):Expression_Reference {
-		var trellis:Trellis = null;
+  function create_path(source:Dynamic, scope_definition:Scope_Definition):Path_Expression {
+		var trellis:Trellis = scope_definition.trellis;
 		var expression:Expression = null;
-		if (Reflect.hasField(source, "expression")) {
-			expression = convert_expression(source.expression, scope_definition);
-			trellis = expression.get_type()[0].trellis;
+		var children = new Array<Expression>();
+		var expressions:Array<Dynamic> = source.children;
+		for (item in expressions) {
+			if (item.type == "function") {
+				var func = Type.createEnum(Functions, item.name);
+				children.push(new metahub.code.expressions.Function_Call(func, [], hub));
+			}
+			else if (item.type == "reference") {
+				var property = trellis.get_property_or_error(item.name);
+				children.push(new Property_Reference(property));
+				if (property.other_trellis != null)
+					trellis = property.other_trellis;
+			}
+			else {
+				throw new Exception("Invalid path token type: " + item.type);
+			}
 		}
-		return new Expression_Reference(Reference.from_scope(source.path, scope_definition, trellis), expression);
+		return new Path_Expression(children);
   }
+
+  //function create_general_reference(source:Dynamic, scope_definition:Scope_Definition, trellis:Trellis):Expression_Reference {
+		//return new Property_Reference();
+  //}
 
   function create_symbol(source:Dynamic, scope_definition:Scope_Definition):Expression {
     var expression = convert_expression(source.expression, scope_definition);

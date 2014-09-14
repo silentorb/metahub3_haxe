@@ -1,5 +1,5 @@
 package metahub.schema;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.engine.List_Port;
 import metahub.engine.Node;
 import metahub.Hub;

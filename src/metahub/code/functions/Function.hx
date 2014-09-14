@@ -1,5 +1,6 @@
 package metahub.code.functions;
 import metahub.code.nodes.Group;
+import metahub.code.nodes.IToken_Node;
 import metahub.code.nodes.Standard_Node;
 import metahub.engine.*;
 import metahub.schema.Trellis;
@@ -10,7 +11,7 @@ typedef Identity = UInt;
  * ...
  * @author Christopher W. Johnson
  */
-class Function extends Standard_Node {
+class Function extends Standard_Node implements IToken_Node {
 	public var hub:Hub;
 	var func:Functions;
 	var signature:Array<Type_Signature>;
@@ -119,4 +120,13 @@ class Function extends Standard_Node {
 		return Std.string(func);
 	}
 
+  public function resolve_token(value:Dynamic):Dynamic {
+		throw new Exception("Not implemented.");
+		//return context;
+	}
+
+  public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Dynamic {
+		throw new Exception("Not implemented.");
+		//return context;
+	}
 }

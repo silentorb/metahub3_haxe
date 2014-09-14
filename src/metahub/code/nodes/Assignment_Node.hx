@@ -1,7 +1,7 @@
 package metahub.code.nodes;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.engine.Node_Context;
 
 /**
@@ -20,9 +20,18 @@ class Assignment_Node implements INode extends Standard_Node
 	}
 
   override public function get_value(index:Int, context:Context):Dynamic {
-		var value = ports[2].get_external_value(context);
-		ports[1].set_external_value(value, context);
-		return value;
+		if (index == 0) {
+			var value = ports[2].get_external_value(context);
+			ports[1].set_external_value(value, context);
+			return value;
+		}
+
+		if (index == 1) {
+			var value = ports[2].get_external_value(context);
+			return value;
+		}
+
+		throw new Exception("Not supported.");
 	}
 
 	override public function to_string():String {
@@ -34,8 +43,12 @@ class Assignment_Node implements INode extends Standard_Node
 		if (is_immediate)
 			return;
 
+		if (index == 1) // Temporary
+			return;
+
 		var port = ports[index == 1 ? 2 : 1];
-		port.set_external_value(value, context);
+		var resolution = port.resolve_external(context);
+		resolution.run(value);
 	}
 
 }

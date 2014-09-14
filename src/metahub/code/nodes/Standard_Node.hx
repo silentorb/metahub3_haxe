@@ -1,6 +1,6 @@
 package metahub.code.nodes;
 import metahub.engine.General_Port;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.engine.Context;
 
 /**
@@ -44,4 +44,9 @@ class Standard_Node implements INode
 	public function to_string():String {
 		throw new Exception("Not implemented");
 	}
+
+	public function resolve(context:Context):IResolution {
+		throw new Exception("Not implemented.");
+	}
+
 }

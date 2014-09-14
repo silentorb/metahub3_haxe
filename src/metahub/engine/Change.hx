@@ -1,9 +1,11 @@
 package metahub.engine;
+import metahub.code.nodes.INode;
 
 /**
  * ...
  * @author Christopher W. Johnson
  */
+
 class Change
 {
 	public var node:INode;
@@ -11,8 +13,8 @@ class Change
 	var value:Dynamic;
 	var context:Context;
 	var source:General_Port;
-	
-	public function new(node:INode, index:Int, value:Dynamic, context:Context, source:General_Port = null) 
+
+	public function new(node:INode, index:Int, value:Dynamic, context:Context, source:General_Port = null)
 	{
 		this.node = node;
 		this.index = index;
@@ -20,9 +22,9 @@ class Change
 		this.context = context;
 		this.source = source;
 	}
-	
+
 	public function run() {
 		node.set_value(index, value, context, source);
 	}
-	
+
 }

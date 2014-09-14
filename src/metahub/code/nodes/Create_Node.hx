@@ -1,7 +1,7 @@
 package metahub.code.nodes;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.engine.Node_Context;
 import metahub.Hub;
 import metahub.schema.Trellis;
@@ -42,5 +42,9 @@ class Create_Node implements INode extends Standard_Node
 
 	override public function to_string():String {
 		return "new " + trellis.name;
+	}
+
+	override function resolve(context:Context):IResolution {
+		return new Empty_Resolution();
 	}
 }

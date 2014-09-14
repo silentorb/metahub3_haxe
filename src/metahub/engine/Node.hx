@@ -71,6 +71,12 @@ class Node {
 		}
 	}
 
+	public function initialize_values2() {
+		for (property in trellis.properties) {
+			input_trellis_connections(property.id);
+		}
+	}
+
 	public function update_values() {
 		for (property in trellis.properties) {
 			update_value(property, values[property.id]);
@@ -157,7 +163,7 @@ class Node {
 		hub.history.log(property.fullname() + "|set_value " + value);
 		#end
 
-		update_trellis_connections(property.id, value, source);
+		ouput_trellis_connections(property.id, value, source);
 
 		if (property.type == Kind.reference && !property.other_trellis.is_value && value != null) {
 			var other_node:Node = value;
@@ -175,11 +181,23 @@ class Node {
 		hub.run_change_queue(this);
 	}
 
-	function update_trellis_connections(index:Int, value:Dynamic, source:General_Port = null) {
+	function ouput_trellis_connections(index:Int, value:Dynamic, source:General_Port = null) {
 		var tree = trellis.get_tree();
 		for (t in tree) {
 			if (t.properties.length > index)
 				t.set_external_value(index, value, this_context, source);
+		}
+	}
+
+	function input_trellis_connections(index:Int) {
+		var tree = trellis.get_tree();
+		for (t in tree) {
+			if (t.properties.length > index) {
+				var value = t.get_value(index, this_context);
+				if (!equals(value, values[index], trellis.properties[index])) {
+					values[index] = value;
+				}
+			}
 		}
 	}
 

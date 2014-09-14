@@ -1,7 +1,8 @@
 package metahub.schema;
 import metahub.code.nodes.Group;
+import metahub.code.nodes.Resolution;
 import metahub.engine.Context;
-import metahub.engine.INode;
+import metahub.code.nodes.INode;
 import metahub.engine.General_Port;
 import metahub.engine.Node.Identity;
 import metahub.schema.Property;
@@ -25,6 +26,7 @@ class Trellis implements INode {
 	public var namespace:Namespace;
   var property_keys:Map<String, Property> = new Map<String, Property>();
 	var ports = new Array<General_Port>();
+	public var readonly_ports = new Array<General_Port>();
 	public var properties = new Array<Property>();
 	public var is_value:Bool = false;
 	public var events:Array<String>;
@@ -114,6 +116,17 @@ class Trellis implements INode {
 		}
 	}
 
+	public function get_external_value(index:Int, value:Dynamic, context:Context) {
+		var port = ports[index];
+		if (port.connections.length == 0)
+			return value;
+
+		if (port.connections.length > 1)
+			throw new Exception("Not yet supported.");
+
+		return port.connections[0].get_node_value(context);
+	}
+
   public function get_tree():Array<Trellis> {
 		if (_tree == null) {
 			var trellis = this;
@@ -178,6 +191,7 @@ class Trellis implements INode {
         properties.push(property);
 				property_keys[property.name] = property;
 				ports.push(new General_Port(this, ports.length));
+				readonly_ports.push(new General_Port(this, readonly_ports.length));
 			}
     }
 
@@ -231,6 +245,10 @@ class Trellis implements INode {
 
 	public function to_string():String {
 		return name;
+	}
+
+	public function resolve(context:Context):Resolution {
+		throw new Exception("Not implemented.");
 	}
 
 }

@@ -1,5 +1,7 @@
-package metahub.engine;
+package metahub.code.nodes;
 import metahub.code.nodes.Group;
+import metahub.engine.Context;
+import metahub.engine.General_Port;
 import metahub.engine.Node.Identity;
 
 /**
@@ -12,5 +14,6 @@ interface INode {
   function get_value(index:Int, context:Context):Dynamic;
   function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null):Void;
 	function to_string():String;
+	function resolve(context:Context):IResolution;
 	var group:Group;
 }

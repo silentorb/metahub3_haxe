@@ -10,7 +10,7 @@ typedef Assignment_Source = {
 
 typedef Reference_Or_Function = {
 	type:String,
-	?path:Array<String>,
+	//?path:Array<String>,
 	?name:String,
 	?expression:Dynamic,
 	?inputs:Array<Dynamic>
@@ -242,34 +242,45 @@ typedef Reference_Or_Function = {
 
   static function reference(data:Dynamic, match:Repetition_Match):Dynamic {
 		var dividers = Lambda.array(Lambda.map(match.dividers, function(d) { return d.matches[0].get_data(); } ));
-		var result:Reference_Or_Function = {
-			type: "reference",
-			path: [ data[0] ]
-		};
+//
+		//if (data.length == 1) {
+			//return {
+				//type: "reference",
+				//path: [ data[0] ]
+			//}
+		//}
+
+		var tokens:Array<Reference_Or_Function> = [
+			{
+				type: "reference",
+				name: data[0]
+			}
+		];
 
 		for (i in 1...data.length) {
 			var token = data[i];
 			var divider = dividers[i - 1];
 			if (divider == '.') {
-				if (result.type == 'reference') {
-					result.path.push(token);
-				}
-				else {
-					result = {
-						type: "reference",
-						expression: result,
-						path: [ token ]
-					}
-				}
+				tokens.push({
+					type: "reference",
+					name: token
+				});
+			}
+			else if (divider == '|') {
+				tokens.push({
+					type: "function",
+					name: token
+				});
 			}
 			else {
-				result = {
-					type: "function",
-					name: token,
-					inputs: [ result ]
-				}
+				throw new Exception("Invalid divider: " + divider);
 			}
 		}
+
+		var result = {
+			type: "path",
+			children: tokens
+		};
 
 		return result;
   }

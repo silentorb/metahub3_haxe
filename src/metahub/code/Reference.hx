@@ -48,28 +48,29 @@ class Reference {
 	}
 
 	public function to_port(scope:Scope, group:Group, input:General_Port):General_Port {
-		if (input != null) {
-			var step = new Path_Node(path.at(0), group);
-			input.connect(step.get_port(1));
-			return step.get_port(0);
-		}
-		else if (symbol != null) {
-			var node = symbol.resolve(scope);
-			return new Symbol_Node(node, path, group).get_port(0);
-		}
-		else {
-			var property = path.last();
-			var port = property.trellis.get_port(property.id);
-
-			if (path.length >= 3 || (path.length == 2 && !property.trellis.is_value)) {
-				var converter = new Context_Converter(path, scope.definition.trellis, group);
-				port.connect(converter.get_port(1));
-				return converter.get_port(0);
-			}
-			else {
-				return port;
-			}
-		}
+		throw new Exception("No longer supported.");
+		//if (input != null) {
+			//var step = new Path_Node(path.at(0), group);
+			//input.connect(step.get_port(1));
+			//return step.get_port(0);
+		//}
+		//else if (symbol != null) {
+			//var node = symbol.resolve(scope);
+			//return new Symbol_Node(node, path, group).get_port(0);
+		//}
+		//else {
+			//var property = path.last();
+			//var port = property.trellis.get_port(property.id);
+//
+			//if (path.length >= 3 || (path.length == 2 && !property.trellis.is_value)) {
+				//var converter = new Context_Converter(path, scope.definition.trellis, group);
+				//port.connect(converter.get_port(1));
+				//return converter.get_port(0);
+			//}
+			//else {
+				//return port;
+			//}
+		//}
 	}
 
 	public function to_string():String {

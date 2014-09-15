@@ -34,10 +34,10 @@ class Function_Call implements Token_Expression {
 		return _to_port(scope, group, [ node_signature ] );
 	}
 
-  function _to_port(scope:Scope, group:Group, signature:Array<Type_Signature>, previous_port:General_Port = null):General_Port {
+  function _to_port(scope:Scope, group:Group, signature:Array < Type_Signature > , previous_port:General_Port = null):General_Port {
 		var function_signature = determine_signature(signature);
 		var info = hub.function_library.get_function_info(func, function_signature);
-		var node:Function = Type.createInstance(info.type, [hub, func, function_signature, group]);
+		var node:Function = Type.createInstance(info.type, [hub, func, function_signature, group, false]);
     hub.add_internal_node(node);
 		var expressions = children;
     var ports = node.get_inputs();
@@ -55,7 +55,7 @@ class Function_Call implements Token_Expression {
 		if (previous_port != null) {
 			node.get_port(1).connect(previous_port);
 		}
-    return output;
+    return node.get_port(0);
   }
 
   public function to_token_port(scope:Scope, group:Group, signature:Array<Type_Signature>, is_last:Bool, previous_port:General_Port):General_Port {
@@ -122,4 +122,28 @@ class Function_Call implements Token_Expression {
 		//return port.get_node_value(new Node_Context(scope.node, scope.node.hub));
 	//}
 
+	public static function instantiate(func:Functions, signature:Array<Type_Signature>, group:Group, hub:Hub, is_constraint:Bool):Function {
+		var function_signature = determine_signature2(signature, func, hub);
+		var info = hub.function_library.get_function_info(func, function_signature);
+		var node:Function = Type.createInstance(info.type, [hub, func, signature, group, is_constraint]);
+    hub.add_internal_node(node);
+		return node;
+	}
+
+	static function determine_signature2(requirement:Array<Type_Signature>, func:Functions, hub:Hub) {
+		var options = hub.function_library.get_function_options(func);
+		for (option in options) {
+			if (Type_Network.signatures_match(requirement, option.signature)) {
+				var result = [];
+				for (i in 0...requirement.length) {
+					var type = requirement[i].copy();
+					type.resolve(option.signature[i]);
+					result.push(type);
+				}
+				return result;
+			}
+		}
+
+		throw new Exception("Could not find valid function type.");
+	}
 }

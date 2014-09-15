@@ -79,13 +79,15 @@ class Coder {
 		//var reference = Reference.from_scope(source.path, scope_definition);
 		var reference = convert_expression(source.reference, scope_definition);
 		var back_reference:Expression = null;
-		var name = source.expression.name;
-		if (['add_equals', 'subtract_equals', 'multiply_equals', 'divide_equals'].indexOf(name) > -1) {
-			name = name.substring(0, name.length - 7);
+		var operator_name = source.operator;
+		if (['add_equals', 'subtract_equals', 'multiply_equals', 'divide_equals'].indexOf(operator_name) > -1) {
+			operator_name = operator_name.substring(0, operator_name.length - 7);
 			back_reference = reference;
 		}
-		var expression = function_expression(source.expression, scope_definition, name, back_reference);
-		return new metahub.code.expressions.Create_Constraint(reference, expression, back_reference != null);
+		var operator = Type.createEnum(Functions, operator_name);
+		var expression = convert_expression(source.expression, scope_definition);
+		//var expression = function_expression(source.expression, scope_definition, name, back_reference);
+		return new metahub.code.expressions.Create_Constraint(reference, expression, operator, back_reference != null);
   }
 
   function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression {

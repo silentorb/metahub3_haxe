@@ -21,7 +21,8 @@ class Float_Functions extends Function {
 				return divide_forward(args);
 
 			default:
-				throw new Exception("Invalid function.");
+				return reverse(args[0], [args[1]]);
+				//throw new Exception("Invalid function.");
 
 		}
 	}

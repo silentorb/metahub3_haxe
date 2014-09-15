@@ -1,5 +1,7 @@
 package metahub.code.functions;
 import metahub.code.nodes.Property_Node;
+import metahub.engine.Context;
+import metahub.engine.General_Port;
 import metahub.engine.Node;
 
 /**
@@ -7,6 +9,10 @@ import metahub.engine.Node;
  * @author Christopher W. Johnson
  */
 class List_Functions extends Function {
+
+	override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+
+	}
 
 	override private function forward(args:Array<Dynamic>):Dynamic {
 		var first:Array<Dynamic> = args[0];

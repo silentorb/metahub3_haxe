@@ -336,11 +336,8 @@ typedef Reference_Or_Function = {
     return {
 			type: "constraint",
 			reference: data[0],
-			expression: {
-				type: "function",
-				"name": Std.string(function_map[data[2]]),
-				"inputs": [data[4]]
-			}
+			operator: Std.string(function_map[data[2]]),
+			expression: data[4]
     };
   }
 }

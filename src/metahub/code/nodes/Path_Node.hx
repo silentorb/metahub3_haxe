@@ -51,7 +51,11 @@ class Path_Node extends Standard_Node {
 		if (previous != null) {
 			var connections = ports[1].connections;
 			var token:IToken_Node = cast get_last_token_port().node;
-			token.set_token_value(value, previous, context);
+			var new_context = Reflect.hasField(previous, 'trellis')
+				? new Node_Context(previous, context.hub)
+				: context;
+
+			token.set_token_value(value, previous, new_context);
 		}
 	}
 

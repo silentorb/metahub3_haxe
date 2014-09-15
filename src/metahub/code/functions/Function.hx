@@ -15,42 +15,51 @@ class Function extends Standard_Node implements IToken_Node {
 	public var hub:Hub;
 	var func:Functions;
 	var signature:Array<Type_Signature>;
+	var is_constraint:Bool;
 
-	public function new(hub:Hub, func:Functions, signature:Array < Type_Signature > , group:Group) {
+	public function new(hub:Hub, func:Functions, signature:Array < Type_Signature > , group:Group, is_constraint:Bool) {
 		super(group);
     this.hub = hub;
+		this.is_constraint = is_constraint;
 		this.func = func;
 		this.signature = signature;
 
-		add_ports(signature.length);
+		add_ports(3);
 	}
 
 	override public function get_value(index:Int, context:Context):Dynamic {
-		if (index == 0)
+		//if (index == 1)
 			return run_forward(context);
-		else
-			throw new Exception("Not implemented.");
+		//else
+			//throw new Exception("Not implemented.");
 	}
 
 	override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
 		if (group.is_back_referencing)
 			return;
 
-		if (index > 0) {
+		if (index == 0 || is_constraint) {
 			var new_value = run_forward(context);
-			ports[0].set_external_value(new_value, context);
+			if (new_value != value)
+				context.hub.add_change(source.node, source.id, new_value, context, source);
+
+			return;
+			//throw new Exception("Not implemented.");
 		}
-		else {
-			var new_value = run_reverse(value, context);
-			if (new_value != value) {
-				hub.add_change(this, index, new_value, context, ports[0]);
-			}
-			//else {
-				//for (i in 1...ports.length) {
-					//ports[i].set_external_value(new_value, context);
-				//}
+
+		var new_value = run_forward(context);
+		ports[0].set_external_value(new_value, context);
+
+		//if (index > 1) {
+			//var new_value = run_forward(context);
+			//ports[1].set_external_value(new_value, context);
+		//}
+		//else {
+			//var new_value = run_reverse(value, context);
+			//if (new_value != value) {
+				//hub.add_change(this, index, new_value, context, ports[1]);
 			//}
-		}
+		//}
 	}
 
   public function get_inputs():Array<General_Port> {

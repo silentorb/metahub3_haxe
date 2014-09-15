@@ -61,11 +61,11 @@ class General_Port {
 		}
 	}
 
-	public function resolve_node(context:Context):IResolution {
+	public function resolve_node(context:Context):Context {
 		return node.resolve(context);
 	}
 
-	public function resolve_external(context:Context):IResolution {
+	public function resolve_external(context:Context):Context {
 		if (connections.length > 1) {
 			throw new Exception("Resolving multiple connections not yet supported.");
 		}

@@ -7,5 +7,5 @@ import metahub.engine.General_Port;
  */
 
 interface Token_Expression extends Expression {
-  function to_token_port(scope:Scope, group:Group, signature:Array<Type_Signature>, is_last:Bool):General_Port;
+  function to_token_port(scope:Scope, group:Group, signature:Array<Type_Signature>, is_last:Bool, previous_port:General_Port):General_Port;
 }

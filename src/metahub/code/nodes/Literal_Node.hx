@@ -23,8 +23,8 @@ class Literal_Node extends Standard_Node
 	}
 
   override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
-		//if (value != this.value)
-			//context.hub.add_change(source.node, source.id, this.value, context, source);
+		if (value != this.value)
+			context.hub.add_change(source.node, source.id, this.value, context, source);
 	}
 
 	override public function to_string():String {

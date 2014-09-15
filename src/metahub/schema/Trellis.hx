@@ -247,7 +247,7 @@ class Trellis implements INode {
 		return name;
 	}
 
-	public function resolve(context:Context):Resolution {
+	public function resolve(context:Context):Context {
 		throw new Exception("Not implemented.");
 	}
 

@@ -132,7 +132,7 @@ import haxe.Json;
 		if (register)
 			add_node(node);
 
-		node.initialize_values2();
+		//node.initialize_values2();
 		node.update_values();
 
     return node;
@@ -205,7 +205,7 @@ import haxe.Json;
 		}
     var match:metahub.parser.Match = cast result;
 		var statement = run_data(match.get_data());
-		trace(graph_expressions(statement));
+		//trace(graph_expressions(statement));
 		var port = statement.to_port(root_scope, new Group(null), null);
 		trace(graph_nodes(port.node));
 		port.get_node_value(new Empty_Context(this));

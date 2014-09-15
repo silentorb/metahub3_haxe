@@ -45,8 +45,9 @@ class Standard_Node implements INode
 		throw new Exception("Not implemented");
 	}
 
-	public function resolve(context:Context):IResolution {
-		throw new Exception("Not implemented.");
+	public function resolve(context:Context):Context {
+		//throw new Exception("Not implemented.");
+		return context;
 	}
 
 }

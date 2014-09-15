@@ -14,6 +14,6 @@ interface INode {
   function get_value(index:Int, context:Context):Dynamic;
   function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null):Void;
 	function to_string():String;
-	function resolve(context:Context):IResolution;
+	function resolve(context:Context):Context;
 	var group:Group;
 }

@@ -70,12 +70,12 @@ class Node {
 				throw new Exception("No default is implemented for type " + property.type + ".");
 		}
 	}
-
-	public function initialize_values2() {
-		for (property in trellis.properties) {
-			input_trellis_connections(property.id);
-		}
-	}
+//
+	//public function initialize_values2() {
+		//for (property in trellis.properties) {
+			//input_trellis_connections(property.id);
+		//}
+	//}
 
 	public function update_values() {
 		for (property in trellis.properties) {
@@ -189,17 +189,17 @@ class Node {
 		}
 	}
 
-	function input_trellis_connections(index:Int) {
-		var tree = trellis.get_tree();
-		for (t in tree) {
-			if (t.properties.length > index) {
-				var value = t.get_value(index, this_context);
-				if (!equals(value, values[index], trellis.properties[index])) {
-					values[index] = value;
-				}
-			}
-		}
-	}
+	//function input_trellis_connections(index:Int) {
+		//var tree = trellis.get_tree();
+		//for (t in tree) {
+			//if (t.properties.length > index) {
+				//var value = t.get_value(index, this_context);
+				//if (!equals(value, values[index], trellis.properties[index])) {
+					//values[index] = value;
+				//}
+			//}
+		//}
+	//}
 
 	public function add_item(index:Int, value:Dynamic) {
 		var port = ports[index];

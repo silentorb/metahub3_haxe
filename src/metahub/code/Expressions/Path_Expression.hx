@@ -22,10 +22,17 @@ class Path_Expression implements Expression {
 		var type_unknown = new Type_Signature(Kind.unknown);
 
 		var token_port = result.get_port(1);
+		var previous:Type_Signature = type_unknown.copy();
+		var port:General_Port = null;
+
 		for (i in 0...children.length) {
+			if (i > 0) {
+				previous = children[i - 1].get_type(previous)[0].copy();
+			}
+
 			var expression:Token_Expression = cast children[i];
-			var signature = [ type_unknown.copy(), type_unknown.copy() ];
-			var port = expression.to_token_port(scope, group, signature, i == children.length - 1);
+			var signature = [ type_unknown.copy(), previous ];
+			port = expression.to_token_port(scope, group, signature, i == children.length - 1, port);
 			token_port.connect(port);
 		}
 		return result.get_port(0);

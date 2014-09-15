@@ -35,7 +35,6 @@ class Assignment_Node implements INode extends Standard_Node
 	}
 
 	override public function to_string():String {
-		//return output.node.to_string() + " = " + input.node.to_string();
 		return "assignment";
 	}
 
@@ -43,12 +42,16 @@ class Assignment_Node implements INode extends Standard_Node
 		if (is_immediate)
 			return;
 
-		if (index == 1) // Temporary
-			return;
+		//if (index == 1) // Temporary
+			//throw new Exception("Not implemented.");
 
 		var port = ports[index == 1 ? 2 : 1];
-		var resolution = port.resolve_external(context);
-		resolution.run(value);
+		//var new_context = port.resolve_external(context);
+		//if (new_context != null)
+			//port.set_external_value(value, new_context);
+
+		port.set_external_value(value, context);
+
 	}
 
 }

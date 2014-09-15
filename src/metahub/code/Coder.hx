@@ -210,7 +210,7 @@ class Coder {
 			}
 			else if (item.type == "reference") {
 				var property = trellis.get_property_or_error(item.name);
-				children.push(new Property_Reference(property));
+				children.push(new Property_Reference(property, trellis));
 				if (property.other_trellis != null)
 					trellis = property.other_trellis;
 			}

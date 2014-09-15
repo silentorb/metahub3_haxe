@@ -44,7 +44,7 @@ class Create_Node implements INode extends Standard_Node
 		return "new " + trellis.name;
 	}
 
-	override function resolve(context:Context):IResolution {
-		return new Empty_Resolution();
+	override function resolve(context:Context):Context {
+		return context;
 	}
 }

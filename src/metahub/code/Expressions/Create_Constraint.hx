@@ -58,7 +58,7 @@ class Create_Constraint implements Expression {
 		assignment.get_port(1).connect(target);
 		assignment.get_port(2).connect(source);
 
-		target.connect(source);
+		//target.connect(source);
 
 		return group.get_port(0);
   }

@@ -34,7 +34,7 @@ class Function_Call implements Token_Expression {
 		return _to_port(scope, group, [ node_signature ] );
 	}
 
-  function _to_port(scope:Scope, group:Group, signature:Array<Type_Signature>):General_Port {
+  function _to_port(scope:Scope, group:Group, signature:Array<Type_Signature>, previous_port:General_Port = null):General_Port {
 		var function_signature = determine_signature(signature);
 		var info = hub.function_library.get_function_info(func, function_signature);
 		var node:Function = Type.createInstance(info.type, [hub, func, function_signature, group]);
@@ -52,11 +52,14 @@ class Function_Call implements Token_Expression {
     }
 
     var output = node.get_port(0);
+		if (previous_port != null) {
+			node.get_port(1).connect(previous_port);
+		}
     return output;
   }
 
-  public function to_token_port(scope:Scope, group:Group, signature:Array<Type_Signature>, is_last:Bool):General_Port {
-		return _to_port(scope, group, signature);
+  public function to_token_port(scope:Scope, group:Group, signature:Array<Type_Signature>, is_last:Bool, previous_port:General_Port):General_Port {
+		return _to_port(scope, group, signature, previous_port);
   }
 
 	public function determine_signature(requirement:Array<Type_Signature>) {

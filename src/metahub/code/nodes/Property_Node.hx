@@ -69,7 +69,9 @@ class Property_Node extends Standard_Node implements IToken_Node {
 	//}
 
   public function resolve_token(node:Dynamic):Dynamic {
-		if (property.other_trellis != null) {
+		if (!node.trellis.is_a(property.trellis))
+			throw new Exception("Trellis mixup!");
+		//if (property.other_trellis != null) {
 
 			var value = node.get_value(property.id);
 			return value;
@@ -83,7 +85,7 @@ class Property_Node extends Standard_Node implements IToken_Node {
 //
 			//var single_value:Dynamic = cast value;
 			//return new Node_Context(single_value, node.hub);
-		}
+		//}
 
 		throw new Exception("Not supported.");
 
@@ -93,27 +95,31 @@ class Property_Node extends Standard_Node implements IToken_Node {
 	public function resolve_token_reverse(node:Dynamic, previous:Dynamic):Dynamic {
 		if (property.other_property != null) {
 			var other = property.other_property;
-			//if (other.type == Kind.list)
-				//throw new Exception("Not implemented.");
+			if (!node.trellis.is_a(other.trellis))
+				throw new Exception("Path resolution trellis mixup!");
 
 			var value = node.get_value(other.id);
+			if (value == null)
+				return null;
+
+			if (other.type == Kind.list) {
+				var list:Array<Dynamic> = value;
+				return list.length > 0 ? list[0] : null;
+			}
+
 			return value;
-			//if (value == null)
-				//return null;
-//
-			//if (other.type == Kind.list) {
-				//var list:Array<Dynamic> = value;
-				//return new Node_Context(list[0], context.hub);
-			//}
-//
-			//var single_value:Dynamic = cast value;
-			//return new Node_Context(single_value, context.hub);
 		}
-		else if (property.trellis.is_value) {
-			return node.get_value(property.trellis.properties.length - 1);
+		else if (property.other_trellis != null && property.other_trellis.is_value) {
+			var node = node.get_value(property.other_trellis.properties.length - 1);
+			if (node == null || !node.trellis.is_a(property.other_trellis))
+				return null;
+
+			return node;
 		}
 		throw new Exception("Not supported.");
+	}
 
-		//return context;
+	public function set_token_value(value:Dynamic, previous:Dynamic, context:Context) {
+		ports[1].set_external_value(value, context);
 	}
 }

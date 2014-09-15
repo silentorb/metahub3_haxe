@@ -36,48 +36,26 @@ class Function extends Standard_Node implements IToken_Node {
 		if (group.is_back_referencing)
 			return;
 
-		//if (source == ports[0]) {
-			//for (i in 0...ports.length) {
-				////var new_value = run_reverse(value, context);
-				//ports[i].set_external_value(value, context);
-			//}
-			//return;
-		//}
-
 		if (index > 0) {
 			var new_value = run_forward(context);
-			//if (new_value != value) {
-				//hub.add_change(this, index, new_value, context, ports[0]);
-			//}
-			//else {
 			ports[0].set_external_value(new_value, context);
-			//}
 		}
 		else {
 			var new_value = run_reverse(value, context);
 			if (new_value != value) {
 				hub.add_change(this, index, new_value, context, ports[0]);
 			}
-			else {
-				for (i in 1...ports.length) {
-					ports[i].set_external_value(new_value, context);
-				}
-			//throw new Exception("Not implemented 367.");
-			}
+			//else {
+				//for (i in 1...ports.length) {
+					//ports[i].set_external_value(new_value, context);
+				//}
+			//}
 		}
 	}
 
   public function get_inputs():Array<General_Port> {
 		return ports.slice(1);
   }
-
-  //public function get_port(index:Int):General_Port {
-//#if debug
-  //if ((index < 0 && index >= ports.length) || ports[index] == null)
-  //throw new Exception("Node " + Std.string(func) + " does not have a property index of " + index + ".");
-//#end
-    //return ports[index];
-  //}
 
 	public function get_input_values(context:Context):Array<Dynamic> {
 		var result = new Array<Dynamic>();
@@ -94,16 +72,12 @@ class Function extends Standard_Node implements IToken_Node {
 		context.hub.history.log("function " + Std.string(func) + " forward()" + args);
 		#end
 		return forward(args);
-
-    //var result = Function_Calls.call(trellis.name, args, ports[0].get_type());
-		//ports[0].set_value(result, context);
 	}
 
 	function run_reverse(value:Dynamic, context:Context) {
 		#if log
 		context.hub.history.log("function " + Std.string(func) + " reverse()");
 		#end
-		//throw new Exception("Function.run_reverse Not implemented.");
 
 		return reverse(value, get_input_values(context));
 	}
@@ -122,11 +96,18 @@ class Function extends Standard_Node implements IToken_Node {
 
   public function resolve_token(value:Dynamic):Dynamic {
 		throw new Exception("Not implemented.");
-		//return context;
 	}
 
   public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Dynamic {
 		throw new Exception("Not implemented.");
-		//return context;
 	}
+
+  public function set_token_value(value:Dynamic, previous:Dynamic, context:Context) {
+		throw new Exception("Not implemented.");
+	}
+
+	override public function resolve(context:Context):Context {
+		return context;
+	}
+
 }

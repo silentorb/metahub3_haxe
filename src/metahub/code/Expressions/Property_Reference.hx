@@ -11,23 +11,25 @@ import metahub.code.nodes.Path_Condition;
 
 class Property_Reference implements Token_Expression {
 	public var property:Property;
+	public var trellis:Trellis;
 	public var children = new Array<Expression>();
 
-  public function new(property:Property) {
+  public function new(property:Property, trellis:Trellis) {
     this.property = property;
+		this.trellis = trellis;
   }
 
   public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
 		throw new Exception("Not supported.");
   }
 
-	public function to_token_port(scope:Scope, group:Group, signature:Array < Type_Signature > , is_last:Bool):General_Port {
+	public function to_token_port(scope:Scope, group:Group, signature:Array < Type_Signature >, is_last:Bool, previous_port:General_Port):General_Port {
 		var node = new Property_Node(property, group, !is_last);
-		var other_port = is_last
-			? property.trellis.get_port(property.id)
-			: property.trellis.readonly_ports[property.id];
+		//var other_port = is_last
+			//? property.trellis.get_port(property.id)
+			//: property.trellis.readonly_ports[property.id];
 
-		node.get_port(1).connect(other_port);
+		node.get_port(1).connect(trellis.get_port(property.id));
 		return node.get_port(0);
   }
 

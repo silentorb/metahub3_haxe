@@ -5,6 +5,7 @@ import metahub.engine.Context;
  * ...
  * @author Christopher W. Johnson
  */
+/*
 class Resolution implements IResolution {
 	public var context:Context;
 	public var node:INode;
@@ -17,4 +18,4 @@ class Resolution implements IResolution {
 	public function run(value:Dynamic) {
 		node.set_value(0, value, context);
 	}
-}
+}*/

@@ -66,7 +66,7 @@ class List_Functions extends Function {
 		}
 	}
 
-	override public function resolve_token(value:Dynamic):Resolution {
+	override public function resolve_token(value:Dynamic, is_last:Bool):Resolution {
 		switch (func) {
 			case Functions.first:
 				var list:Array<Dynamic> = cast value;

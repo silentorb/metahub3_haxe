@@ -104,7 +104,7 @@ class Function extends Standard_Node implements IToken_Node {
 		return Std.string(func);
 	}
 
-  public function resolve_token(value:Dynamic):Resolution {
+  public function resolve_token(value:Dynamic, is_last:Bool):Resolution {
 		throw new Exception("Not implemented.");
 	}
 

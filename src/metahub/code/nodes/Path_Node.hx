@@ -27,7 +27,7 @@ class Path_Node extends Standard_Node {
 		//if (index == 1)
 
 		//ports[1 - index].get_external_value(context);
-		return _resolve(context);
+		return _resolve(context).value;
 		//return get_last_token_port().get_node_value(new Node_Context(node, context.hub));
 	}
 
@@ -43,20 +43,23 @@ class Path_Node extends Standard_Node {
 			if (root_context == null)
 				return;
 
-			var expression_value = _resolve(root_context);
-			ports[0].set_external_value(expression_value, root_context);
-			return;
+			var resolution = _resolve(root_context);
+			if (!resolution.success)
+				return;
+				
+			ports[0].set_external_value(resolution.value, root_context);
 		}
+		else {
+			var previous = _resolve(context, -1);
+			if (previous.success) {
+				var connections = ports[1].connections;
+				var token:IToken_Node = cast get_last_token_port().node;
+				var new_context = Reflect.hasField(previous.value, 'trellis')
+					? new Node_Context(previous.value, context.hub)
+					: context;
 
-		var previous = _resolve(context, -1);
-		if (previous.success) {
-			var connections = ports[1].connections;
-			var token:IToken_Node = cast get_last_token_port().node;
-			var new_context = Reflect.hasField(previous.value, 'trellis')
-				? new Node_Context(previous.value, context.hub)
-				: context;
-
-			token.set_token_value(value, previous.value, new_context);
+				token.set_token_value(value, previous.value, new_context);
+			}
 		}
 	}
 
@@ -104,15 +107,17 @@ class Path_Node extends Standard_Node {
 		for (i in 0...(connections.length + end_offset)) {
 			var port = connections[i];
 			var token:IToken_Node = cast port.node;
-			var resolution = token.resolve_token(value);
-			if (!resolution.success)
+			var is_last = i == connections.length - 1;
+			var resolution = token.resolve_token(value, is_last);
+			if (!resolution.success || is_last)
 				return resolution;
 
 			value = resolution.value;
 			if (value == null)
-				return null;
+				return { success: false, value: null};
 		}
 
+		// Can only get here if the iteration count is zero.
 		return { success: true, value: value};
 	}
 

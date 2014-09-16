@@ -39,7 +39,7 @@ class Count extends Function {
 		return result;
 	}
 
-	override public function resolve_token(value:Dynamic):Resolution {
+	override public function resolve_token(value:Dynamic, is_last:Bool):Resolution {
 		var list:Array<Dynamic> = cast value;
 		return {
 			success: true,

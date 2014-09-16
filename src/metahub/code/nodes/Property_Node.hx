@@ -68,24 +68,16 @@ class Property_Node extends Standard_Node implements IToken_Node {
 		//return new Resolution(context, ports[1].connections[0].node);
 	//}
 
-  public function resolve_token(node:Dynamic):Resolution {
+  public function resolve_token(node:Dynamic, is_last:Bool):Resolution {
 		if (!node.trellis.is_a(property.trellis))
 			throw new Exception("Trellis mixup!");
-		//if (property.other_trellis != null) {
 
 			var value = node.get_value(property.id);
-			return { success: value != null, value: value };
-			//if (value == null)
-				//return null;
+			return { 
+				success: value != null || (property.type == Kind.reference && is_last),
+				value: value 
+			};
 
-			//if (property.type == Kind.list) {
-				//var list:Array<Dynamic> = value;
-				//return list[0];
-			//}
-//
-			//var single_value:Dynamic = cast value;
-			//return new Node_Context(single_value, node.hub);
-		//}
 
 		throw new Exception("Not supported.");
 

@@ -1,5 +1,6 @@
 package metahub.code.functions;
 import metahub.code.nodes.Property_Node;
+import metahub.code.nodes.Resolution;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
 
@@ -38,12 +39,12 @@ class Count extends Function {
 		return result;
 	}
 
-	override public function resolve_token(value:Dynamic):Dynamic {
+	override public function resolve_token(value:Dynamic):Resolution {
 		var list:Array<Dynamic> = cast value;
-		if (list.length == 0)
-			return 0;
-
-		return list.length;
+		return {
+			success: true,
+			value: list.length
+		};
 	}
 
 	override public function set_token_value(value:Dynamic, previous:Dynamic, context:Context) {

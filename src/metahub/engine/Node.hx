@@ -138,6 +138,9 @@ class Node {
 			return;
 		}
 
+		//if (property.type == Kind.int && Type.typeof(value).getName() != 'TInt')
+			//throw new Exception("Invalid assignment to integer.");
+
 		if (property.other_trellis != null && property.other_trellis.is_value) {
 			var mine:Node = cast old_value;
 			var other:Node = cast value;

@@ -18,7 +18,7 @@ class Path_Expression implements Expression {
   }
 
   public function to_port(scope:Scope, group:Group, signature_node:Type_Signature):General_Port {
-		var result = new Path_Node(group);
+		var result = new Path_Node(group, scope.definition.trellis);
 		var type_unknown = new Type_Signature(Kind.unknown);
 
 		var token_port = result.get_port(1);

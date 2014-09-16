@@ -20,6 +20,7 @@ class If_Node implements INode extends Standard_Node
 
   override public function get_value(index:Int, context:Context):Dynamic {
 		var condition_result:Bool = ports[1].get_external_value(context);
+		ports[1].get_external_value(context);
 		if (condition_result)
 			return ports[2].get_external_value(context);
 

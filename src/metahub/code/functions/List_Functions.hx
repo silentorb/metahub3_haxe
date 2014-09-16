@@ -1,5 +1,6 @@
 package metahub.code.functions;
 import metahub.code.nodes.Property_Node;
+import metahub.code.nodes.Resolution;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
 import metahub.engine.Node;
@@ -43,7 +44,7 @@ class List_Functions extends Function {
 		return null;
 	}
 
-	override public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Dynamic {
+	override public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Resolution {
 		var property_node:Property_Node = cast previous;
 		var property = property_node.property;
 
@@ -52,12 +53,12 @@ class List_Functions extends Function {
 				var node:Node = cast value;
 				var list:Array<Dynamic> = node.get_value(property.other_property.id);
 				if (list == null)
-					return null;
+					return { success: false, value: null };
 
 				if (list.indexOf(node) > -1)
-					return list;
+					return { success: true, value: list };
 
-				return null;
+				return { success: false, value: null };
 
 			default:
 				throw new Exception("Invalid function.");
@@ -65,14 +66,14 @@ class List_Functions extends Function {
 		}
 	}
 
-	override public function resolve_token(value:Dynamic):Dynamic {
+	override public function resolve_token(value:Dynamic):Resolution {
 		switch (func) {
 			case Functions.first:
 				var list:Array<Dynamic> = cast value;
 				if (list.length == 0)
-					return null;
+					return { success: false, value: null };
 
-				return list[0];
+				return { success: true, value: list[0] };
 
 			default:
 				throw new Exception("Invalid function.");

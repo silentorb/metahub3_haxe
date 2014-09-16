@@ -16,6 +16,9 @@ class Change
 
 	public function new(node:INode, index:Int, value:Dynamic, context:Context, source:General_Port = null)
 	{
+		if (value == null)
+			throw new Exception("Not yet supported.");
+
 		this.node = node;
 		this.index = index;
 		this.value = value;

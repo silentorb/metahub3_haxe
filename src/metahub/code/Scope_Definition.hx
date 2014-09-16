@@ -14,6 +14,7 @@ class Scope_Definition {
   public var depth:Int = 0;
 	public var hub:Hub;
 	public var is_particular_node:Bool = false;
+	public var only_new:Bool = false; // If true, nodes in this scope are only evaluated for new entities.
 
   public function new(parent:Scope_Definition = null, hub:Hub = null) {
 		this.parent = parent;
@@ -21,6 +22,7 @@ class Scope_Definition {
 			this.hub = parent.hub;
 			this.trellis = parent.trellis;
       this.depth = parent.depth + 1;
+			this.only_new = parent.only_new;
 		}
 		else {
 			this.hub = hub;

@@ -1,5 +1,5 @@
 package metahub.code;
-import metahub.code.expressions.Trellis_Scope;
+import metahub.code.expressions.Scope_Expression;
 import metahub.code.Reference;
 import metahub.engine.Constraint_Operator;
 import metahub.Hub;
@@ -259,13 +259,19 @@ class Coder {
 
 		var expression:Expression = null;
 		var new_scope_definition = new Scope_Definition(scope_definition);
+		if (path.length == 1 && path[0] == 'new') {
+			new_scope_definition.only_new = true;
+			expression = convert_statement(source.expression, new_scope_definition);
+			return new Scope_Expression(expression, new_scope_definition);
+		}
+
 		var namespace = get_namespace(path, hub.schema.root_namespace);
 		var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
 
 		if (trellis != null) {
 			new_scope_definition.trellis = trellis;
 			expression = convert_statement(source.expression, new_scope_definition);
-			return new Trellis_Scope(trellis, expression, new_scope_definition);
+			return new Scope_Expression(expression, new_scope_definition);
 		}
 		else {
 			var symbol = scope_definition.find(source.path);

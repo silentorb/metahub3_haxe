@@ -68,13 +68,13 @@ class Property_Node extends Standard_Node implements IToken_Node {
 		//return new Resolution(context, ports[1].connections[0].node);
 	//}
 
-  public function resolve_token(node:Dynamic):Dynamic {
+  public function resolve_token(node:Dynamic):Resolution {
 		if (!node.trellis.is_a(property.trellis))
 			throw new Exception("Trellis mixup!");
 		//if (property.other_trellis != null) {
 
 			var value = node.get_value(property.id);
-			return value;
+			return { success: value != null, value: value };
 			//if (value == null)
 				//return null;
 
@@ -92,7 +92,7 @@ class Property_Node extends Standard_Node implements IToken_Node {
 		//return node;
 	}
 
-	public function resolve_token_reverse(node:Dynamic, previous:Dynamic):Dynamic {
+	public function resolve_token_reverse(node:Dynamic, previous:Dynamic):Resolution {
 		if (property.other_property != null) {
 			var other = property.other_property;
 			if (!node.trellis.is_a(other.trellis))
@@ -100,21 +100,21 @@ class Property_Node extends Standard_Node implements IToken_Node {
 
 			var value = node.get_value(other.id);
 			if (value == null)
-				return null;
+				return { success: false, value: null };
 
 			if (other.type == Kind.list) {
 				var list:Array<Dynamic> = value;
-				return list.length > 0 ? list[0] : null;
+				return list.length > 0 ? { success: true, value: list[0] } : { success: false, value: null };
 			}
 
-			return value;
+			return { success: true, value: value };
 		}
 		else if (property.other_trellis != null && property.other_trellis.is_value) {
 			var node = node.get_value(property.other_trellis.properties.length - 1);
 			if (node == null || !node.trellis.is_a(property.other_trellis))
-				return null;
+				return { success: false, value: null };
 
-			return node;
+			return { success: node != null, value: node };
 		}
 		throw new Exception("Not supported.");
 	}

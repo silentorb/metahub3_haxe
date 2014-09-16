@@ -1,6 +1,7 @@
 package metahub.code.functions;
 import metahub.code.nodes.Group;
 import metahub.code.nodes.IToken_Node;
+import metahub.code.nodes.Resolution;
 import metahub.code.nodes.Standard_Node;
 import metahub.engine.*;
 import metahub.schema.Trellis;
@@ -103,11 +104,11 @@ class Function extends Standard_Node implements IToken_Node {
 		return Std.string(func);
 	}
 
-  public function resolve_token(value:Dynamic):Dynamic {
+  public function resolve_token(value:Dynamic):Resolution {
 		throw new Exception("Not implemented.");
 	}
 
-  public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Dynamic {
+  public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Resolution {
 		throw new Exception("Not implemented.");
 	}
 

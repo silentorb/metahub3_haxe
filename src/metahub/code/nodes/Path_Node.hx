@@ -13,11 +13,12 @@ import metahub.schema.Trellis;
  * @author Christopher W. Johnson
  */
 class Path_Node extends Standard_Node {
+	var trellis:Trellis;
 	//var reverse_path:Path;
 
-	public function new(group:Group) {
+	public function new(group:Group, trellis:Trellis) {
 		super(group);
-		//this.reverse_path = path.reverse();
+		this.trellis = trellis;
 		add_ports(2);
 	}
 
@@ -48,14 +49,14 @@ class Path_Node extends Standard_Node {
 		}
 
 		var previous = _resolve(context, -1);
-		if (previous != null) {
+		if (previous.success) {
 			var connections = ports[1].connections;
 			var token:IToken_Node = cast get_last_token_port().node;
-			var new_context = Reflect.hasField(previous, 'trellis')
-				? new Node_Context(previous, context.hub)
+			var new_context = Reflect.hasField(previous.value, 'trellis')
+				? new Node_Context(previous.value, context.hub)
 				: context;
 
-			token.set_token_value(value, previous, new_context);
+			token.set_token_value(value, previous.value, new_context);
 		}
 	}
 
@@ -71,7 +72,7 @@ class Path_Node extends Standard_Node {
 		throw new Exception("Could not find local port index.");
 	}
 
-	function get_root(context:Context, token_index:Int) {
+	function get_root(context:Context, token_index:Int):Context {
 		var value:Dynamic = context.node;
 		var connections = ports[1].connections;
 		var i = token_index;
@@ -79,10 +80,16 @@ class Path_Node extends Standard_Node {
 			var port = connections[i];
 			var token:IToken_Node = cast port.node;
 			var previous = i > 0 ? connections[i - 1].node : null;
-			value = token.resolve_token_reverse(value, previous);
-			if (value == null)
+			var resolution = token.resolve_token_reverse(value, previous);
+			if (!resolution.success)
 				return null;
+
+			value = resolution.value;
 		}
+
+		var node:Node = cast value;
+		if (!node.trellis.is_a(trellis))
+			return null;
 
 		return new Node_Context(value, context.hub);
 	}
@@ -91,27 +98,30 @@ class Path_Node extends Standard_Node {
 		return "Path";
 	}
 
-	function _resolve(context:Context, end_offset:Int = 0):Dynamic {
+	function _resolve(context:Context, end_offset:Int = 0):Resolution {
 		var value = context.node;
 		var connections = ports[1].connections;
 		for (i in 0...(connections.length + end_offset)) {
 			var port = connections[i];
 			var token:IToken_Node = cast port.node;
-			value = token.resolve_token(value);
+			var resolution = token.resolve_token(value);
+			if (!resolution.success)
+				return resolution;
+
+			value = resolution.value;
 			if (value == null)
 				return null;
 		}
 
-		//return connections[connections.length - 1];
-		return value;
+		return { success: true, value: value};
 	}
 
 	override function resolve(context:Context):Context {
-		var node = _resolve(context, -1);
-		if (node == null)
+		var resolution = _resolve(context, -1);
+		if (!resolution.success)
 			return null;
 
-		return new Node_Context(node, context.hub);
+		return new Node_Context(resolution.value, context.hub);
 		//return result != null ? result : new Empty_Resolution();
 	}
 }

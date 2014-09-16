@@ -11,15 +11,12 @@ import metahub.schema.Kind;
  * ...
  * @author Christopher W. Johnson
  */
-class Trellis_Scope implements Expression {
-  public var trellis:Trellis;
+class Scope_Expression implements Expression {
 	var expression:Expression;
-  public var type:Type_Signature;
 	var scope_definition:Scope_Definition;
 	public var children :Array<Expression>;
 
-  public function new(trellis:Trellis, expression:Expression, scope_definition:Scope_Definition) {
-    this.trellis = trellis;
+  public function new(expression:Expression, scope_definition:Scope_Definition) {
     this.expression = expression;
 		this.scope_definition = scope_definition;
 		children = [ expression ];
@@ -27,7 +24,6 @@ class Trellis_Scope implements Expression {
 
   public function to_port(scope:Scope, group:Group, signature:Type_Signature):General_Port {
     var new_scope = new Scope(scope.hub, scope_definition, scope);
-		//var new_signature = Type_Network.analyze(expression, scope);
 		return expression.to_port(new_scope, group, null);
   }
 
@@ -36,6 +32,6 @@ class Trellis_Scope implements Expression {
 	}
 
 	public function to_string():String {
-		return trellis.name;
+		return scope_definition.trellis.name;
 	}
 }

@@ -6,7 +6,7 @@ package metahub.code.functions;
  */
 class Greater_Than_Int extends Function {
 	override private function forward(args:Array<Dynamic>):Dynamic {
-		return reverse(args[0], args[1]);
+		return reverse(args[0], [args[1]]);
 		//var first:Int = cast args[0]
 		//return first > second
 			//? first

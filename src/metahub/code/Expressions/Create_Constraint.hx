@@ -38,6 +38,7 @@ class Create_Constraint implements Expression {
 
 		var group = new Group(old_group, scope.definition.only_new);
 		scope.hub.constraints.push(group);
+		
 		group.is_back_referencing = is_back_referencing || inside_back_reference;
 		var source = expression.to_port(scope, group, reference.get_type(type_unknown)[0]);
 		//group.get_port(1).connect(target);

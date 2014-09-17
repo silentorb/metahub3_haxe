@@ -46,17 +46,22 @@ class Assignment_Node implements INode extends Standard_Node
 
 		if (group.only_new && !context.hub.is_node_new(context.node))
 			return null;
-		
-		//if (index == 1) // Temporary
-			//throw new Exception("Not implemented.");
 
 		var port = ports[index == 1 ? 2 : 1];
-		//var new_context = port.resolve_external(context);
-		//if (new_context != null)
-			//port.set_external_value(value, new_context);
-
 		port.set_external_value(change, context);
 
+		//if (index == 1) {
+			//var new_change = port.get_external_value(context);
+			//if (new_change == null) {
+				//port.set_external_value(change, context);
+			//}
+			//else if (new_change.value != change.value) {
+				//context.hub.add_change(source.node, source.id, new_change.value, context, source);
+			//}
+		//}
+		//else {
+			//port.set_external_value(change, context);
+		//}
 	}
 
 }

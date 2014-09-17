@@ -52,7 +52,8 @@ class General_Port {
 		}
 
 		if (connections.length == 0)
-			throw new Exception("Cannot get_external_value from an unconnected port.");
+			return null;
+			//throw new Exception("Cannot get_external_value from an unconnected port.");
 
 		return connections[0].get_node_value(context);
 	}

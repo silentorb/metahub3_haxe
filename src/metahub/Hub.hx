@@ -246,9 +246,9 @@ import haxe.Json;
 	}
 
 	public function increment(layer:Int = 10000) {
-		new_nodes = [];
 		var node = get_increment();
 		node.get_value(0, new Empty_Context(this));
+		new_nodes = [];
 	}
 
 	public static function graph_nodes(node:INode, depth:Int = 0, used:Array<INode> = null, port:General_Port = null):String {

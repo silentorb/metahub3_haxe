@@ -27,6 +27,7 @@ class Trellis implements INode {
   var property_keys:Map<String, Property> = new Map<String, Property>();
 	var ports = new Array<General_Port>();
 	public var readonly_ports = new Array<General_Port>();
+	public var on_create_ports = new Array<General_Port>();
 	public var properties = new Array<Property>();
 	public var is_value:Bool = false;
 	public var events:Array<String>;
@@ -249,6 +250,12 @@ class Trellis implements INode {
 
 	public function resolve(context:Context):Context {
 		throw new Exception("Not implemented.");
+	}
+	
+	public function on_create_node(context:Context) {
+		for (port in on_create_ports) {
+			port.get_node_value(context);
+		}
 	}
 
 }

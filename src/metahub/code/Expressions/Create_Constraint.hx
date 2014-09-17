@@ -59,6 +59,11 @@ class Create_Constraint implements Expression {
 
 				assignment.get_port(1).connect(target);
 				assignment.get_port(2).connect(function_node.get_port(0));
+				
+				if (scope.definition.only_new) {
+					scope.definition.trellis.on_create_ports.push(assignment.get_port(0));
+					return group.get_port(0);					
+				}
 			}
 
 			if (scope.definition.is_particular_node || inside_back_reference) {

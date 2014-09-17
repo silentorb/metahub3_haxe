@@ -137,6 +137,7 @@ import haxe.Json;
 
 		//node.initialize_values2();
 		node.update_values();
+		node.update_on_create();
 
     return node;
   }

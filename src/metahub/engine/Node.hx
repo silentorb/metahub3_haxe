@@ -191,6 +191,13 @@ class Node {
 				t.set_external_value(index, value, this_context, source);
 		}
 	}
+	
+	public function update_on_create() {
+		var tree = trellis.get_tree();
+		for (t in tree) {
+			t.on_create_node(this_context);
+		}
+	}
 
 	//function input_trellis_connections(index:Int) {
 		//var tree = trellis.get_tree();

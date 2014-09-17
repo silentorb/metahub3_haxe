@@ -29,6 +29,9 @@ class Function extends Standard_Node implements IToken_Node {
 	}
 
 	override public function get_value(index:Int, context:Context):Change {
+		if (group.only_new && !context.hub.is_node_new(context.node))
+			return null;
+		
 		//if (index == 1)
 			return run_forward(context);
 		//else
@@ -39,6 +42,9 @@ class Function extends Standard_Node implements IToken_Node {
 		if (group.is_back_referencing)
 			return;
 
+		if (group.only_new && !context.hub.is_node_new(context.node))
+			return null;
+		
 		if (index == 0 || is_constraint) {
 			var resolution = run_forward(context);
 			if (resolution == null)

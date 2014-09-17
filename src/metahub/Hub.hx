@@ -40,6 +40,7 @@ import haxe.Json;
 	public var function_library:Function_Library;
 	public var history = new History();
 	public var constraints = new Array<Group>();
+	var new_nodes = new Array<Node>();
 	var trellis_nodes = new Map<String, Array<Node>>();
 	var queue = new Array<Pending_Change>();
 	var entry_node:Node = null;
@@ -131,6 +132,8 @@ import haxe.Json;
 
 		if (register)
 			add_node(node);
+			
+		new_nodes.push(node);
 
 		//node.initialize_values2();
 		node.update_values();
@@ -243,6 +246,7 @@ import haxe.Json;
 	}
 
 	public function increment(layer:Int = 10000) {
+		new_nodes = [];
 		var node = get_increment();
 		node.get_value(0, new Empty_Context(this));
 	}
@@ -324,5 +328,9 @@ import haxe.Json;
 		}
 
 		return result;
+	}
+	
+	public function is_node_new(node:Node) {
+		return this.new_nodes.indexOf(node) > -1;
 	}
 }

@@ -20,6 +20,9 @@ class Assignment_Node implements INode extends Standard_Node
 	}
 
   override public function get_value(index:Int, context:Context):Change {
+		if (group.only_new && !context.hub.is_node_new(context.node))
+			return null;
+		
 		if (index == 0) {
 			var change = ports[2].get_external_value(context);
 			ports[1].set_external_value(change, context);
@@ -41,6 +44,9 @@ class Assignment_Node implements INode extends Standard_Node
 		if (is_immediate)
 			return;
 
+		if (group.only_new && !context.hub.is_node_new(context.node))
+			return null;
+		
 		//if (index == 1) // Temporary
 			//throw new Exception("Not implemented.");
 

@@ -25,7 +25,7 @@ class Condition implements INode extends Standard_Node
   override public function get_value(index:Int, context:Context):Change {
 		var first = ports[1].get_external_value(context);
 		var second = ports[2].get_external_value(context);
-		return new Change(comparison.compare(first, second));
+		return new Change(comparison.compare(first.value, second.value));
 	}
 
   override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {

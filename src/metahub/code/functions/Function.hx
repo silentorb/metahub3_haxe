@@ -1,7 +1,7 @@
 package metahub.code.functions;
+import metahub.code.Change;
 import metahub.code.nodes.Group;
 import metahub.code.nodes.IToken_Node;
-import metahub.code.nodes.Resolution;
 import metahub.code.nodes.Standard_Node;
 import metahub.engine.*;
 import metahub.schema.Trellis;
@@ -28,20 +28,24 @@ class Function extends Standard_Node implements IToken_Node {
 		add_ports(3);
 	}
 
-	override public function get_value(index:Int, context:Context):Dynamic {
+	override public function get_value(index:Int, context:Context):Change {
 		//if (index == 1)
 			return run_forward(context);
 		//else
 			//throw new Exception("Not implemented.");
 	}
 
-	override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+	override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		if (group.is_back_referencing)
 			return;
 
 		if (index == 0 || is_constraint) {
-			var new_value = run_forward(context);
-			if (new_value != value)
+			var resolution = run_forward(context);
+			if (resolution == null)
+				return;
+				
+			var new_value = resolution.value;
+			if (new_value != change.value)
 				context.hub.add_change(source.node, source.id, new_value, context, source);
 
 			return;
@@ -71,26 +75,30 @@ class Function extends Standard_Node implements IToken_Node {
 		var result = new Array<Dynamic>();
 		for (i in 1...ports.length) {
 			var port:General_Port = cast get_port(i);
-			result.push(port.get_external_value(context));
+			var change = port.get_external_value(context);
+			if (change == null)
+				return null;
+			
+			result.push(change.value);
 		}
 		return result;
 	}
 
-	function run_forward(context:Context):Dynamic {
-   var args = get_input_values(context);
-		#if log
-		context.hub.history.log("function " + Std.string(func) + " forward()" + args);
-		#end
-		return forward(args);
+	function run_forward(context:Context):Change {
+		var args = get_input_values(context);
+		if (args == null)
+			return null;
+
+		return new Change(forward(args));
 	}
 
-	function run_reverse(value:Dynamic, context:Context) {
-		#if log
-		context.hub.history.log("function " + Std.string(func) + " reverse()");
-		#end
-
-		return reverse(value, get_input_values(context));
-	}
+	//function run_reverse(value:Dynamic, context:Context) {
+		//#if log
+		//context.hub.history.log("function " + Std.string(func) + " reverse()");
+		//#end
+//
+		//return reverse(value, get_input_values(context));
+	//}
 
 	private function forward(args:Array<Dynamic>):Dynamic {
 		throw new Exception("Function.forward is abstract.");
@@ -104,11 +112,11 @@ class Function extends Standard_Node implements IToken_Node {
 		return Std.string(func);
 	}
 
-  public function resolve_token(value:Dynamic, is_last:Bool):Resolution {
+  public function resolve_token(value:Dynamic, is_last:Bool):Change {
 		throw new Exception("Not implemented.");
 	}
 
-  public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Resolution {
+  public function resolve_token_reverse(value:Dynamic, previous:Dynamic):Change {
 		throw new Exception("Not implemented.");
 	}
 

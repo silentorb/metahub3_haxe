@@ -1,4 +1,5 @@
 package metahub.code.nodes;
+import metahub.code.Change;
 import metahub.code.functions.Comparison;
 import metahub.engine.Context;
 import metahub.code.nodes.INode;
@@ -22,35 +23,41 @@ class Condition_Group implements INode extends Standard_Node
 		}
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
-		if (join == Condition_Join.or) {
-			return get_or(context);
-		}
-		else {
-			return get_and(context);
-		}
+  override public function get_value(index:Int, context:Context):Change {
+		return join == Condition_Join.or
+			? get_or(context)
+			: get_and(context)
+			;
 	}
 
-	function get_and(context:Context):Bool {
+	function get_and(context:Context):Change {
 		for (other in ports[1].connections)
 		{
-			var value:Bool = other.get_node_value(context);
+			var change = other.get_node_value(context);
+			if (change == null)
+				return null;
+			
+			var value:Bool = change.value;
 			if (!value)
-				return false;
+				return new Change(false);
 		}
 
-		return true;
+		return new Change(true);
 	}
 
-	function get_or(context:Context):Bool {
+	function get_or(context:Context):Change {
 		for (other in ports[1].connections)
 		{
-			var value:Bool = other.get_node_value(context);
+			var change = other.get_node_value(context);
+			if (change == null)
+				return null;
+				
+			var value:Bool = change.value;
 			if (value)
-				return true;
+				return new Change(true);
 		}
 
-		return false;
+		return new Change(false);
 	}
 
 	override public function to_string():String {

@@ -21,7 +21,7 @@ import metahub.code.Type_Network;
 
 import metahub.code.nodes.INode;
 import metahub.engine.Node;
-import metahub.engine.Change;
+import metahub.engine.Pending_Change;
 import metahub.code.nodes.Group;
 import metahub.code.functions.Functions;
 import metahub.schema.Kind;
@@ -41,7 +41,7 @@ import haxe.Json;
 	public var history = new History();
 	public var constraints = new Array<Group>();
 	var trellis_nodes = new Map<String, Array<Node>>();
-	var queue = new Array<Change>();
+	var queue = new Array<Pending_Change>();
 	var entry_node:Node = null;
 	public var max_steps = 100;
 	var node_count:Int;
@@ -70,7 +70,7 @@ import haxe.Json;
 				queue.splice(i, 1);
 			}
 		}
-		var change = new Change(node, index, value, context, source);
+		var change = new Pending_Change(node, index, value, context, source);
 		queue.push(change);
 	}
 

@@ -21,11 +21,11 @@ class Group implements INode extends Standard_Node {
 		this.only_new = only_new;
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Change {
 		return null;
 	}
 
-  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 
 	}
 

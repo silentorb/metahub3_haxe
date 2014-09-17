@@ -26,7 +26,7 @@ class Block_Node implements INode extends Standard_Node {
 
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Change {
 		var definition = scope.definition;
 		if (definition.trellis == null || definition.is_particular_node) {
 			resolve_block(context);
@@ -42,7 +42,7 @@ class Block_Node implements INode extends Standard_Node {
 		return null;
 	}
 
-  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		//throw new Exception("Not implemented.");
 	}
 

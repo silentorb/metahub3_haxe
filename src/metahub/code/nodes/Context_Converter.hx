@@ -54,7 +54,7 @@ class Context_Converter extends Standard_Node {
 		return false;
 	}
 
-	override public function get_value(index:Int, context:Context):Dynamic {
+	override public function get_value(index:Int, context:Context):Change {
 		//throw new Exception("Not implemented.");
 		var port = ports[1 - index];
 
@@ -96,14 +96,14 @@ class Context_Converter extends Standard_Node {
 		}*/
 	}
 
-	override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+	override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		var port = ports[1 - index];
 
 		var current_path = index == 0 ? forward_path : reverse_path;
 		var nodes = follow_path(current_path, 0, context.node, index);
 		var property_id = current_path.last().id;
 		for (node in nodes) {
-			port.set_external_value(value, new Node_Context(node, context.hub));
+			port.set_external_value(change, new Node_Context(node, context.hub));
 			//node.set_value(property_id, value);
 		}
 	}

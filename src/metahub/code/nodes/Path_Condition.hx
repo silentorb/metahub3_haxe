@@ -23,16 +23,16 @@ class Path_Condition extends Standard_Node {
 		add_ports(2);
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Change {
 		if (index == 1)
 			return ports[1 - index].get_external_value(context);
 
 		throw new Exception("Not implemented");
 	}
 
-  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		if (index == 1) {
-			ports[1 - index].set_external_value(value, context);
+			ports[1 - index].set_external_value(change, context);
 			return;
 		}
 
@@ -44,7 +44,7 @@ class Path_Condition extends Standard_Node {
 		if (!node.trellis.is_a(trellis))
 			return;
 
-		ports[1 - index].set_external_value(value, context);
+		ports[1 - index].set_external_value(change, context);
 	}
 
 	override public function to_string():String {

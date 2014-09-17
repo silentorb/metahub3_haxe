@@ -1,4 +1,5 @@
 package metahub.code.nodes;
+import metahub.code.Change;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
 import metahub.code.nodes.INode;
@@ -25,18 +26,18 @@ class Create_Node implements INode extends Standard_Node
 		this.hub = hub;
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Change {
     var node = hub.create_node(trellis);
 		if (ports[1].connections.length > 0) {
 			var node_context = new Node_Context(node, hub);
 			ports[1].get_external_value(node_context);
 		}
-		return node;
+		return new Change(node);
 	}
 
-  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		//throw new Exception("Not implemented");
-		if (value == null)
+		if (change.value == null)
 			hub.add_change(source.node, source.id, hub.create_node(trellis), context, source);
 	}
 

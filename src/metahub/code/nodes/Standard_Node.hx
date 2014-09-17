@@ -33,11 +33,11 @@ class Standard_Node implements INode
 		}
 	}
 
-	public function get_value(index:Int, context:Context):Dynamic {
+	public function get_value(index:Int, context:Context):Change {
 		throw new Exception("Not implemented");
 	}
 
-  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		throw new Exception("Not implemented");
 	}
 

@@ -1,6 +1,6 @@
 package metahub.schema;
+import metahub.code.Change;
 import metahub.code.nodes.Group;
-import metahub.code.nodes.Resolution;
 import metahub.engine.Context;
 import metahub.code.nodes.INode;
 import metahub.engine.General_Port;
@@ -95,15 +95,15 @@ class Trellis implements INode {
     return properties[name];
   }
 
-  public function get_value(index:Int, context:Context):Dynamic {
-		return context.node.get_value(index);
+  public function get_value(index:Int, context:Context):Change {
+		return new Change(context.node.get_value(index));
 	}
 
-  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		if (!context.node.trellis.is_a(this))
 			throw new Exception("Type mismatch: a " + context.node.trellis.name + " node was passed to trellis " + name + ".");
 
-		context.node.set_value(index, value, source);
+		context.node.set_value(index, change.value, source);
 	}
 
 	 public function set_external_value(index:Int, value:Dynamic, context:Context, source:General_Port) {
@@ -112,14 +112,14 @@ class Trellis implements INode {
 			if (connection == source)
 				continue;
 
-			connection.set_node_value(value, context, port);
+			connection.set_node_value(new Change(value), context, port);
 		}
 	}
 
-	public function get_external_value(index:Int, value:Dynamic, context:Context) {
+	public function get_external_value(index:Int, change:Change, context:Context) {
 		var port = ports[index];
 		if (port.connections.length == 0)
-			return value;
+			return null;
 
 		if (port.connections.length > 1)
 			throw new Exception("Not yet supported.");

@@ -19,16 +19,15 @@ class Assignment_Node implements INode extends Standard_Node
 		this.is_immediate = is_immediate;
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Change {
 		if (index == 0) {
-			var value = ports[2].get_external_value(context);
-			ports[1].set_external_value(value, context);
-			return value;
+			var change = ports[2].get_external_value(context);
+			ports[1].set_external_value(change, context);
+			return change;
 		}
 
 		if (index == 1) {
-			var value = ports[2].get_external_value(context);
-			return value;
+			return ports[2].get_external_value(context);
 		}
 
 		throw new Exception("Not supported.");
@@ -38,7 +37,7 @@ class Assignment_Node implements INode extends Standard_Node
 		return "assignment";
 	}
 
-  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		if (is_immediate)
 			return;
 
@@ -50,7 +49,7 @@ class Assignment_Node implements INode extends Standard_Node
 		//if (new_context != null)
 			//port.set_external_value(value, new_context);
 
-		port.set_external_value(value, context);
+		port.set_external_value(change, context);
 
 	}
 

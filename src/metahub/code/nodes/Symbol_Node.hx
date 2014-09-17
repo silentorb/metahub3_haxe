@@ -20,16 +20,16 @@ class Symbol_Node extends Standard_Node {
 		add_ports(1);
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic{
+  override public function get_value(index:Int, context:Context):Change{
 		return path.resolve(node);
 	}
 
-  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		if (path.length == 0)
 			throw new Exception("Not implemented yet.");
 
 		var parent:Node = path.resolve(node, -1);
-		parent.set_value(path.last().id, value, source);
+		parent.set_value(path.last().id, change, source);
 	}
 
 	override public function to_string():String {

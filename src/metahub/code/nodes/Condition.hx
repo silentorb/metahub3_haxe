@@ -22,13 +22,13 @@ class Condition implements INode extends Standard_Node
 		}
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
+  override public function get_value(index:Int, context:Context):Change {
 		var first = ports[1].get_external_value(context);
 		var second = ports[2].get_external_value(context);
-		return comparison.compare(first, second);
+		return new Change(comparison.compare(first, second));
 	}
 
-  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		// Right now only incremental conditions are supported, so this set_value should by empty.
 		// Once event-driven conditions are also supported, this should check which type of condition
 		// it is and either do nothing or update it's dependents.

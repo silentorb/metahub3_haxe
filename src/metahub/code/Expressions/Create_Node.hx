@@ -1,7 +1,6 @@
 package metahub.code.expressions;
 import haxe.macro.Context;
 import metahub.code.expressions.Expression;
-import metahub.code.nodes.Empty_Resolution;
 import metahub.code.nodes.Group;
 import metahub.code.Scope;
 import metahub.code.Scope_Definition;

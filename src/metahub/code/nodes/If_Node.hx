@@ -18,8 +18,12 @@ class If_Node implements INode extends Standard_Node
 		}
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
-		var condition_result:Bool = ports[1].get_external_value(context);
+  override public function get_value(index:Int, context:Context):Change {
+		var change = ports[1].get_external_value(context);
+		if (change == null)
+			return null;
+			
+		var condition_result:Bool = change.value;
 		ports[1].get_external_value(context);
 		if (condition_result)
 			return ports[2].get_external_value(context);

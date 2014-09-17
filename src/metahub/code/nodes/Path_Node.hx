@@ -1,4 +1,5 @@
 package metahub.code.nodes;
+import metahub.code.Change;
 import metahub.engine.Context;
 import metahub.code.Path;
 import metahub.engine.General_Port;
@@ -22,13 +23,8 @@ class Path_Node extends Standard_Node {
 		add_ports(2);
 	}
 
-  override public function get_value(index:Int, context:Context):Dynamic {
-		//throw new Exception("Not implemented");
-		//if (index == 1)
-
-		//ports[1 - index].get_external_value(context);
-		return _resolve(context).value;
-		//return get_last_token_port().get_node_value(new Node_Context(node, context.hub));
+  override public function get_value(index:Int, context:Context):Change {
+		return _resolve(context);
 	}
 
 	function get_last_token_port() {
@@ -36,7 +32,7 @@ class Path_Node extends Standard_Node {
 		return connections[connections.length - 1];
 	}
 
-  override public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  override public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		if (index == 1) {
 			var token_index = get_index(source);
 			var root_context = get_root(context, token_index);
@@ -44,21 +40,21 @@ class Path_Node extends Standard_Node {
 				return;
 
 			var resolution = _resolve(root_context);
-			if (!resolution.success)
+			if (resolution == null)
 				return;
 				
-			ports[0].set_external_value(resolution.value, root_context);
+			ports[0].set_external_value(resolution, root_context);
 		}
 		else {
 			var previous = _resolve(context, -1);
-			if (previous.success) {
+			if (previous != null) {
 				var connections = ports[1].connections;
 				var token:IToken_Node = cast get_last_token_port().node;
 				var new_context = Reflect.hasField(previous.value, 'trellis')
 					? new Node_Context(previous.value, context.hub)
 					: context;
 
-				token.set_token_value(value, previous.value, new_context);
+				token.set_token_value(change.value, previous.value, new_context);
 			}
 		}
 	}
@@ -84,7 +80,7 @@ class Path_Node extends Standard_Node {
 			var token:IToken_Node = cast port.node;
 			var previous = i > 0 ? connections[i - 1].node : null;
 			var resolution = token.resolve_token_reverse(value, previous);
-			if (!resolution.success)
+			if (resolution == null)
 				return null;
 
 			value = resolution.value;
@@ -101,7 +97,7 @@ class Path_Node extends Standard_Node {
 		return "Path";
 	}
 
-	function _resolve(context:Context, end_offset:Int = 0):Resolution {
+	function _resolve(context:Context, end_offset:Int = 0):Change {
 		var value = context.node;
 		var connections = ports[1].connections;
 		for (i in 0...(connections.length + end_offset)) {
@@ -109,21 +105,21 @@ class Path_Node extends Standard_Node {
 			var token:IToken_Node = cast port.node;
 			var is_last = i == connections.length - 1;
 			var resolution = token.resolve_token(value, is_last);
-			if (!resolution.success || is_last)
+			if (resolution == null || is_last)
 				return resolution;
 
 			value = resolution.value;
 			if (value == null)
-				return { success: false, value: null};
+				return null;
 		}
 
 		// Can only get here if the iteration count is zero.
-		return { success: true, value: value};
+		return new Change(value);
 	}
 
 	override function resolve(context:Context):Context {
 		var resolution = _resolve(context, -1);
-		if (!resolution.success)
+		if (resolution == null)
 			return null;
 
 		return new Node_Context(resolution.value, context.hub);

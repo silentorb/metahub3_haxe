@@ -29,12 +29,12 @@ class Create_Symbol_Node implements INode{
 		return 1;
 	}
 
-  public function get_value(index:Int, context:Context):Dynamic {
+  public function get_value(index:Int, context:Context):Change {
 
 		return path.resolve(node);
 	}
 
-  public function set_value(index:Int, value:Dynamic, context:Context, source:General_Port = null) {
+  public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
 		throw new Exception('Not implementednid');
 	}
 

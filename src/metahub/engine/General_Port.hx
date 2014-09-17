@@ -1,7 +1,7 @@
 package metahub.engine;
 
+import metahub.code.Change;
 import metahub.code.nodes.INode;
-import metahub.code.nodes.IResolution;
 import metahub.schema.Kind;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
@@ -31,22 +31,24 @@ class General_Port {
 		port.connections.push(this);
 	}
 
-  public function get_node_value(context:Context):Dynamic {
+  public function get_node_value(context:Context):Change {
 		return node.get_value(id, context);
 	}
 
-	public function set_node_value(value:Dynamic, context:Context, source:General_Port) {
-		node.set_value(id, value, context, source);
+	public function set_node_value(change:Change, context:Context, source:General_Port) {
+		node.set_value(id, change, context, source);
 	}
 
-	public function get_external_value(context:Context):Dynamic {
+	public function get_external_value(context:Context):Change {
 		if (connections.length > 1) {
 			var result = new Array<Dynamic>();
 			for (connection in connections) {
-				result.push(connection.get_node_value(context));
+				var change = connection.get_node_value(context);
+				if (change != null)
+					result.push(change.value);
 			}
 
-			return result;
+			return new Change(result);
 		}
 
 		if (connections.length == 0)
@@ -55,9 +57,9 @@ class General_Port {
 		return connections[0].get_node_value(context);
 	}
 
-	public function set_external_value(value:Dynamic, context:Context) {
+	public function set_external_value(change:Change, context:Context) {
 		for (connection in connections) {
-			connection.set_node_value(value, context, this);
+			connection.set_node_value(change, context, this);
 		}
 	}
 

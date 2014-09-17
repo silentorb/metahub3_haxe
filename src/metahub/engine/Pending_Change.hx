@@ -1,4 +1,5 @@
 package metahub.engine;
+import metahub.code.Change;
 import metahub.code.nodes.INode;
 
 /**
@@ -6,7 +7,7 @@ import metahub.code.nodes.INode;
  * @author Christopher W. Johnson
  */
 
-class Change
+class Pending_Change
 {
 	public var node:INode;
 	var index:Int;
@@ -27,7 +28,7 @@ class Change
 	}
 
 	public function run() {
-		node.set_value(index, value, context, source);
+		node.set_value(index, new Change(value), context, source);
 	}
 
 }

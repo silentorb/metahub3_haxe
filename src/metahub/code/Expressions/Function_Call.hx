@@ -1,9 +1,12 @@
 package metahub.code.expressions;
 
+import metahub.code.functions.Function_Library;
 import metahub.code.functions.Functions;
 import metahub.code.Node_Signature;
 import metahub.code.nodes.Group;
 import metahub.engine.Node_Context;
+import metahub.Hub;
+import metahub.schema.Namespace;
 
 import metahub.code.Type_Signature;
 import metahub.schema.Trellis;
@@ -13,21 +16,39 @@ import metahub.engine.General_Port;
 import metahub.engine.Constraint_Operator;
 import metahub.code.functions.Function;
 
+typedef Function_Info = {
+	library:Function_Library,
+	index:Int
+}
+
 class Function_Call implements Token_Expression {
   public var children:Array<Expression>;
-	var func:Functions;
+	var function_string:String;
 	var hub:Hub;
+	var info:Function_Info;
 
-  public function new(func:Functions, inputs:Array<Expression>, hub:Hub) {
+  public function new(func:String, inputs:Array<Expression>, hub:Hub) {
 		this.hub = hub;
-		this.func = func;
+		this.function_string = func;
     this.children = inputs;
+		info = get_function_info(func, hub);
   }
+	
+	public static function get_function_info(function_string:String, hub:Hub):Function_Info {
+		var path = function_string.split('.');
+		var name = path.pop();
+		var namespace = hub.metahub_namespace.get_namespace(path);
+		var library = namespace.function_library;
+		return {
+			library: library,
+			index: library.get_function_id(name)
+		};
+	}
 
-  public function to_port(scope:Scope, group:Group, node_signature:Type_Signature):General_Port {
-		if (func == Functions.equals) {
+  public function to_port(scope:Scope, group:Group, node_signature:Type_Signature):General_Port {		
+		if (function_string == "equals") {
 			return children[0].to_port(scope, group, node_signature);
-		}
+		}		
 		if (node_signature == null) {
 			node_signature = get_type()[0];
 		}
@@ -36,8 +57,8 @@ class Function_Call implements Token_Expression {
 
   function _to_port(scope:Scope, group:Group, signature:Array < Type_Signature > , previous_port:General_Port = null):General_Port {
 		var function_signature = determine_signature(signature);
-		var info = hub.function_library.get_function_info(func, function_signature);
-		var node:Function = Type.createInstance(info.type, [hub, func, function_signature, group, false]);
+		var info = info.library.get_function_info(this.info.index, function_signature);
+		var node:Function = Type.createInstance(info.type, [hub, this.info.index, function_signature, group, false]);
     hub.add_internal_node(node);
 		var expressions = children;
     var ports = node.get_inputs();
@@ -63,7 +84,7 @@ class Function_Call implements Token_Expression {
   }
 
 	public function determine_signature(requirement:Array<Type_Signature>) {
-		var options = hub.function_library.get_function_options(func);
+		var options = hub.function_library.get_function_options(info.index);
 		for (child in children) {
 			requirement.push(child.get_type()[0]);
 		}
@@ -83,12 +104,12 @@ class Function_Call implements Token_Expression {
 	}
 
 	public function get_type(out_type:Type_Signature = null):Array < Type_Signature > {
-		if (func == Functions.equals) {
+		if (function_string == "equals") {
 			var type = children[0].get_type()[0];
 			return [ type ];
 		}
 
-		var options = hub.function_library.get_function_options(func);
+		var options = info.library.get_function_options(info.index);
 
 		if (out_type == null) {
 			//throw new Exception("out_type required for determining function type.");
@@ -114,7 +135,7 @@ class Function_Call implements Token_Expression {
 	}
 
 	public function to_string():String {
-		return Std.string(func);
+		return function_string;
 	}
 
 	//public function get_value(scope:Scope, node_signature:Node_Signature):Dynamic {
@@ -122,16 +143,16 @@ class Function_Call implements Token_Expression {
 		//return port.get_node_value(new Node_Context(scope.node, scope.node.hub));
 	//}
 
-	public static function instantiate(func:Functions, signature:Array<Type_Signature>, group:Group, hub:Hub, is_constraint:Bool):Function {
-		var function_signature = determine_signature2(signature, func, hub);
-		var info = hub.function_library.get_function_info(func, function_signature);
-		var node:Function = Type.createInstance(info.type, [hub, func, signature, group, is_constraint]);
+	public static function instantiate(function_info:Function_Info, signature:Array<Type_Signature>, group:Group, hub:Hub, is_constraint:Bool):Function {
+		var function_signature = determine_signature2(signature, function_info, hub);
+		var info = function_info.library.get_function_info(function_info.index, function_signature);
+		var node:Function = Type.createInstance(info.type, [hub, function_info.index, signature, group, is_constraint]);
     hub.add_internal_node(node);
 		return node;
 	}
 
-	static function determine_signature2(requirement:Array<Type_Signature>, func:Functions, hub:Hub) {
-		var options = hub.function_library.get_function_options(func);
+	static function determine_signature2(requirement:Array<Type_Signature>, info:Function_Info, hub:Hub) {
+		var options = info.library.get_function_options(info.index);
 		for (option in options) {
 			if (Type_Network.signatures_match(requirement, option.signature)) {
 				var result = [];

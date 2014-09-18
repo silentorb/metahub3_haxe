@@ -8,7 +8,7 @@ import metahub.engine.Node;
 class Struct_Float_Functions extends Function {
 
 	override private function forward(args:Array<Dynamic>):Dynamic {
-		switch (func) {
+		switch (cast func) {
 			case Functions.multiply:
 				return multiply_float_forward(args);
 
@@ -19,7 +19,7 @@ class Struct_Float_Functions extends Function {
 	}
 
 	override private function reverse(value:Dynamic, args:Array<Dynamic>):Dynamic {
-		switch (func) {
+		switch (cast func) {
 			case Functions.multiply:
 				return multiply_float_reverse(value, args);
 

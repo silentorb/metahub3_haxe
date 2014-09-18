@@ -84,10 +84,10 @@ class Coder {
 			operator_name = operator_name.substring(0, operator_name.length - 7);
 			back_reference = reference;
 		}
-		var operator = Type.createEnum(Functions, operator_name);
+		//var operator = Type.createEnum(Functions, operator_name);
 		var expression = convert_expression(source.expression, scope_definition);
 		//var expression = function_expression(source.expression, scope_definition, name, back_reference);
-		return new metahub.code.expressions.Create_Constraint(reference, expression, operator, back_reference != null);
+		return new metahub.code.expressions.Create_Constraint(reference, expression, operator_name, back_reference != null);
   }
 
   function create_block(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -128,7 +128,7 @@ class Coder {
 
 		var func = Type.createEnum(Functions, name);
     //var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
-    return new metahub.code.expressions.Function_Call(func, inputs, hub);
+    return new metahub.code.expressions.Function_Call(name, inputs, hub);
   }
 
   function if_statement(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -154,31 +154,12 @@ class Coder {
 			Functions.createByName(source.operator));
   }
 
-	function get_namespace(path:Array<String>, start:Namespace):Namespace {
-		var current_namespace = start;
-		var i = 0;
-		for (token in path) {
-			if (current_namespace.children.exists(token)) {
-				current_namespace = current_namespace.children[token];
-			}
-			else if (current_namespace.trellises.exists(token) && i == path.length - 1) {
-				return current_namespace;
-			}
-			else {
-				return null;
-			}
-			++i;
-		}
-
-		return current_namespace;
-	}
-
   function create_node(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		var path:Array<String> = source.trellis;
 		if (path.length == 0)
 			throw new Exception("Trellis path is empty for node creation.");
 
-		var namespace = get_namespace(path, hub.schema.root_namespace);
+		var namespace = hub.schema.root_namespace.get_namespace(path);
     var trellis = hub.schema.get_trellis(path[path.length - 1], namespace, true);
 		var new_scope = new Scope_Definition(scope_definition);
 		new_scope.is_particular_node = true;
@@ -207,8 +188,7 @@ class Coder {
 		var expressions:Array<Dynamic> = source.children;
 		for (item in expressions) {
 			if (item.type == "function") {
-				var func = Type.createEnum(Functions, item.name);
-				children.push(new metahub.code.expressions.Function_Call(func, [], hub));
+				children.push(new metahub.code.expressions.Function_Call(item.name, [], hub));
 			}
 			else if (item.type == "reference") {
 				var property = trellis.get_property_or_error(item.name);
@@ -265,7 +245,7 @@ class Coder {
 			return new Scope_Expression(expression, new_scope_definition);
 		}
 
-		var namespace = get_namespace(path, hub.schema.root_namespace);
+		var namespace = hub.schema.root_namespace.get_namespace(path);
 		var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
 
 		if (trellis != null) {

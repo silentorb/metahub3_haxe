@@ -19,7 +19,7 @@ class List_Functions extends Function {
 		var first:Array<Dynamic> = args[0];
 		var second:Dynamic = args[1];
 
-		switch (func) {
+		switch (cast func) {
 			case Functions.add:
 				return first.concat([second]);
 
@@ -48,7 +48,7 @@ class List_Functions extends Function {
 		var property_node:Property_Node = cast previous;
 		var property = property_node.property;
 
-		switch (func) {
+		switch (cast func) {
 			case Functions.first:
 				var node:Node = cast value;
 				var list:Array<Dynamic> = node.get_value(property.other_property.id);
@@ -67,7 +67,7 @@ class List_Functions extends Function {
 	}
 
 	override public function resolve_token(value:Dynamic, is_last:Bool):Change {
-		switch (func) {
+		switch (cast func) {
 			case Functions.first:
 				var list:Array<Dynamic> = cast value;
 				if (list.length == 0)

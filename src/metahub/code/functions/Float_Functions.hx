@@ -7,7 +7,7 @@ package metahub.code.functions;
 class Float_Functions extends Function {
 
 	override private function forward(args:Array<Dynamic>):Dynamic {
-		switch (func) {
+		switch (cast func) {
 			case Functions.add:
 				return add_forward(args);
 
@@ -28,7 +28,7 @@ class Float_Functions extends Function {
 	}
 
 	override private function reverse(value:Dynamic, args:Array<Dynamic>):Dynamic {
-		switch (func) {
+		switch (cast func) {
 			case Functions.lesser_than:
 				return lesser_than_reverse(value, args);
 

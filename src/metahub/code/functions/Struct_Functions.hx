@@ -10,7 +10,7 @@ import metahub.engine.Node;
 class Struct_Functions extends Function {
 
 	override private function forward(args:Array<Dynamic>):Dynamic {
-		switch (func) {
+		switch (cast func) {
 			case Functions.add:
 				return add_forward(args);
 

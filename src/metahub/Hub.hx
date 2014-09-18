@@ -59,9 +59,10 @@ import haxe.Json;
     root_scope_definition = new Scope_Definition(this);
     root_scope = new Scope(this, root_scope_definition);
     schema = new Schema();
-		metahub_namespace = schema.add_namespace('metahub');
-    load_internal_trellises();
 		function_library = new Function_Library(this);
+		metahub_namespace = schema.add_namespace('metahub', function_library);
+    load_internal_trellises();
+		function_library.load();
   }
 
 	public function add_change(node:INode, index:Int, value:Dynamic, context:Context, source:General_Port = null) {

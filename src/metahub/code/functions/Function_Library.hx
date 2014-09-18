@@ -26,7 +26,10 @@ class Function_Library {
 
 	public function new(hub:Hub) {
 		this.hub = hub;
-
+	}
+	
+	public function load() {
+		
 		// Int
 		var type_int = new Type_Signature(Kind.int);
 		var type_float = new Type_Signature(Kind.float);
@@ -70,7 +73,6 @@ class Function_Library {
 		var list_any = [ type_list, type_list, type_unknown ];
 		add(Functions.add, "List_Functions", list_any);
 		add(Functions.first, "List_Functions", [ type_unknown, type_list ]);
-
 	}
 
 	function add(func:metahub.code.functions.Functions, class_name:String, signature:Array<Type_Signature>) {
@@ -89,14 +91,10 @@ class Function_Library {
 		var signature = Type_Signature.array_from_trellis(trellis);
 		function_classes[func].push(create_class_info(class_name, signature, trellis));
 	}
-
-	//function add_operator(func:metahub.code.functions.Functions, class_name:String, signature:Array<Type_Signature>) {
-		//if (!operator_classes.exists(func)) {
-			//operator_classes[func] = new Array<Function_Class_Info>();
-		//}
-//
-		//operator_classes[func] = create_class_info(class_name, signature);
-	//}
+	
+	public function get_function_id(function_string:String):Int {
+		return cast Type.createEnum(Functions, function_string);
+	}
 
 	function create_class_info(class_name:String, signature:Array<Type_Signature>, trellis:Trellis):Function_Class_Info {
 		var full_class_name = "metahub.code.functions." + class_name;
@@ -123,14 +121,14 @@ class Function_Library {
 		return true;
 	}
 
-	public function get_function_options(func:Functions):Array<Function_Class_Info> {
-		if (!function_classes.exists(func))
+	public function get_function_options(func:Int):Array<Function_Class_Info> {
+		if (!function_classes.exists(cast func))
 			throw new Exception("Function " + func + " is not yet implemented.");
 
-		return function_classes[func];
+		return function_classes[cast func];
 	}
 
-	public function get_function_info(func:Functions, signature:Array<Type_Signature>):Function_Class_Info {
+	public function get_function_info(func:Int, signature:Array<Type_Signature>):Function_Class_Info {
 		var options = get_function_options(func);
 		for (o in options) {
 			if (arrays_match(o.signature, signature))

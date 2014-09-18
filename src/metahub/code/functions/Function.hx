@@ -14,11 +14,11 @@ typedef Identity = UInt;
  */
 class Function extends Standard_Node implements IToken_Node {
 	public var hub:Hub;
-	var func:Functions;
+	var func:Int;
 	var signature:Array<Type_Signature>;
 	var is_constraint:Bool;
 
-	public function new(hub:Hub, func:Functions, signature:Array < Type_Signature > , group:Group, is_constraint:Bool) {
+	public function new(hub:Hub, func:Int, signature:Array < Type_Signature > , group:Group, is_constraint:Bool) {
 		super(group);
     this.hub = hub;
 		this.is_constraint = is_constraint;

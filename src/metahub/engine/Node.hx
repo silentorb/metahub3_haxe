@@ -152,6 +152,17 @@ class Node {
 			update_value(property, value, source);
 		}
 
+		if (trellis.is_value) {
+			var parent:Node = values[this.values.length - 1];
+			if (parent != null) {
+				for (property in parent.trellis.properties) {
+					if (property.other_trellis == trellis && parent.get_value(property.id) == this) {
+						parent.update_value(property, this);
+						break;
+					}
+				}
+			}
+		}
   }
 
 	function update_value(property:Property, value:Dynamic, source:General_Port = null) {
@@ -191,7 +202,7 @@ class Node {
 				t.set_external_value(index, value, this_context, source);
 		}
 	}
-	
+
 	public function update_on_create() {
 		var tree = trellis.get_tree();
 		for (t in tree) {

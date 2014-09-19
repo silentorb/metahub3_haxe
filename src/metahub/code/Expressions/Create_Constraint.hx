@@ -38,7 +38,7 @@ class Create_Constraint implements Expression {
 
 		var group = new Group(old_group, scope.definition.only_new);
 		scope.hub.constraints.push(group);
-		
+
 		group.is_back_referencing = is_back_referencing || inside_back_reference;
 		var source = expression.to_port(scope, group, reference.get_type(type_unknown)[0]);
 		//group.get_port(1).connect(target);
@@ -60,10 +60,10 @@ class Create_Constraint implements Expression {
 
 				assignment.get_port(1).connect(target);
 				assignment.get_port(2).connect(function_node.get_port(0));
-				
+
 				if (scope.definition.only_new) {
 					scope.definition.trellis.on_create_ports.push(assignment.get_port(0));
-					return group.get_port(0);					
+					return group.get_port(0);
 				}
 			}
 
@@ -88,6 +88,10 @@ class Create_Constraint implements Expression {
 			group.get_port(1).connect(assignment.get_port(0));
 			assignment.get_port(1).connect(target);
 			assignment.get_port(2).connect(source);
+		}
+
+		if (scope.definition.only_new) {
+			scope.definition.trellis.on_create_ports.push(assignment.get_port(0));
 		}
 
 		return group.get_port(0);

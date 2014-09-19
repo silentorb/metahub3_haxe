@@ -8,5 +8,4 @@ import metahub.schema.Trellis;
 typedef Function_Class_Info = {
 	signature:Array<Type_Signature>,
 	type:Dynamic,
-	trellis:Trellis
 }

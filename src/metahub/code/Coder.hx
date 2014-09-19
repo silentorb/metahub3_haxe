@@ -126,9 +126,10 @@ class Coder {
 			inputs.unshift(reference);
 		}
 
-		var func = Type.createEnum(Functions, name);
+		//var func = Type.createEnum(Functions, name);
     //var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope_definition, type)));
-    return new metahub.code.expressions.Function_Call(name, inputs, hub);
+		var info = Function_Call.get_function_info(name, hub);
+    return new metahub.code.expressions.Function_Call(name, info, inputs, hub);
   }
 
   function if_statement(source:Dynamic, scope_definition:Scope_Definition):Expression {
@@ -181,14 +182,22 @@ class Coder {
 		return result;
 	}
 
-  function create_path(source:Dynamic, scope_definition:Scope_Definition):Path_Expression {
+  function create_path(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		var trellis:Trellis = scope_definition.trellis;
 		var expression:Expression = null;
 		var children = new Array<Expression>();
 		var expressions:Array<Dynamic> = source.children;
+		if (expressions.length == 0)
+			throw new Exception("Empty reference path.");
+
+		if (expressions[0].type == "reference" && trellis.get_property_or_null(expressions[0].name) == null) {
+				return function_path(source, scope_definition);
+		}
+
 		for (item in expressions) {
 			if (item.type == "function") {
-				children.push(new metahub.code.expressions.Function_Call(item.name, [], hub));
+				var info = Function_Call.get_function_info(item.name, hub);
+				children.push(new metahub.code.expressions.Function_Call(item.name, info, [], hub));
 			}
 			else if (item.type == "reference") {
 				var property = trellis.get_property_or_error(item.name);
@@ -203,6 +212,28 @@ class Coder {
 		return new Path_Expression(children);
   }
 
+	function function_path(source:Dynamic, scope_definition:Scope_Definition):Expression {
+		var path = new Array<String>();
+		var expressions:Array<Dynamic> = source.children;
+		for (expression in expressions) {
+			path.push(expression.name);
+		}
+
+		var fullname = path.join(".");
+		var namespace = hub.metahub_namespace.get_namespace(path);
+		if (namespace == null)
+			throw new Exception("Could not find " +	fullname);
+
+		var name = path[path.length - 1];
+		if (!namespace.function_library.exists(name))
+			throw new Exception("Could not find function " +	fullname);
+
+			var info = {
+				library: namespace.function_library,
+				index: namespace.function_library.get_function_id(name)
+			};
+		return new Function_Call(fullname, info, [], hub);
+	}
   //function create_general_reference(source:Dynamic, scope_definition:Scope_Definition, trellis:Trellis):Expression_Reference {
 		//return new Property_Reference();
   //}

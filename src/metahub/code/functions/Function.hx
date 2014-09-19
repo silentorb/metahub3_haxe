@@ -31,7 +31,7 @@ class Function extends Standard_Node implements IToken_Node {
 	override public function get_value(index:Int, context:Context):Change {
 		if (group.only_new && !context.hub.is_node_new(context.node))
 			return null;
-		
+
 		//if (index == 1)
 			return run_forward(context);
 		//else
@@ -44,12 +44,12 @@ class Function extends Standard_Node implements IToken_Node {
 
 		if (group.only_new && !context.hub.is_node_new(context.node))
 			return null;
-		
+
 		if (index == 0 || is_constraint) {
 			var resolution = run_forward(context);
 			if (resolution == null)
 				return;
-				
+
 			var new_value = resolution.value;
 			if (new_value != change.value)
 				context.hub.add_change(source.node, source.id, new_value, context, source);
@@ -84,13 +84,16 @@ class Function extends Standard_Node implements IToken_Node {
 			var change = port.get_external_value(context);
 			if (change == null)
 				return null;
-			
+
 			result.push(change.value);
 		}
 		return result;
 	}
 
 	function run_forward(context:Context):Change {
+		if (signature.length == 1)
+			return new Change(forward([]));
+
 		var args = get_input_values(context);
 		if (args == null)
 			return null;

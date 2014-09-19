@@ -27,13 +27,14 @@ class Function_Call implements Token_Expression {
 	var hub:Hub;
 	var info:Function_Info;
 
-  public function new(func:String, inputs:Array<Expression>, hub:Hub) {
+  public function new(func:String, info:Function_Info, inputs:Array<Expression>, hub:Hub) {
 		this.hub = hub;
 		this.function_string = func;
     this.children = inputs;
-		info = get_function_info(func, hub);
+		this.info = info;
+		//info = get_function_info(func, hub);
   }
-	
+
 	public static function get_function_info(function_string:String, hub:Hub):Function_Info {
 		var path = function_string.split('.');
 		var name = path.pop();
@@ -45,10 +46,10 @@ class Function_Call implements Token_Expression {
 		};
 	}
 
-  public function to_port(scope:Scope, group:Group, node_signature:Type_Signature):General_Port {		
+  public function to_port(scope:Scope, group:Group, node_signature:Type_Signature):General_Port {
 		if (function_string == "equals") {
 			return children[0].to_port(scope, group, node_signature);
-		}		
+		}
 		if (node_signature == null) {
 			node_signature = get_type()[0];
 		}
@@ -56,9 +57,10 @@ class Function_Call implements Token_Expression {
 	}
 
   function _to_port(scope:Scope, group:Group, signature:Array < Type_Signature > , previous_port:General_Port = null):General_Port {
-		var function_signature = determine_signature(signature);
-		var info = info.library.get_function_info(this.info.index, function_signature);
-		var node:Function = Type.createInstance(info.type, [hub, this.info.index, function_signature, group, false]);
+		var function_signature = determine_signature(info.library, signature);
+		//var info = info.library.get_function_info(this.info.index, function_signature);
+		//var node:Function = Type.createInstance(info.type, [hub, this.info.index, function_signature, group, false]);
+		var node = info.library.create_node(info.index, function_signature, group, false);
     hub.add_internal_node(node);
 		var expressions = children;
     var ports = node.get_inputs();
@@ -83,17 +85,17 @@ class Function_Call implements Token_Expression {
 		return _to_port(scope, group, signature, previous_port);
   }
 
-	public function determine_signature(requirement:Array<Type_Signature>) {
-		var options = hub.function_library.get_function_options(info.index);
+	public function determine_signature(function_library:Function_Library, requirement:Array<Type_Signature>) {
+		var options = function_library.get_function_options(info.index);
 		for (child in children) {
 			requirement.push(child.get_type()[0]);
 		}
 		for (option in options) {
-			if (Type_Network.signatures_match(requirement, option.signature)) {
+			if (Type_Network.signatures_match(requirement, option)) {
 				var result = [];
 				for (i in 0...requirement.length) {
 					var type = requirement[i].copy();
-					type.resolve(option.signature[i]);
+					type.resolve(option[i]);
 					result.push(type);
 				}
 				return result;
@@ -119,7 +121,7 @@ class Function_Call implements Token_Expression {
 			}
 
 			for (option in options) {
-				if (Type_Signature.arrays_match(option.signature, signature))
+				if (Type_Signature.arrays_match(option, signature))
 					return [signature[1]];
 			}
 
@@ -127,8 +129,8 @@ class Function_Call implements Token_Expression {
 		}
 
 		for (option in options) {
-			if (out_type.equals(option.signature[0]))
-				return option.signature;
+			if (out_type.equals(option[0]))
+				return option;
 		}
 
 		throw new Exception("Could not find valid function type.");
@@ -145,8 +147,8 @@ class Function_Call implements Token_Expression {
 
 	public static function instantiate(function_info:Function_Info, signature:Array<Type_Signature>, group:Group, hub:Hub, is_constraint:Bool):Function {
 		var function_signature = determine_signature2(signature, function_info, hub);
-		var info = function_info.library.get_function_info(function_info.index, function_signature);
-		var node:Function = Type.createInstance(info.type, [hub, function_info.index, signature, group, is_constraint]);
+		//var info = function_info.library.get_function_info(function_info.index, function_signature);
+		var node:Function = function_info.library.create_node(function_info.index, signature, group, is_constraint);
     hub.add_internal_node(node);
 		return node;
 	}
@@ -154,11 +156,11 @@ class Function_Call implements Token_Expression {
 	static function determine_signature2(requirement:Array<Type_Signature>, info:Function_Info, hub:Hub) {
 		var options = info.library.get_function_options(info.index);
 		for (option in options) {
-			if (Type_Network.signatures_match(requirement, option.signature)) {
+			if (Type_Network.signatures_match(requirement, option)) {
 				var result = [];
 				for (i in 0...requirement.length) {
 					var type = requirement[i].copy();
-					type.resolve(option.signature[i]);
+					type.resolve(option[i]);
 					result.push(type);
 				}
 				return result;

@@ -1,12 +1,13 @@
 package metahub;
 import haxe.xml.Parser;
 import metahub.code.expressions.Expression;
-import metahub.code.functions.Function_Library;
+import metahub.code.functions.Core_Function_Library;
 import metahub.code.nodes.Block_Node;
 import metahub.code.Type_Signature;
 import metahub.engine.Context;
 import metahub.engine.Empty_Context;
 import metahub.engine.General_Port;
+import metahub.libraries.math.Math_Library;
 import metahub.parser.Definition;
 import metahub.parser.Match;
 import metahub.schema.Load_Settings;
@@ -37,7 +38,7 @@ import haxe.Json;
 	static var remove_comments = ~/#[^\n]*/g;
 	public var metahub_namespace:Namespace;
 	public var node_factories = new Array < Hub->Int->Trellis->Node > ();
-	public var function_library:Function_Library;
+	public var function_library:Core_Function_Library;
 	public var history = new History();
 	public var constraints = new Array<Group>();
 	var new_nodes = new Array<Node>();
@@ -59,10 +60,15 @@ import haxe.Json;
     root_scope_definition = new Scope_Definition(this);
     root_scope = new Scope(this, root_scope_definition);
     schema = new Schema();
-		function_library = new Function_Library(this);
+
+		function_library = new Core_Function_Library();
 		metahub_namespace = schema.add_namespace('metahub', function_library);
     load_internal_trellises();
-		function_library.load();
+		function_library.load(this);
+
+		var math_library = new Math_Library();
+		metahub_namespace.children['Math'] = schema.add_namespace('Math', math_library);
+		math_library.load(this);
   }
 
 	public function add_change(node:INode, index:Int, value:Dynamic, context:Context, source:General_Port = null) {
@@ -133,7 +139,7 @@ import haxe.Json;
 
 		if (register)
 			add_node(node);
-			
+
 		new_nodes.push(node);
 
 		//node.initialize_values2();
@@ -331,7 +337,7 @@ import haxe.Json;
 
 		return result;
 	}
-	
+
 	public function is_node_new(node:Node) {
 		return this.new_nodes.indexOf(node) > -1;
 	}

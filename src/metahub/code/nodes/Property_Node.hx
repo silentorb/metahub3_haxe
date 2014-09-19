@@ -62,7 +62,7 @@ class Property_Node extends Standard_Node implements IToken_Node {
 	}
 
 	override public function to_string():String {
-		return "path: " + property.fullname();
+		return "property: " + property.fullname();
 	}
 //
 	//override function resolve(context:Context):IResolution {

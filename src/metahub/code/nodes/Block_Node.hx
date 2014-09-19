@@ -3,6 +3,7 @@ import metahub.code.Scope;
 import metahub.code.expressions.Block;
 import metahub.code.expressions.Expression;
 import metahub.code.Type_Signature;
+import metahub.debug.Entry;
 import metahub.engine.Context;
 import metahub.engine.General_Port;
 import metahub.code.nodes.INode;
@@ -27,6 +28,10 @@ class Block_Node implements INode extends Standard_Node {
 	}
 
   override public function get_value(index:Int, context:Context):Change {
+		#if trace
+			context.hub.history.add(new Entry('Block'), true);
+		#end
+
 		var definition = scope.definition;
 		if (definition.trellis == null || definition.is_particular_node) {
 			resolve_block(context);
@@ -36,8 +41,15 @@ class Block_Node implements INode extends Standard_Node {
 			for (node in nodes) {
 				var node_context = new Node_Context(node, scope.hub);
 				resolve_block(node_context);
+				#if trace
+					context.hub.history.back();
+				#end
 			}
 		}
+
+		#if trace
+			context.hub.history.pop();
+		#end
 
 		return null;
 	}

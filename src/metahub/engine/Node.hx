@@ -133,7 +133,7 @@ class Node {
 
 		if (equals(old_value, value, property)) {
 			#if log
-			hub.history.log("attempted " + property.fullname() + "|set_value " + value);
+			//hub.history.log("attempted " + property.fullname() + "|set_value " + value);
 			#end
 			return;
 		}

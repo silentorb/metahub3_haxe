@@ -2,6 +2,7 @@ package metahub.engine;
 
 import metahub.code.Change;
 import metahub.code.nodes.INode;
+import metahub.debug.Entry;
 import metahub.schema.Kind;
 import metahub.schema.Trellis;
 import metahub.schema.Property;
@@ -36,6 +37,9 @@ class General_Port {
 	}
 
 	public function set_node_value(change:Change, context:Context, source:General_Port) {
+		#if trace
+			log(context.hub, 'set_node_value', change.value, source.node, node);
+		#end
 		node.set_value(id, change, context, source);
 	}
 
@@ -77,5 +81,13 @@ class General_Port {
 			throw new Exception("Cannot get_external_value from an unconnected port.");
 
 		return connections[0].node.resolve(context);
+	}
+
+	function log(hub:Hub, message:String, value:Dynamic, input:INode, output:INode) {
+		var entry = new Entry(message);
+		entry.value = value;
+		entry.input = input;
+		entry.output = output;
+		hub.history.add(entry);
 	}
 }

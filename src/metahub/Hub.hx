@@ -4,6 +4,7 @@ import metahub.code.expressions.Expression;
 import metahub.code.functions.Core_Function_Library;
 import metahub.code.nodes.Block_Node;
 import metahub.code.Type_Signature;
+import metahub.debug.History;
 import metahub.engine.Context;
 import metahub.engine.Empty_Context;
 import metahub.engine.General_Port;
@@ -216,12 +217,23 @@ import haxe.Json;
 		}
     var match:metahub.parser.Match = cast result;
 		var statement = run_data(match.get_data());
-		trace(graph_expressions(statement));
+
+		//trace(graph_expressions(statement));
+
+		#if trace
+			history.new_tree();
+		#end
+
 		var port = statement.to_port(root_scope, new Group(null), null);
-		trace(graph_nodes(port.node));
+		//trace(graph_nodes(port.node));
+
+		#if trace
+			history.new_tree();
+		#end
+
 		port.get_node_value(new Empty_Context(this));
+		history.start_finished();
 		return port;
-		//Expression_Utility.resolve(statement, new Type_Signature(Kind.unknown), root_scope);
   }
 
 	public function parse_code(code:String) {
@@ -259,6 +271,16 @@ import haxe.Json;
 		new_nodes = [];
 	}
 
+	public static function get_node_label(node:INode, port:General_Port = null) {
+		var trellis:Trellis = Type.getClassName(Type.getClass(node)) == "metahub.schema.Trellis"
+			? cast node
+			: null;
+
+		return trellis != null && port != null
+			? trellis.properties[port.id].fullname()
+			: node.to_string();
+	}
+
 	public static function graph_nodes(node:INode, depth:Int = 0, used:Array<INode> = null, port:General_Port = null):String {
 		if (used == null)
 			used = [];
@@ -274,9 +296,7 @@ import haxe.Json;
 		for (i in 0...depth) {
 			padding += tabbing;
 		}
-		var label = trellis != null && port != null
-			? trellis.properties[port.id].fullname()
-			: node.to_string();
+		var label = get_node_label(node, port);
 
 		if (Reflect.hasField(node, 'id'))
 			label = "#" + Reflect.field(node, 'id') + " " + label;

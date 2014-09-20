@@ -38,7 +38,7 @@ class General_Port {
 
 	public function set_node_value(change:Change, context:Context, source:General_Port) {
 		#if trace
-			log(context.hub, 'set_node_value', change.value, source.node, node);
+			log(context, 'set_node_value', change.value, source.node, node);
 		#end
 		node.set_value(id, change, context, source);
 	}
@@ -63,9 +63,21 @@ class General_Port {
 	}
 
 	public function set_external_value(change:Change, context:Context) {
+		#if trace
+			context.hub.history.start_anchor();
+		#end
+		
 		for (connection in connections) {
+			#if trace
+				context.hub.history.back_to_anchor();
+			#end
+			
 			connection.set_node_value(change, context, this);
 		}
+		
+		#if trace
+			context.hub.history.end_anchor();
+		#end
 	}
 
 	public function resolve_node(context:Context):Context {
@@ -83,11 +95,12 @@ class General_Port {
 		return connections[0].node.resolve(context);
 	}
 
-	function log(hub:Hub, message:String, value:Dynamic, input:INode, output:INode) {
+	function log(context:Context, message:String, value:Dynamic, input:INode, output:INode) {
 		var entry = new Entry(message);
 		entry.value = value;
 		entry.input = input;
 		entry.output = output;
-		hub.history.add(entry);
+		entry.context = context.node;
+		context.hub.history.add(entry);
 	}
 }

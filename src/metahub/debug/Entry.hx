@@ -15,8 +15,13 @@ class Entry {
 	public var property:Property;
 	public var children = new Array<Entry>();
 	public var parent:Entry = null;
+	public var id:Int;
+	public var context:Node;
 
+	static var counter = -1;
+	
 	public function new(message:String = '') {
 		this.message = message;
+		id = ++counter;
 	}
 }

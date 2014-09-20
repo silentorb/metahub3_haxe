@@ -1,6 +1,6 @@
 -cp src
 -lib nodejs
--D nodejs haxeJSON
+-D nodejs haxeJSON trace
 -js output/nodejs/metahub.js
 -main metahub.Main
 -debug

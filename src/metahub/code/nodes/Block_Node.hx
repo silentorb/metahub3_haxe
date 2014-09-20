@@ -29,7 +29,8 @@ class Block_Node implements INode extends Standard_Node {
 
   override public function get_value(index:Int, context:Context):Change {
 		#if trace
-			context.hub.history.add(new Entry('Block'), true);
+			context.hub.history.add(new Entry('Block'));
+			context.hub.history.start_anchor();
 		#end
 
 		var definition = scope.definition;
@@ -42,13 +43,13 @@ class Block_Node implements INode extends Standard_Node {
 				var node_context = new Node_Context(node, scope.hub);
 				resolve_block(node_context);
 				#if trace
-					context.hub.history.back();
+					context.hub.history.back_to_anchor();
 				#end
 			}
 		}
 
 		#if trace
-			context.hub.history.pop();
+			context.hub.history.end_anchor();
 		#end
 
 		return null;

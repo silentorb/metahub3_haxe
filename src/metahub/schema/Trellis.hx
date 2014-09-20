@@ -108,13 +108,25 @@ class Trellis implements INode {
 	}
 
 	 public function set_external_value(index:Int, value:Dynamic, context:Context, source:General_Port) {
+		#if trace
+			context.hub.history.start_anchor();
+		#end
+		
 		var port = ports[index];
 		for (connection in port.connections) {
 			if (connection == source)
 				continue;
 
+			#if trace
+				context.hub.history.back_to_anchor();
+			#end
+			
 			connection.set_node_value(new Change(value), context, port);
 		}
+		
+		#if trace
+			context.hub.history.end_anchor();
+		#end
 	}
 
 	public function get_external_value(index:Int, change:Change, context:Context) {

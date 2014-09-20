@@ -4,6 +4,7 @@ import metahub.code.expressions.Expression;
 import metahub.code.functions.Core_Function_Library;
 import metahub.code.nodes.Block_Node;
 import metahub.code.Type_Signature;
+import metahub.debug.Entry;
 import metahub.debug.History;
 import metahub.engine.Context;
 import metahub.engine.Empty_Context;
@@ -129,6 +130,12 @@ import haxe.Json;
 		var id = register ? ++node_count : 0;
 		//if (id != 0)
 			//trace("Creating " + trellis.name + " : " + id);
+			
+		#if trace
+			var entry = new Entry("Create " + trellis.name + " " + id);
+			history.add(entry);
+		#end
+		
 		for (factory in node_factories) {
 			node = factory(this, id, trellis);
 			if (node != null)
@@ -144,8 +151,10 @@ import haxe.Json;
 		new_nodes.push(node);
 
 		//node.initialize_values2();
-		node.update_values();
-		node.update_on_create();
+		if (!trellis.is_value) {
+			node.update_values();
+			node.update_on_create();
+		}
 
     return node;
   }

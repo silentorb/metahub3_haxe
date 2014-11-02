@@ -51,7 +51,10 @@ import haxe.Json;
 	var node_count:Int;
 	var interval_node = null;
 
+	static var instances = new Array<Hub>();
+
   public function new() {
+		instances.push(this);
     nodes[0] = null;
 		node_count = 1;
 
@@ -130,12 +133,12 @@ import haxe.Json;
 		var id = register ? ++node_count : 0;
 		//if (id != 0)
 			//trace("Creating " + trellis.name + " : " + id);
-			
+
 		#if trace
 			var entry = new Entry("Create " + trellis.name + " " + id);
 			history.add(entry);
 		#end
-		
+
 		for (factory in node_factories) {
 			node = factory(this, id, trellis);
 			if (node != null)

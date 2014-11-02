@@ -24,7 +24,7 @@
     <option noInlineOnDebug="False" />
     <option mainClass="" />
     <option enabledebug="False" />
-    <option additional="trace" />
+    <option additional="" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>

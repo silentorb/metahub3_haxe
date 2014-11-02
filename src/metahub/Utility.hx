@@ -21,4 +21,34 @@ class Utility {
     return Json.parse(json);
   }
 
+	public static function clear_folder(url:String) {
+#if nodejs
+	var walk = function(dir:String) {
+		var children = Nodejs.fs.readDir(dir);
+		for (child in children) {
+			var stat = Nodejs.fs.statSync(child)
+			if (stat && stat.isDirectory()) {
+				walk(child);
+				Nodejs.fs.rmdirSync(child);
+			}
+			else {
+				Nodejs.fs.unlinkSync(child);
+			}
+		}
+	}
+	var files = Nodejs.fs.readDir(url);
+	for
+#else
+	throw "Not supported.";
+#end
+	}
+
+	public static function create_file(url:String, contents:String) {
+#if nodejs
+	Nodejs.fs.writeFileSync(url, cast contents );
+#else
+	throw "Not supported.";
+#end
+
+	}
 }

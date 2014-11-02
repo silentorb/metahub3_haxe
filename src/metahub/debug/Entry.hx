@@ -19,9 +19,20 @@ class Entry {
 	public var context:Node;
 
 	static var counter = -1;
-	
+
 	public function new(message:String = '') {
 		this.message = message;
 		id = ++counter;
+	}
+
+	public function get_parent_depth():Int {
+		var depth = 0;
+		var entry = this;
+		while (entry.parent != null) {
+			++depth;
+			entry = entry.parent;
+		}
+
+		return depth;
 	}
 }

@@ -1,6 +1,6 @@
 package metahub.debug;
 
-import metahub.debug.Explorer;
+import metahub.debug.query.Explorer;
 
 /**
  * ...
@@ -38,11 +38,11 @@ class History {
 		if (stack.length > 1)
 			throw new Exception("History leak:  Tried to create new tree when previous stack was not unset.");
 
-		current = new Entry('Root');		
+		current = new Entry('Root');
 		entries.push(current);
 		stack = [ current ];
 	}
-	
+
 	public function start_anchor() {
 		stack.push(current);
 	}
@@ -50,7 +50,7 @@ class History {
 	public function end_anchor() {
 		current = stack.pop();
 	}
-	
+
 	public function back_to_anchor() {
 		if (only_on_start && !is_start)
 			return;
@@ -75,5 +75,9 @@ class History {
 	public function start_finished(){
 		is_start = false;
 	}
-	
+
+	public function create_explorer() {
+		return new Explorer(this);
+	}
+
 }

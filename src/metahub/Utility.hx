@@ -23,21 +23,23 @@ class Utility {
 
 	public static function clear_folder(url:String) {
 #if nodejs
-	var walk = function(dir:String) {
-		var children = Nodejs.fs.readDir(dir);
+	var fs = Nodejs.fs;
+	function walk(dir:String) {
+		var children = Nodejs.fs.readdirSync(dir);
 		for (child in children) {
-			var stat = Nodejs.fs.statSync(child)
-			if (stat && stat.isDirectory()) {
-				walk(child);
-				Nodejs.fs.rmdirSync(child);
+			var name = dir + "/" + child;
+			//trace(name);
+			var stat = fs.statSync(name);
+			if (stat != null && stat.isDirectory()) {
+				walk(name);
+				Nodejs.fs.rmdirSync(name);
 			}
 			else {
-				Nodejs.fs.unlinkSync(child);
+				Nodejs.fs.unlinkSync(name);
 			}
 		}
 	}
-	var files = Nodejs.fs.readDir(url);
-	for
+	walk(url);
 #else
 	throw "Not supported.";
 #end
@@ -49,6 +51,14 @@ class Utility {
 #else
 	throw "Not supported.";
 #end
+	}
 
+	public static function create_folder(url:String) {
+#if nodejs
+	if (!Nodejs.fs.existsSync(url))
+		Nodejs.fs.mkdirSync(url);
+#else
+	throw "Not supported.";
+#end
 	}
 }

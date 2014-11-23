@@ -2,5 +2,5 @@
 	"code": "logic.mh",
   "schema": "schema.json",
   "output": "output",
-	"namespace": "game"
+	"namespace": "marloth"
 }

@@ -1,0 +1,119 @@
+{
+	"trellises": {
+		"World": {
+			"properties": {
+				"entities": {
+					"type": "list",
+					"trellis": "Entity"
+				},
+				"input": {
+					"type": "reference",
+					"trellis": "Player_Input"
+				},
+				"walls": {
+					"type": "list",
+					"trellis": "Wall"
+				},
+				"player": {
+					"type": "reference",
+					"trellis": "Player"
+				}
+			}
+		},
+		"Entity": {
+			"properties": {
+				"world": {
+					"type": "reference",
+					"trellis": "World"
+				}
+			}
+		},
+		"Position": {
+			"is_value": true,
+			"properties": {
+				"x": {
+					"type": "float"
+				},
+				"y": {
+					"type": "float"
+				},
+				"parent": {
+					"type": "unknown"
+				}
+			}
+		},
+		"Body": {
+			"parent": "Entity",
+			"properties": {
+				"position": {
+					"type": "reference",
+					"trellis": "Position"
+				},
+				"forces": {
+					"type": "list",
+					"trellis": "Force"
+				},
+				"image": {
+					"type": "string",
+					"default": "ball1.png"
+				}
+			}
+		},
+		"Bullet": {
+			"parent": "Body"
+		},
+		"Force": {
+			"parent": "Entity",
+			"properties": {
+				"body": {
+					"type": "reference",
+					"trellis": "Body"
+				},
+				"vector": {
+					"type": "reference",
+					"trellis": "Position"
+				},
+				"x": {
+					"type": "float"
+				},
+				"y": {
+					"type": "float"
+				}
+			}
+		},
+		"Bullet_Force": {
+			"parent": "Force"
+		},
+		"Player": {
+			"parent": "Body"
+		},
+    "Player_Input_Force": {
+      "parent": "Force"
+    },
+		"Player_Input": {
+			"properties": {
+        "world": {
+          "type": "reference",
+          "trellis": "World"
+        },
+				"dir": {
+					"type": "reference",
+          "trellis": "Position"
+				},
+				"attack_cooldown": {
+					"type": "int"
+				},
+				"attacking": {
+					"type": "bool"
+				},
+				"attack_dir": {
+					"type": "reference",
+					"trellis": "Position"
+				}
+      }
+		},
+		"Wall": {
+			"parent": "Body"
+		}
+	}
+}

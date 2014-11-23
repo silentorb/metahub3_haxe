@@ -1,5 +1,9 @@
 package metahub.generate;
+import metahub.generate.targets.Cpp_Target;
+import metahub.generate.targets.Haxe_Target;
+import metahub.generate.targets.Target;
 import metahub.Hub;
+import metahub.schema.Namespace;
 
 /**
  * ...
@@ -13,15 +17,30 @@ import metahub.Hub;
 		this.hub = hub;
 	}
 
-	public function run(statement, output_folder:String) {
+	public function run(statement, target_name:String, output_folder:String) {
+		Utility.clear_folder(output_folder);
 
-		for (trellis in hub.schema.trellises) {
-			var text = "package ;\n\nclass " + trellis.name + " {\n\n}\n\nclass "
-			+ trellis.name + "_Actions {\n\n}\n";
-			Utility.create_file("test/gen/output/" + trellis.name + ".hx", text);
+		var target:Target = null;
+
+		switch(target_name) {
+			case "cpp":
+				target = new Cpp_Target(hub);
+
+			case "haxe":
+				target = new Haxe_Target(hub);
 		}
 
+		target.run(statement, output_folder);
+	}
 
+	public static function get_namespace_path(namespace:Namespace):Array<String> {
+		var tokens = [];
+		while(namespace != null && namespace.name != 'root') {
+			tokens.unshift(namespace.name);
+			namespace = namespace.parent;
+		}
+
+		return tokens;
 	}
 
 }

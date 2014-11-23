@@ -14,7 +14,7 @@ class Group implements INode extends Standard_Node {
 
 	public function new(parent:Group, only_new:Bool = false) {
 		super(parent);
-		if (parent != null && parent.is_back_referencing != null)
+		if (parent != null && Reflect.hasField(parent, "is_back_referencing"))
 			is_back_referencing = parent.is_back_referencing;
 
 		add_ports(2);

@@ -9,7 +9,8 @@ import metahub.schema.Property;
 
 typedef ITrellis_Source = {
   name:String,
-  properties:Map<String, IProperty_Source>,
+  //properties:Map<String, IProperty_Source>,
+  properties:Dynamic,
   parent:String,
 	?primary_key:String,
 	?is_value:Bool

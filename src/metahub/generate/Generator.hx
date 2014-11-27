@@ -20,14 +20,15 @@ import metahub.schema.Namespace;
 	public function run(statement, target_name:String, output_folder:String) {
 		Utility.clear_folder(output_folder);
 
+		var railway = new Railway(hub);
 		var target:Target = null;
 
 		switch(target_name) {
 			case "cpp":
-				target = new Cpp_Target(hub);
+				target = new Cpp_Target(railway);
 
 			case "haxe":
-				target = new Haxe_Target(hub);
+				target = new Haxe_Target(railway);
 		}
 
 		target.run(statement, output_folder);

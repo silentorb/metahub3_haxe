@@ -1,4 +1,5 @@
 package metahub.generate.targets;
+import metahub.generate.Railway;
 import metahub.Hub;
 import metahub.schema.Namespace;
 
@@ -8,12 +9,13 @@ import metahub.schema.Namespace;
  */
 class Haxe_Target extends Target{
 
-	public function new(hub:Hub) {
-		super(hub);
+	public function new(railway:Railway) {
+		super(railway);
 	}
 
 	override public function run(statement, output_folder:String) {
-		for (trellis in hub.schema.trellises) {
+		for (rail in railway.rails) {
+			var trellis = rail.trellis;
 			//trace(trellis.namespace.fullname);
 			var namespace = Generator.get_namespace_path(trellis.namespace);
 			var dir = output_folder + "/" + namespace.join('/');

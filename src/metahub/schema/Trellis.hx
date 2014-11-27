@@ -19,7 +19,7 @@ typedef ITrellis_Source = {
 class Trellis implements INode {
   public var name:String;
   public var schema:Schema;
-  var core_properties:Array<Property> = new Array<Property>();
+  public var core_properties:Array<Property> = new Array<Property>();
   var all_properties:Array<Property>;
 	public var parent:Trellis;
   public var id:Identity;
@@ -112,7 +112,7 @@ class Trellis implements INode {
 		#if trace
 			context.hub.history.start_anchor();
 		#end
-		
+
 		var port = ports[index];
 		for (connection in port.connections) {
 			if (connection == source)
@@ -121,10 +121,10 @@ class Trellis implements INode {
 			#if trace
 				context.hub.history.back_to_anchor();
 			#end
-			
+
 			connection.set_node_value(new Change(value), context, port);
 		}
-		
+
 		#if trace
 			context.hub.history.end_anchor();
 		#end
@@ -264,7 +264,7 @@ class Trellis implements INode {
 	public function resolve(context:Context):Context {
 		throw new Exception("Not implemented.");
 	}
-	
+
 	public function on_create_node(context:Context) {
 		for (port in on_create_ports) {
 			port.get_node_value(context);

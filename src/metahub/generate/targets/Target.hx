@@ -1,17 +1,17 @@
 package metahub.generate.targets;
+import metahub.generate.Railway;
 import metahub.generate.Renderer;
-import metahub.Hub;
 
 /**
  * ...
  * @author Christopher W. Johnson
  */
 class Target{
-	var hub:Hub;
+	var railway:Railway;
 	var render = new Renderer();
 
-	public function new(hub:Hub) {
-		this.hub = hub;
+	public function new(railway:Railway) {
+		this.railway = railway;
 	}
 
 	public function run(statement, output_folder:String) {

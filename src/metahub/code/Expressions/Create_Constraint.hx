@@ -1,4 +1,4 @@
-package metahub.code.expressions ;
+package metahub.code.expressions;
 
 import metahub.code.expressions.Expression;
 import metahub.code.functions.Functions;
@@ -14,11 +14,11 @@ import metahub.schema.Kind;
 
 class Create_Constraint implements Expression {
   public var type:Type_Signature;
-  var reference:Expression;
-  var expression:Expression;
-	var is_back_referencing = false;
+  public var reference:Expression;
+  public var expression:Expression;
+	public var is_back_referencing = false;
 	public var children:Array<Expression>;
-	var operator:String;
+	public var operator:String;
 
   public function new(reference:Expression, expression:Expression, operator:String, is_back_referencing:Bool) {
     this.reference = reference;

@@ -1,4 +1,5 @@
 package metahub.generate;
+import metahub.code.expressions.Expression;
 import metahub.generate.targets.Cpp_Target;
 import metahub.generate.targets.Haxe_Target;
 import metahub.generate.targets.Target;
@@ -17,10 +18,10 @@ import metahub.schema.Namespace;
 		this.hub = hub;
 	}
 
-	public function run(statement, target_name:String, output_folder:String) {
+	public function run(statement:Expression, target_name:String, output_folder:String) {
 		Utility.clear_folder(output_folder);
-
 		var railway = new Railway(hub);
+		railway.process(statement, hub.root_scope);
 		var target:Target = null;
 
 		switch(target_name) {

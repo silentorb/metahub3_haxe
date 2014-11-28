@@ -13,7 +13,7 @@ import metahub.schema.Kind;
  */
 class Scope_Expression implements Expression {
 	var expression:Expression;
-	var scope_definition:Scope_Definition;
+	public var scope_definition:Scope_Definition;
 	public var children :Array<Expression>;
 
   public function new(expression:Expression, scope_definition:Scope_Definition) {

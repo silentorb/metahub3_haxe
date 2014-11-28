@@ -2,6 +2,7 @@ package metahub.generate.targets;
 import metahub.generate.Rail;
 import metahub.generate.Railway;
 import metahub.generate.Renderer;
+import metahub.generate.Tie;
 import metahub.Hub;
 import metahub.schema.Namespace;
 import metahub.schema.Property;
@@ -21,6 +22,11 @@ class Cpp_Target extends Target{
 		"int": "int",
 		"bool": "bool",
 		"float": "float"
+	}
+
+	static var operators = {
+		"greater_than": ">",
+		"lesser_than": "<"
 	}
 
 	public function new(railway:Railway) {
@@ -45,7 +51,7 @@ class Cpp_Target extends Target{
 			ambient_dependencies(rail);
 			class_declaration(rail);
 			render.newline();
-			class_actions_declaration(rail);
+			//class_actions_declaration(rail);
 			render.unindent().line("}");
 
 			var body = render.finish();
@@ -58,8 +64,8 @@ class Cpp_Target extends Target{
 	function ambient_dependencies(rail:Rail) {
 		var lines = false;
 		for (dependency in rail.dependencies) {
-			if (dependency != rail.trellis.parent) {
-				render.line('class ' + dependency.name + ";");
+			if (dependency != rail.parent) {
+				render.line('class ' + dependency.rail_name + ";");
 				lines = true;
 			}
 		}
@@ -70,16 +76,20 @@ class Cpp_Target extends Target{
 	function class_declaration(rail:Rail) {
 		var first = "class " + rail.name;
 		if (rail.trellis.parent != null) {
-			first += " : public " + get_rail_class_name(rail.trellis.parent);
-			//add_dependency(property.parent);
+			first += " : public " + rail.parent.rail_name;
 		}
 
 		render.line(first + " {")
 		.line("public:")
 		.indent();
-		for (property in rail.trellis.core_properties) {
-			property_declaration(property);
+		for (tie in rail.core_ties) {
+			property_declaration(tie);
 		}
+
+		for (tie in rail.all_ties) {
+			render_setter(tie);
+		}
+
 		render.unindent().line("}")
 		;
 	}
@@ -91,25 +101,22 @@ class Cpp_Target extends Target{
 		;
 	}
 
-	function get_property_type_string(property:Property) {
-		if (property.type == Kind.reference) {
-			return get_rail_class_name(property.other_trellis);
+	function get_property_type_string(tie:Tie, is_parameter = false) {
+		if (tie.property.type == Kind.reference) {
+			return is_parameter
+			? tie.other_rail.rail_name + '&'
+			: tie.other_rail.rail_name;
 		}
-		else if (property.type == Kind.list) {
-			return "std::vector<" + get_rail_class_name(property.other_trellis) + ">";
+		else if (tie.property.type == Kind.list) {
+			return "std::vector<" + tie.other_rail.rail_name + ">";
 		}
 		else {
-			return Reflect.field(types, property.type.to_string());
+			return Reflect.field(types, tie.property.type.to_string());
 		}
 	}
 
-	function property_declaration(property:Property) {
-		return render.line(get_property_type_string(property) + " " +	property.name + ";");
-	}
-
-	function get_rail_class_name(trellis:Trellis) {
-		var rail = railway.rails[trellis.name];
-		return rail.name;
+	function property_declaration(tie:Tie) {
+		return render.line(get_property_type_string(tie) + " " +	tie.tie_name + ";");
 	}
 
 	function render_headers(rail:Rail) {
@@ -118,5 +125,34 @@ class Cpp_Target extends Target{
 		}
 
 		return render;
+	}
+
+	function render_setter(tie:Tie) {
+		if (tie.constraints.length == 0)
+			return;
+
+		render.line('function set_' + tie.tie_name + '(' + get_property_type_string(tie, true) + ' value) {');
+		render.indent();
+		for (constraint in tie.constraints) {
+			render.line('if (' + render_value_path(constraint.reference)
+			+ ' ' + Reflect.field(operators, constraint.operator) + ' '
+			+ ')');
+		}
+		render.unindent();
+		render.line('}');
+	}
+
+	function render_value_path(path:Array<Tie>) {
+		return ['value'].concat(path.slice(1).map(function(t) return t.tie_name)).join('.');
+	}
+
+	function render_path(path:Array<Tie>) {
+		return path.map(function(t) return t.tie_name).join('.');
+		//var result = "";
+		//for (tie in path) {
+			////token.
+		//}
+//
+		//return result;
 	}
 }

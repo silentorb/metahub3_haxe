@@ -1,4 +1,4 @@
-require('source-map-support').install()
+//require('source-map-support').install()
 var args = process.argv.slice(2)
 console.log('args', args)
 var MetaHub = require('./output/nodejs/metahub.js').metahub
@@ -23,9 +23,8 @@ hub.load_schema_from_string(schema, hub.schema.add_namespace(config.namespace))
 var result = hub.parse_code(code)
 
 if (!result.success)
-  throw new Exception("Syntax Error at " + result.end.y + ":" + result.end.x);
-
+  throw new Exception("Syntax Error at " + result.end.y + ":" + result.end.x)
 //var statement = run_data(result.get_data())
-var statement = null
+var statement = hub.run_data(result.get_data())
 var generator = new MetaHub.generate.Generator(hub)
 generator.run(statement, 'cpp', root + config.output)

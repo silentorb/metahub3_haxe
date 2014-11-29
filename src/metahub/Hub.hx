@@ -205,16 +205,22 @@ import haxe.Json;
 
   public function load_schema_from_file(url:String, namespace:Namespace, auto_identity:Bool = false) {
     var data = Utility.load_json(url);
-    schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
+    load_schema_from_object(data, namespace, auto_identity);
   }
 
 	public function load_schema_from_string(json:String, namespace:Namespace, auto_identity:Bool = false) {
     var data = Json.parse(json);
-    schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
+    load_schema_from_object(data, namespace, auto_identity);
   }
 
 	public function load_schema_from_object(data:Dynamic, namespace:Namespace, auto_identity:Bool = false) {
     schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
+		for (key in Reflect.fields(data)) {
+			if (key == 'trellises')
+				continue;
+				
+			schema.additional[key] = Reflect.field(data, key);
+		}
   }
 
   public function run_data(source:Dynamic):Expression {

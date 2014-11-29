@@ -15,9 +15,9 @@ class Railway {
 
 	public var rails = new Map<String, Rail>();
 
-	public function new(hub:Hub) {
+	public function new(hub:Hub, map:Dynamic) {
 		for (trellis in hub.schema.trellises) {
-			rails[trellis.name] = new Rail(trellis, this);
+			rails[trellis.name] = new Rail(trellis, this, Reflect.field(map, trellis.name));
 		}
 
 		for (rail in rails) {

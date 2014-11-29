@@ -20,13 +20,13 @@ import metahub.schema.Namespace;
 
 	public function run(statement:Expression, target_name:String, output_folder:String) {
 		Utility.clear_folder(output_folder);
-		var railway = new Railway(hub);
+		var railway = new Railway(hub, hub.schema.additional[target_name]);
 		railway.process(statement, hub.root_scope);
 		var target:Target = null;
 
 		switch(target_name) {
 			case "cpp":
-				target = new Cpp_Target(railway);
+				target = new Cpp_Target(railway, hub.schema.additional['cpp']);
 
 			case "haxe":
 				target = new Haxe_Target(railway);

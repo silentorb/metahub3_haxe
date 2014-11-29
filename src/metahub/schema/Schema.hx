@@ -7,6 +7,7 @@ import metahub.schema.Trellis;
 class Schema {
   public var trellises:Array<Trellis> = new Array<Trellis>();
   public var root_namespace = new Namespace("root", "root");
+	public var additional = new Map<String, Dynamic>();
 
 	public function add_namespace(name:String, function_library:Function_Library = null):Namespace {
 		if (root_namespace.children.exists(name))

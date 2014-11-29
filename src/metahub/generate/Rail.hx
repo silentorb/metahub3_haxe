@@ -17,11 +17,19 @@ class Rail {
 	public var all_ties = new Map<String, Tie>();
 	public var railway:Railway;
 	public var parent:Rail;
+	public var is_external = false;
 
-	public function new(trellis:Trellis, railway:Railway) {
+	public function new(trellis:Trellis, railway:Railway, map:Dynamic) {
 		this.trellis = trellis;
 		this.railway = railway;
 		rail_name = this.name = trellis.name;
+		if (map != null) {
+			if (Reflect.hasField(map, 'is_external'))
+				is_external = Reflect.field(map, 'is_external');
+				
+			if (Reflect.hasField(map, 'name'))
+				rail_name = Reflect.field(map, 'name');
+		}
 	}
 
 	public function process() {

@@ -19,6 +19,7 @@ import metahub.schema.Kind;
 class Cpp_Target extends Target{
 
 	//var types:Map<Kind, Dynamic>;
+	public var map:Dynamic;
 
 	static var types = {
 		"string": "std::string",
@@ -34,7 +35,8 @@ class Cpp_Target extends Target{
 		//"lesser_than_or_equal_to": "<="
 	//}
 //
-	public function new(railway:Railway) {
+	public function new(railway:Railway, map:Dynamic) {
+		this.map = map != null ? map : {};
 		super(railway);
 
 		//types[Kind.string] = {

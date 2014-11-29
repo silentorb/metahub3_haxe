@@ -7,16 +7,15 @@ package metahub.generate;
 class Renderer{
 
 	var depth:Int = 0;
-	var content:String = "";
+	//var content:String = "";
 	var indentation:String = "";
 
 	public function new() {
 
 	}
 
-	public function line(text:String) {
-		content += indentation + text + "\n";
-		return this;
+	public function line(text:String):String {
+		return indentation + text + "\n";
 	}
 
 	public function indent() {
@@ -31,25 +30,30 @@ class Renderer{
 		return this;
 	}
 
-	public function add(text:String) {
-		content += text;
-		return this;
-	}
+	//public function add(text:String) {
+		//content += text;
+		//return this;
+	//}
 
-	public function newline(amount:Int = 1) {
+	public function newline(amount:Int = 1):String {
 		var i = 0;
+		var result = "";
 		while(i++ < amount) {
-			content += "\n";
+			result += "\n";
 		}
-		return this;
+		return result;
 	}
 
 	public function finish() {
-		var result = content;
-		content = "";
+		//content = "";
 		depth = 0;
 		indentation = "";
-		return result;
+	}
+	
+	public function pad(content:String) {
+		return content == ""
+		? content
+		: newline() + content;
 	}
 
 }

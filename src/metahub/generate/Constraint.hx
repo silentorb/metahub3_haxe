@@ -2,6 +2,7 @@ package metahub.generate;
 import metahub.code.expressions.Create_Constraint;
 import metahub.code.expressions.Expression;
 import metahub.code.expressions.Property_Reference;
+import metahub.code.Scope;
 import metahub.code.Type_Signature;
 
 /**
@@ -15,8 +16,9 @@ class Constraint {
 	public var is_back_referencing = false;
 	//public var children:Array<Expression>;
 	public var operator:String;
+	public var scope:Scope;
 
-	public function new(expression:Create_Constraint, railway:Railway) {
+	public function new(expression:Create_Constraint, railway:Railway, scope:Scope) {
 		type = expression.type;
 		is_back_referencing = expression.is_back_referencing;
 		operator = expression.operator;
@@ -24,6 +26,7 @@ class Constraint {
 		reference = convert_reference(expression.reference, railway);
 		//this.expression = convert_reference(expression.expression, railway);
 		this.expression = expression.expression;
+		this.scope = scope;
 	}
 
 	static function convert_reference(expression:Expression, railway:Railway):Array<Tie> {

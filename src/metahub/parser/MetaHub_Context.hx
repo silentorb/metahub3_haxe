@@ -176,7 +176,8 @@ typedef Reference_Or_Function = {
 		return {
 			type: "condition",
 			"first": data[0],
-			"operator": Std.string(function_map[data[2][0]]),
+			"operator": Std.string(data[2][0]),
+			//"operator": Std.string(function_map[data[2][0]]),
 			"second": data[4]
     }
 	}
@@ -336,7 +337,8 @@ typedef Reference_Or_Function = {
     return {
 			type: "constraint",
 			reference: data[0],
-			operator: Std.string(function_map[data[2]]),
+			//operator: Std.string(function_map[data[2]]),
+			operator: data[2],
 			expression: data[4]
     };
   }

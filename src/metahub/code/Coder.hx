@@ -80,8 +80,8 @@ class Coder {
 		var reference = convert_expression(source.reference, scope_definition);
 		var back_reference:Expression = null;
 		var operator_name = source.operator;
-		if (['add_equals', 'subtract_equals', 'multiply_equals', 'divide_equals'].indexOf(operator_name) > -1) {
-			operator_name = operator_name.substring(0, operator_name.length - 7);
+		if (['+=', '-=', '*=', '/='].indexOf(operator_name) > -1) {
+			//operator_name = operator_name.substring(0, operator_name.length - 7);
 			back_reference = reference;
 		}
 		//var operator = Type.createEnum(Functions, operator_name);

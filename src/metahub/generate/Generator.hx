@@ -1,6 +1,6 @@
 package metahub.generate;
 import metahub.code.expressions.Expression;
-import metahub.generate.targets.Cpp_Target;
+import metahub.generate.targets.cpp.Cpp_Target;
 import metahub.generate.targets.Haxe_Target;
 import metahub.generate.targets.Target;
 import metahub.Hub;

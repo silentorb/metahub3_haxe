@@ -25,7 +25,7 @@ class Railway {
 		}
 	}
 
-	static function get_class_name(expression):String {
+	public static function get_class_name(expression):String {
 		return Type.getClassName(Type.getClass(expression)).split('.').pop();
 	}
 
@@ -69,7 +69,7 @@ class Railway {
 		//}
 		var rail = rails[scope.definition.trellis.name];
 		var tie = rail.all_ties[reference[0].property.name];
-		tie.constraints.push(new Constraint(expression, rail.railway));
+		tie.constraints.push(new Constraint(expression, rail.railway, scope));
 		trace("reference:", type);
 	}
 

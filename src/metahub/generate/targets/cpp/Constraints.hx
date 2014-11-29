@@ -16,7 +16,7 @@ class Constraints
 		"<=": ">"
 	}
 
-	public static function render(constraint:Constraint, render:Renderer, target:Cpp_Target):String {
+	public static function render(constraint:Constraint, render:Renderer, target:Cpp):String {
 		var operator = constraint.operator;
 		var inverse = Reflect.field(inverse_operators, operator);
 		var reference = target.render_value_path(constraint.reference);

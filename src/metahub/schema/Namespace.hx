@@ -14,6 +14,8 @@ class Namespace
 	public var function_library:Function_Library;
 	public var children = new Map<String, Namespace>();
 	public var parent:Namespace;
+	public var additional = new Map<String, Dynamic>();
+	public var is_external = false;
 
 	public function new(name:String, fullname:String, function_library:Function_Library = null)
 	{
@@ -23,7 +25,7 @@ class Namespace
 	}
 
 	public function has_name(name:String):Bool {
-		return trellises.exists(name) || function_library.exists(name);
+		return trellises.exists(name);
 	}
 
 	public function get_namespace(path:Array<String>):Namespace {
@@ -37,7 +39,9 @@ class Namespace
 				return current_namespace;
 			}
 			else {
-				return null;
+				return parent != null
+					? parent.get_namespace(path)
+					: null;
 			}
 			++i;
 		}

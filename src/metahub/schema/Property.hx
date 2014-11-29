@@ -82,6 +82,8 @@ typedef IProperty_Source = {
       return;
 
     this.other_trellis = this.trellis.schema.get_trellis(source.trellis, trellis.namespace);
+			if (this.other_trellis == null)
+				throw new Exception("Could not find other trellis for " + fullname() + ".");
 	}
 
   public function initialize_link2(source:IProperty_Source) {
@@ -91,6 +93,7 @@ typedef IProperty_Source = {
     if (source.other_property != null)
       this.other_property = other_trellis.get_property(source.other_property);
     else {
+
       var other_properties = Lambda.filter(this.other_trellis.properties, function(p) { return p.other_trellis == this.trellis; });
 //        throw new Exception('Could not find other property for ' + this.trellis.name + '.' + this.name + '.');
 
@@ -104,8 +107,12 @@ typedef IProperty_Source = {
         this.other_property.other_property = this;
       }
 			else {
-				if (!other_trellis.is_value)
+				if (!other_trellis.is_value) {
+					if (other_trellis.namespace.is_external)
+						return;
+						
 					throw new Exception("Could not find other property for " + fullname());
+				}
 			}
     }
   }

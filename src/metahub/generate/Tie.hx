@@ -16,6 +16,7 @@ class Tie {
 	public var tie_name:String;
 	public var other_rail:Rail;
 	public var other_tie:Tie;
+	public var is_value = false;
 
 	public var constraints = new Array<Constraint>();
 
@@ -27,11 +28,14 @@ class Tie {
 		if (property.other_trellis != null) {
 			trace('p', property.fullname(), property.other_trellis.name);
 			other_rail = rail.railway.rails[property.other_trellis.name];
+			is_value = property.other_trellis.is_value;
 			if (other_rail != null && property.other_property != null && other_rail.all_ties.exists(property.other_property.name)) {
 				other_tie = other_rail.all_ties[property.other_property.name];
 				//other_tie.other_rail = rail;
 				//other_tie.other_tie = this;
 			}
+			
+			
 		}
 	}
 }

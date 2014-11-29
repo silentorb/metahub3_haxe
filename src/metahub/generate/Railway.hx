@@ -13,11 +13,20 @@ import metahub.schema.Kind;
 
 class Railway {
 
+	public var regions = new Map<String, Region>();
 	public var rails = new Map<String, Rail>();
-
-	public function new(hub:Hub, map:Dynamic) {
+	public var target_name:String;
+	
+	public function new(hub:Hub, target_name:String) {
+		this.target_name = target_name;
+		
+		for (namespace in hub.schema.root_namespace.children) {
+			var region = new Region(namespace, target_name);
+			regions[namespace.name] = region;
+		}
+		
 		for (trellis in hub.schema.trellises) {
-			rails[trellis.name] = new Rail(trellis, this, Reflect.field(map, trellis.name));
+			rails[trellis.name] = new Rail(trellis, this);
 		}
 
 		for (rail in rails) {

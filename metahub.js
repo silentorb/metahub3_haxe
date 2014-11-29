@@ -11,15 +11,18 @@ var path = require('path')
 var root = path.dirname(config_path) + '/'
 //console.log('root', root)
 var config = JSON.parse(read_file(config_path))
-if (typeof config.namespace != 'string')
-	throw new Error('Configuration is missing "namespace".');
 
 var code = read_file(root + config.code)
-var schema = read_file(root + config.schema)
-
 var hub = new MetaHub.Hub()
 hub.load_parser()
-hub.load_schema_from_string(schema, hub.schema.add_namespace(config.namespace))
+
+for (var i in config.schemas) {
+  var schema_name = config.schemas[i]
+  var schema = read_file(root + schema_name + '.json')
+  var namespace = hub.schema.add_namespace(path.basename(schema_name, '.json'))
+  hub.load_schema_from_string(schema, namespace)
+}
+
 var result = hub.parse_code(code)
 
 if (!result.success)

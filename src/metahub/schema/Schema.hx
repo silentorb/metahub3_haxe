@@ -7,7 +7,6 @@ import metahub.schema.Trellis;
 class Schema {
   public var trellises:Array<Trellis> = new Array<Trellis>();
   public var root_namespace = new Namespace("root", "root");
-	public var additional = new Map<String, Dynamic>();
 
 	public function add_namespace(name:String, function_library:Function_Library = null):Namespace {
 		if (root_namespace.children.exists(name))
@@ -15,6 +14,7 @@ class Schema {
 
 		var namespace = new Namespace(name, name, function_library);
 		root_namespace.children[name] = namespace;
+		namespace.parent = root_namespace;
 		return namespace;
 	}
 
@@ -70,8 +70,11 @@ class Schema {
   }
 
   public function get_trellis(name:String, namespace:Namespace, throw_exception_on_missing = false):Trellis {
-		if (name.indexOf('.') > -1)
-			throw new Exception('Namespace paths are not supported yet.', 400);
+		if (name.indexOf('.') > -1) {
+			var path = name.split('.');
+			name = path.pop();
+			namespace = namespace.get_namespace(path);
+		}			
 
 		if (namespace == null)
 				throw new Exception('Could not find namespace for trellis: ' + name + '.', 400);

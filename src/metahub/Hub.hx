@@ -215,11 +215,14 @@ import haxe.Json;
 
 	public function load_schema_from_object(data:Dynamic, namespace:Namespace, auto_identity:Bool = false) {
     schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
+		if (Reflect.hasField(data, 'is_external') && Reflect.field(data, 'is_external') == true)
+			namespace.is_external = true;
+	
 		for (key in Reflect.fields(data)) {
 			if (key == 'trellises')
 				continue;
 				
-			schema.additional[key] = Reflect.field(data, key);
+			namespace.additional[key] = Reflect.field(data, key);
 		}
   }
 

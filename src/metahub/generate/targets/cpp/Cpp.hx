@@ -17,10 +17,7 @@ import metahub.schema.Kind;
  * ...
  * @author Christopher W. Johnson
  */
-class Cpp_Target extends Target{
-
-	//var types:Map<Kind, Dynamic>;
-	public var map:Dynamic;
+class Cpp extends Target{
 
 	static var types = {
 		"string": "std::string",
@@ -36,8 +33,7 @@ class Cpp_Target extends Target{
 		//"lesser_than_or_equal_to": "<="
 	//}
 //
-	public function new(railway:Railway, map:Dynamic) {
-		this.map = map != null ? map : {};
+	public function new(railway:Railway) {
 		super(railway);
 
 		//types[Kind.string] = {
@@ -48,6 +44,9 @@ class Cpp_Target extends Target{
 
 	override public function run(statement, output_folder:String) {
 		for (rail in railway.rails) {
+			if (rail.is_external)
+				continue;
+			
 			//trace(rail.namespace.fullname);
 			var namespace = Generator.get_namespace_path(rail.trellis.namespace);
 			var dir = output_folder + "/" + namespace.join('/');
@@ -60,8 +59,8 @@ class Cpp_Target extends Target{
 
 	function create_header_file(rail:Rail, namespace, dir) {
 		var headers = [ "stdafx" ];
-		if (rail.trellis.parent != null)
-			headers.push(rail.trellis.parent.name);
+		if (rail.parent != null && rail.parent.source_file != null)
+			headers.push(rail.parent.source_file);
 
 		render = new Renderer();
 		var result = render.line('#pragma once')
@@ -77,6 +76,11 @@ class Cpp_Target extends Target{
 
 	function create_class_file(rail:Rail, namespace, dir) {
 		var headers = [ "stdafx", rail.rail_name ];
+		for (dependency in rail.dependencies) {
+			if (dependency != rail.parent && dependency.source_file != null) {
+				headers.push(dependency.source_file);
+			}
+		}
 		render = new Renderer();
 		var result = render_includes(headers) + render.newline()
 		+ render.line("namespace " + namespace.join('.') + " {");
@@ -96,8 +100,11 @@ class Cpp_Target extends Target{
 				lines = true;
 			}
 		}
+		
+		if (result.length > 0)
+			result += render.newline();
 
-		return result + render.newline();
+		return result;
 	}
 
 	function class_declaration(rail:Rail):String {
@@ -108,7 +115,7 @@ class Cpp_Target extends Target{
 		}
 
 		result = render.line(first + " {")
-		+ render.line("public:");
+		+ "public:" + render.newline();
 		render.indent();
 
 		for (tie in rail.core_ties) {
@@ -150,16 +157,21 @@ class Cpp_Target extends Target{
 	}
 
 	function get_property_type_string(tie:Tie, is_parameter = false) {
+		var other_rail = tie.other_rail;
+		if (other_rail == null)
+			return Reflect.field(types, tie.property.type.to_string());
+			
+		var other_name = other_rail.rail_name;
+		if (other_rail.region.external_name != null)
+			other_name = other_rail.region.external_name + "::" + other_name;
+		
 		if (tie.property.type == Kind.reference) {
-			return is_parameter
-			? tie.other_rail.rail_name + '&'
-			: tie.other_rail.rail_name;
-		}
-		else if (tie.property.type == Kind.list) {
-			return "std::vector<" + tie.other_rail.rail_name + ">";
+			return tie.is_value
+				? is_parameter ? other_name + '&' : other_name
+				: other_name + '*';
 		}
 		else {
-			return Reflect.field(types, tie.property.type.to_string());
+			return "std::vector<" + other_name + ">";
 		}
 	}
 

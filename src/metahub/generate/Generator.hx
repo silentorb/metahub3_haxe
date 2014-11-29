@@ -1,6 +1,6 @@
 package metahub.generate;
 import metahub.code.expressions.Expression;
-import metahub.generate.targets.cpp.Cpp_Target;
+import metahub.generate.targets.cpp.Cpp;
 import metahub.generate.targets.Haxe_Target;
 import metahub.generate.targets.Target;
 import metahub.Hub;
@@ -21,13 +21,13 @@ import metahub.schema.Namespace;
 	public function run(statement:Expression, target_name:String, output_folder:String) {
 		Utility.create_folder(output_folder);
 		Utility.clear_folder(output_folder);
-		var railway = new Railway(hub, hub.schema.additional[target_name]);
+		var railway = new Railway(hub, target_name);
 		railway.process(statement, hub.root_scope);
 		var target:Target = null;
 
 		switch(target_name) {
 			case "cpp":
-				target = new Cpp_Target(railway, hub.schema.additional['cpp']);
+				target = new Cpp(railway);
 
 			case "haxe":
 				target = new Haxe_Target(railway);

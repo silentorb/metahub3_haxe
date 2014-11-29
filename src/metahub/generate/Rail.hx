@@ -18,18 +18,34 @@ class Rail {
 	public var railway:Railway;
 	public var parent:Rail;
 	public var is_external = false;
-
-	public function new(trellis:Trellis, railway:Railway, map:Dynamic) {
+	public var source_file:String = null;
+	public var region:Region;
+	
+	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
 		this.railway = railway;
 		rail_name = this.name = trellis.name;
-		if (map != null) {
-			if (Reflect.hasField(map, 'is_external'))
-				is_external = Reflect.field(map, 'is_external');
-				
-			if (Reflect.hasField(map, 'name'))
-				rail_name = Reflect.field(map, 'name');
-		}
+		region = railway.regions[trellis.namespace.name];
+		is_external = region.is_external;
+		load_additional();
+		if (!is_external && source_file == null)
+			source_file = rail_name;		
+	}
+	
+	function load_additional() {
+		if (!region.trellis_additional.exists(trellis.name))
+			return;
+			
+		var map = region.trellis_additional[trellis.name];
+			
+		if (Reflect.hasField(map, 'is_external'))
+			is_external = Reflect.field(map, 'is_external');
+			
+		if (Reflect.hasField(map, 'name'))
+			rail_name = Reflect.field(map, 'name');
+			
+		if (Reflect.hasField(map, 'source_file'))
+			source_file = Reflect.field(map, 'source_file');
 	}
 
 	public function process() {

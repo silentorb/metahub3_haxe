@@ -67,7 +67,7 @@ class Cpp extends Target{
 		+ render_includes(headers) + render.newline()
 		+ render.line("namespace " + namespace.join('.') + " {")
 		+ render.indent().newline()
-		+ ambient_dependencies(rail)
+		+ render_ambient_dependencies(rail)
 		+ class_declaration(rail)
 		+ render.newline()
 		+ render.unindent().line("}");
@@ -91,12 +91,12 @@ class Cpp extends Target{
 		Utility.create_file(dir + "/" + rail.name + ".cpp", result);
 	}
 
-	function ambient_dependencies(rail:Rail):String {
+	function render_ambient_dependencies(rail:Rail):String {
 		var lines = false;
 		var result = "";
 		for (dependency in rail.dependencies) {
 			if (dependency != rail.parent) {
-				result += render.line('class ' + dependency.rail_name + ";");
+				result += render.line('class ' + get_rail_type_string(dependency) + ";");
 				lines = true;
 			}
 		}
@@ -139,21 +139,51 @@ class Cpp extends Target{
 
 	function render_functions(rail:Rail):String {
 		var result = "";
+		var definitions = [ render_initialize_definition(rail) ];
+					
 		for (tie in rail.all_ties) {
-			result += render_setter(tie);
+			var definition = render_setter(tie);
+			if (definition.length > 0)
+				definitions.push(definition);
 		}
 
-		return result;
+		return definitions.join(render.newline());
 	}
 
 	function render_function_declarations(rail:Rail):String {
-		var result = "";
+		var declarations = [ render.line("virtual void initialize();") ];
+		if (rail.hooks.exists("initialize_post")) {
+			declarations.push(render.line("void initialize_post(); // Externally defined."));
+		}
+		
 		for (tie in rail.all_ties) {
 			if (tie.constraints.length > 0)
-				result += render.line(render_signature('set_', tie) + ';');
+				declarations.push(render.line(render_signature('set_', tie) + ';'));
 		}
 
-		return result;
+		return declarations.join('');
+	}
+	
+	function render_initialize_definition(rail:Rail):String {
+		var result = render.line("void " + rail.rail_name + "::initialize() {");
+		render.indent();
+		result += render.line(rail.parent != null
+			? rail.parent.rail_name + "::initialize();"
+			: ""
+		);
+		if (rail.hooks.exists("initialize_post")) {
+			result += render.line("initialize_post();");
+		}
+		render.unindent();
+		return result + render.line("}");		
+	}
+	
+	function get_rail_type_string(rail:Rail):String {
+		var name = rail.rail_name;
+		if (rail.region.external_name != null)
+			name = rail.region.external_name + "::" + name;
+		
+		return name;
 	}
 
 	function get_property_type_string(tie:Tie, is_parameter = false) {
@@ -161,10 +191,7 @@ class Cpp extends Target{
 		if (other_rail == null)
 			return Reflect.field(types, tie.property.type.to_string());
 			
-		var other_name = other_rail.rail_name;
-		if (other_rail.region.external_name != null)
-			other_name = other_rail.region.external_name + "::" + other_name;
-		
+		var other_name = get_rail_type_string(other_rail);
 		if (tie.property.type == Kind.reference) {
 			return tie.is_value
 				? is_parameter ? other_name + '&' : other_name

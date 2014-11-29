@@ -20,6 +20,7 @@ class Rail {
 	public var is_external = false;
 	public var source_file:String = null;
 	public var region:Region;
+	public var hooks = new Map<String, Dynamic>();
 	
 	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
@@ -46,6 +47,13 @@ class Rail {
 			
 		if (Reflect.hasField(map, 'source_file'))
 			source_file = Reflect.field(map, 'source_file');
+			
+		if (Reflect.hasField(map, 'hooks')) {
+			var hook_source = Reflect.field(map, 'hooks');
+			for (key in Reflect.fields(hook_source)) {
+				hooks[key] = Reflect.field(hook_source, key);
+			}
+		}
 	}
 
 	public function process() {

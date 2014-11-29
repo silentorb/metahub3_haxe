@@ -19,6 +19,7 @@ import metahub.schema.Namespace;
 	}
 
 	public function run(statement:Expression, target_name:String, output_folder:String) {
+		Utility.create_folder(output_folder);
 		Utility.clear_folder(output_folder);
 		var railway = new Railway(hub, hub.schema.additional[target_name]);
 		railway.process(statement, hub.root_scope);

@@ -8,7 +8,7 @@ import metahub.generate.Renderer;
  */
 class Constraints
 {
-	
+
 	public static var inverse_operators = {
 		">": "<=",
 		"<": ">=",
@@ -26,21 +26,23 @@ class Constraints
 			+ Std.string(limit)
 			+ ')'
 		);
-			
+
 		var min:Float = 0.0001;
 		render.indent();
+		var value:Float = 0;
 		switch(operator) {
 			case '<':
-				result += render.line(reference + ' = ' + Std.string(limit - min));
+				value = limit - min;
 			case '>':
-				result += render.line(reference + ' = ' + Std.string(limit + min));
+				value = limit + min;
 			case '<=':
-				result += render.line(reference + ' = ' + Std.string(limit));
+				value = limit;
 			case '>=':
-				result += render.line(reference + ' = ' + Std.string(limit));
+				value = limit;
 		}
+		result += render.line(reference + ' = ' + Std.string(value) + ';');
 		render.unindent();
 		return result + render.newline();
 	}
-	
+
 }

@@ -1,6 +1,6 @@
 {
 	"code": "logic.mh",
   "schema": "schema.json",
-  "output": "output",
+  "output": "E:/games/marloth-ogre/source/gen",
 	"namespace": "marloth"
 }

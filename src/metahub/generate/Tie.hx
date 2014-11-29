@@ -10,7 +10,7 @@ import metahub.code.expressions.Create_Constraint;
 
 class Tie {
 
-	var rail:Rail;
+	public var rail:Rail;
 	public var property:Property;
 	public var name:String;
 	public var tie_name:String;
@@ -25,11 +25,12 @@ class Tie {
 		tie_name = name = property.name;
 
 		if (property.other_trellis != null) {
+			trace('p', property.fullname(), property.other_trellis.name);
 			other_rail = rail.railway.rails[property.other_trellis.name];
 			if (other_rail != null && property.other_property != null && other_rail.all_ties.exists(property.other_property.name)) {
 				other_tie = other_rail.all_ties[property.other_property.name];
-				other_tie.other_rail = rail;
-				other_tie.other_tie = this;
+				//other_tie.other_rail = rail;
+				//other_tie.other_tie = this;
 			}
 		}
 	}

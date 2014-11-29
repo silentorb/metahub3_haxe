@@ -1,4 +1,5 @@
 package metahub.generate.targets.cpp ;
+import haxe.Timer;
 import metahub.code.expressions.Expression;
 import metahub.code.expressions.Literal;
 import metahub.code.Scope;
@@ -48,21 +49,42 @@ class Cpp_Target extends Target{
 	override public function run(statement, output_folder:String) {
 		for (rail in railway.rails) {
 			//trace(rail.namespace.fullname);
-			render = new Renderer();
 			var namespace = Generator.get_namespace_path(rail.trellis.namespace);
 			var dir = output_folder + "/" + namespace.join('/');
 			Utility.create_folder(dir);
 
-			var result = render_headers(rail) + render.newline()
-			+ render.line("namespace " + namespace.join('.') + " {")
-			+ render.indent().newline()
-			+ ambient_dependencies(rail)
-			+ class_declaration(rail)
-			+ render.newline()
-			+ render.unindent().line("}");
-
-			Utility.create_file(dir + "/" + rail.name + ".cpp", result);
+			create_header_file(rail, namespace, dir);
+			create_class_file(rail, namespace, dir);
 		}
+	}
+
+	function create_header_file(rail:Rail, namespace, dir) {
+		var headers = [ "stdafx" ];
+		if (rail.trellis.parent != null)
+			headers.push(rail.trellis.parent.name);
+
+		render = new Renderer();
+		var result = render.line('#pragma once')
+		+ render_includes(headers) + render.newline()
+		+ render.line("namespace " + namespace.join('.') + " {")
+		+ render.indent().newline()
+		+ ambient_dependencies(rail)
+		+ class_declaration(rail)
+		+ render.newline()
+		+ render.unindent().line("}");
+		Utility.create_file(dir + "/" + rail.name + ".h", result);
+	}
+
+	function create_class_file(rail:Rail, namespace, dir) {
+		var headers = [ "stdafx", rail.rail_name ];
+		render = new Renderer();
+		var result = render_includes(headers) + render.newline()
+		+ render.line("namespace " + namespace.join('.') + " {");
+		render.indent();
+		result += class_definition(rail)
+		+ render.newline()
+		+ render.unindent().line("}");
+		Utility.create_file(dir + "/" + rail.name + ".cpp", result);
 	}
 
 	function ambient_dependencies(rail:Rail):String {
@@ -88,23 +110,42 @@ class Cpp_Target extends Target{
 		result = render.line(first + " {")
 		+ render.line("public:");
 		render.indent();
-		
+
 		for (tie in rail.core_ties) {
 			result += property_declaration(tie);
 		}
 
-		result += render.pad(render_functions(rail))
-		+ render.unindent().line("}");
-		
+		result += render.pad(render_function_declarations(rail))
+		+ render.unindent().line("};");
+
 		return result;
 	}
-	
+
+	function class_definition(rail:Rail):String {
+		var result = "";
+
+		result += render.pad(render_functions(rail));
+		render.unindent();
+
+		return result;
+	}
+
 	function render_functions(rail:Rail):String {
 		var result = "";
 		for (tie in rail.all_ties) {
 			result += render_setter(tie);
 		}
-		
+
+		return result;
+	}
+
+	function render_function_declarations(rail:Rail):String {
+		var result = "";
+		for (tie in rail.all_ties) {
+			if (tie.constraints.length > 0)
+				result += render.line(render_signature('set_', tie) + ';');
+		}
+
 		return result;
 	}
 
@@ -126,28 +167,32 @@ class Cpp_Target extends Target{
 		return render.line(get_property_type_string(tie) + " " +	tie.tie_name + ";");
 	}
 
-	function render_headers(rail:Rail):String {
-		if (rail.trellis.parent != null) {
-			return render.line('#include "' + rail.trellis.parent.name + '.h"');
-		}
+	function render_includes(headers:Array<String>):String {
+		return headers.map(function(h) return render.line('#include "' + h + '.h"')).join('');
+	}
 
-		return "";
+	function render_signature(prefix, tie:Tie, is_definition = false):String {
+		var right = 'set_' + tie.tie_name + '(' + get_property_type_string(tie, true) + ' value)';
+		if (is_definition)
+			right = tie.rail.rail_name + "::" + right;
+
+		return 'void ' + right;
 	}
 
 	function render_setter(tie:Tie):String {
 		if (tie.constraints.length == 0)
 			return "";
 
-		var result = render.line('function set_' + tie.tie_name + '(' + get_property_type_string(tie, true) + ' value) {');
+		var result = render.line(render_signature('set_', tie, true) + ' {');
 		render.indent();
 		for (constraint in tie.constraints) {
 			result += Constraints.render(constraint, render, this);
 		}
-		result += 
+		result +=
 			render.line('if (' + tie.tie_name + ' == value)')
 		+ render.indent().line('return;')
-		+	render.unindent().newline() 
-		+ render.line(tie.tie_name + ' = value;'); 
+		+	render.unindent().newline()
+		+ render.line(tie.tie_name + ' = value;');
 		render.unindent();
 		result += render.line('}');
 		return result;
@@ -160,7 +205,7 @@ class Cpp_Target extends Target{
 	function render_path(path:Array<Tie>):String {
 		return path.map(function(t) return t.tie_name).join('.');
 	}
-	
+
 	public function render_expression(expression:Expression, scope:Scope):Dynamic {
 		var type = Railway.get_class_name(expression);
 		trace("expression:", type);
@@ -169,10 +214,10 @@ class Cpp_Target extends Target{
 			case "Literal":
 				return render_literal(cast expression);
 		}
-		
+
 		throw new Exception("Cannot render expression " + type + ".");
 	}
-	
+
 	function render_literal(expression:Literal):String {
 		return expression.value;
 	}

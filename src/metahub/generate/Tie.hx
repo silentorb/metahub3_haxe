@@ -17,6 +17,9 @@ class Tie {
 	public var other_rail:Rail;
 	public var other_tie:Tie;
 	public var is_value = false;
+	public var has_setter = false;
+	public var has_getter = false;
+	public var has_set_post_hook = false;
 
 	public var constraints = new Array<Constraint>();
 
@@ -34,8 +37,18 @@ class Tie {
 				//other_tie.other_rail = rail;
 				//other_tie.other_tie = this;
 			}
-			
-			
 		}
+		
+		var additional = rail.property_additional[name];
+		if (additional != null && additional.hooks != null) {			
+			has_set_post_hook = additional.hooks.set_post != null;
+		}
+		
+		has_setter = constraints.length > 0 || has_set_post_hook;
 	}
+	
+	public function get_setter_post_name() {
+		return "set_" + name + "_post";
+	}
+	
 }

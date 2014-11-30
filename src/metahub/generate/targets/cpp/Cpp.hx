@@ -26,13 +26,6 @@ class Cpp extends Target{
 		"float": "float"
 	}
 
-	//public static var operators = {
-		//"greater_than": ">",
-		//"lesser_than": "<",
-		//"greater_than_or_equal_to": ">=",
-		//"lesser_than_or_equal_to": "<="
-	//}
-//
 	public function new(railway:Railway) {
 		super(railway);
 
@@ -59,8 +52,14 @@ class Cpp extends Target{
 
 	function create_header_file(rail:Rail, namespace, dir) {
 		var headers = [ "stdafx" ];
-		if (rail.parent != null && rail.parent.source_file != null)
-			headers.push(rail.parent.source_file);
+		//if (rail.parent != null && rail.parent.source_file != null)
+			//headers.push(rail.parent.source_file);
+			
+		for (d in rail.dependencies) {
+			var dependency = d.rail;
+			if (!d.allow_ambient)
+				headers.push(dependency.source_file);
+		}
 
 		render = new Renderer();
 		var result = render.line('#pragma once')
@@ -76,7 +75,8 @@ class Cpp extends Target{
 
 	function create_class_file(rail:Rail, namespace, dir) {
 		var headers = [ "stdafx", rail.rail_name ];
-		for (dependency in rail.dependencies) {
+		for (d in rail.dependencies) {
+			var dependency = d.rail;
 			if (dependency != rail.parent && dependency.source_file != null) {
 				headers.push(dependency.source_file);
 			}
@@ -94,8 +94,9 @@ class Cpp extends Target{
 	function render_ambient_dependencies(rail:Rail):String {
 		var lines = false;
 		var result = "";
-		for (dependency in rail.dependencies) {
-			if (dependency != rail.parent) {
+		for (d in rail.dependencies) {
+			var dependency = d.rail;
+			if (d.allow_ambient) {
 				result += render.line('class ' + get_rail_type_string(dependency) + ";");
 				lines = true;
 			}
@@ -151,14 +152,21 @@ class Cpp extends Target{
 	}
 
 	function render_function_declarations(rail:Rail):String {
-		var declarations = [ render.line("virtual void initialize();") ];
+		var declarations = [ render.line("virtual void initialize();") ]
+			.concat(rail.stubs.map(function(s) return render.line(s)));
+			
 		if (rail.hooks.exists("initialize_post")) {
 			declarations.push(render.line("void initialize_post(); // Externally defined."));
 		}
 		
 		for (tie in rail.all_ties) {
-			if (tie.constraints.length > 0)
-				declarations.push(render.line(render_signature('set_', tie) + ';'));
+			if (tie.has_set_post_hook)
+				declarations.push(render.line("void " + tie.get_setter_post_name() + "(" + get_property_type_string(tie, true) +  " value);"));
+		}
+		
+		for (tie in rail.all_ties) {
+			if (tie.has_setter)
+				declarations.push(render.line(render_signature('set_' + tie.tie_name, tie) + ';'));
 		}
 
 		return declarations.join('');
@@ -210,8 +218,8 @@ class Cpp extends Target{
 		return headers.map(function(h) return render.line('#include "' + h + '.h"')).join('');
 	}
 
-	function render_signature(prefix, tie:Tie, is_definition = false):String {
-		var right = 'set_' + tie.tie_name + '(' + get_property_type_string(tie, true) + ' value)';
+	function render_signature(name, tie:Tie, is_definition = false):String {
+		var right = name + '(' + get_property_type_string(tie, true) + ' value)';
 		if (is_definition)
 			right = tie.rail.rail_name + "::" + right;
 
@@ -219,10 +227,10 @@ class Cpp extends Target{
 	}
 
 	function render_setter(tie:Tie):String {
-		if (tie.constraints.length == 0)
+		if (!tie.has_setter)
 			return "";
 
-		var result = render.line(render_signature('set_', tie, true) + ' {');
+		var result = render.line(render_signature('set_' + tie.tie_name, tie, true) + ' {');
 		render.indent();
 		for (constraint in tie.constraints) {
 			result += Constraints.render(constraint, render, this);
@@ -232,6 +240,9 @@ class Cpp extends Target{
 		+ render.indent().line('return;')
 		+	render.unindent().newline()
 		+ render.line(tie.tie_name + ' = value;');
+		if (tie.has_set_post_hook)
+			result += render.line(tie.get_setter_post_name() + "(value);");
+		
 		render.unindent();
 		result += render.line('}');
 		return result;

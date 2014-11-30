@@ -12,7 +12,7 @@ class Rail {
 	public var trellis:Trellis;
 	public var name:String;
 	public var rail_name:String;
-	public var dependencies = new Map<String, Rail>();
+	public var dependencies = new Map<String, Dependency>();
 	public var core_ties = new Map<String, Tie>();
 	public var all_ties = new Map<String, Tie>();
 	public var railway:Railway;
@@ -21,6 +21,8 @@ class Rail {
 	public var source_file:String = null;
 	public var region:Region;
 	public var hooks = new Map<String, Dynamic>();
+	public var stubs = new Array<String>();
+	public var property_additional = new Map<String, Property_Addition>();
 	
 	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
@@ -54,12 +56,26 @@ class Rail {
 				hooks[key] = Reflect.field(hook_source, key);
 			}
 		}
+		
+		if (Reflect.hasField(map, 'stubs')) {
+			var hook_source = Reflect.field(map, 'stubs');
+			for (key in Reflect.fields(hook_source)) {
+				stubs.push(Reflect.field(hook_source, key));
+			}
+		}
+		
+		if (Reflect.hasField(map, 'properties')) {
+			var properties = Reflect.field(map, 'properties');
+			for (key in Reflect.fields(properties)) {
+				property_additional[key] = Reflect.field(properties, key);
+			}
+		}
 	}
 
 	public function process() {
 		if (trellis.parent != null) {
 			parent = railway.rails[trellis.parent.name];
-			add_dependency(parent);
+			add_dependency(parent).allow_ambient = false;
 		}
 		for (property in trellis.properties) {
 			var tie = new Tie(this, property);
@@ -67,14 +83,19 @@ class Rail {
 			if (property.trellis == trellis) {
 				core_ties[tie.name] = tie;
 				if (property.other_trellis != null) {
-					add_dependency(railway.rails[property.other_trellis.name]);
+					var dependency = add_dependency(railway.rails[property.other_trellis.name]);
+					if (property.type == Kind.list)
+						dependency.allow_ambient = false;
 				}
 			}
 		}
 	}
 
-	function add_dependency(rail:Rail) {
-		dependencies[rail.name] = rail;
+	function add_dependency(rail:Rail):Dependency {
+		if (!dependencies.exists(rail.name))
+			dependencies[rail.name] = new Dependency(rail);
+		
+		return dependencies[rail.name];
 	}
 
 }

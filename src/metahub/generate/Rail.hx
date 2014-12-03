@@ -23,7 +23,7 @@ class Rail {
 	public var hooks = new Map<String, Dynamic>();
 	public var stubs = new Array<String>();
 	public var property_additional = new Map<String, Property_Addition>();
-	
+
 	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
 		this.railway = railway;
@@ -32,38 +32,38 @@ class Rail {
 		is_external = region.is_external;
 		load_additional();
 		if (!is_external && source_file == null)
-			source_file = rail_name;		
+			source_file = trellis.namespace.name + '/' + rail_name;
 	}
-	
+
 	function load_additional() {
 		if (!region.trellis_additional.exists(trellis.name))
 			return;
-			
+
 		var map = region.trellis_additional[trellis.name];
-			
+
 		if (Reflect.hasField(map, 'is_external'))
 			is_external = Reflect.field(map, 'is_external');
-			
+
 		if (Reflect.hasField(map, 'name'))
 			rail_name = Reflect.field(map, 'name');
-			
+
 		if (Reflect.hasField(map, 'source_file'))
 			source_file = Reflect.field(map, 'source_file');
-			
+
 		if (Reflect.hasField(map, 'hooks')) {
 			var hook_source = Reflect.field(map, 'hooks');
 			for (key in Reflect.fields(hook_source)) {
 				hooks[key] = Reflect.field(hook_source, key);
 			}
 		}
-		
+
 		if (Reflect.hasField(map, 'stubs')) {
 			var hook_source = Reflect.field(map, 'stubs');
 			for (key in Reflect.fields(hook_source)) {
 				stubs.push(Reflect.field(hook_source, key));
 			}
 		}
-		
+
 		if (Reflect.hasField(map, 'properties')) {
 			var properties = Reflect.field(map, 'properties');
 			for (key in Reflect.fields(properties)) {
@@ -94,7 +94,7 @@ class Rail {
 	function add_dependency(rail:Rail):Dependency {
 		if (!dependencies.exists(rail.name))
 			dependencies[rail.name] = new Dependency(rail);
-		
+
 		return dependencies[rail.name];
 	}
 

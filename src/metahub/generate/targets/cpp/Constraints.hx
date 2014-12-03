@@ -46,10 +46,15 @@ class Constraints
 	}
 
 	public static function render_list_constraint(constraint:Constraint, render:Renderer, target:Cpp):String {
-		var reference = target.render_value_path(constraint.reference);
+		//var reference = target.render_value_path(constraint.reference);
+		var reference = constraint.reference[0].tie.tie_name;
 		var amount:Int = target.render_expression(constraint.expression, constraint.scope);
+		var instance_name = constraint.reference[0].tie.other_rail.rail_name;
 		return target.render_block('while', reference + '.size() < ' + amount, function() {
-			return render.line(reference + '.push_back(' + 'new ');
+			return
+				render.line(instance_name + '* _child = new ' + instance_name + '();')
+				+ render.line('_child->initialize();')
+				+ render.line(reference + '.push_back(*_child);');
 		});
 	}
 

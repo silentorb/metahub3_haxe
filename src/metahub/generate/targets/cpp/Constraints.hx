@@ -45,4 +45,12 @@ class Constraints
 		return result + render.newline();
 	}
 
+	public static function render_list_constraint(constraint:Constraint, render:Renderer, target:Cpp):String {
+		var reference = target.render_value_path(constraint.reference);
+		var amount:Int = target.render_expression(constraint.expression, constraint.scope);
+		return target.render_block('while', reference + '.size() < ' + amount, function() {
+			return render.line(reference + '.push_back(' + 'new ');
+		});
+	}
+
 }

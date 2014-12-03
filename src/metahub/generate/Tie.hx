@@ -17,7 +17,6 @@ class Tie {
 	public var other_rail:Rail;
 	public var other_tie:Tie;
 	public var is_value = false;
-	public var has_setter = false;
 	public var has_getter = false;
 	public var has_set_post_hook = false;
 
@@ -29,7 +28,6 @@ class Tie {
 		tie_name = name = property.name;
 
 		if (property.other_trellis != null) {
-			trace('p', property.fullname(), property.other_trellis.name);
 			other_rail = rail.railway.rails[property.other_trellis.name];
 			is_value = property.other_trellis.is_value;
 			if (other_rail != null && property.other_property != null && other_rail.all_ties.exists(property.other_property.name)) {
@@ -38,17 +36,20 @@ class Tie {
 				//other_tie.other_tie = this;
 			}
 		}
-		
+
 		var additional = rail.property_additional[name];
-		if (additional != null && additional.hooks != null) {			
+		if (additional != null && additional.hooks != null) {
 			has_set_post_hook = additional.hooks.set_post != null;
 		}
-		
-		has_setter = constraints.length > 0 || has_set_post_hook;
 	}
-	
+
+	public function has_setter() {
+		return (property.type != Kind.list && constraints.length > 0)
+		|| has_set_post_hook;
+	}
+
 	public function get_setter_post_name() {
 		return "set_" + name + "_post";
 	}
-	
+
 }

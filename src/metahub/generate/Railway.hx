@@ -16,22 +16,22 @@ class Railway {
 	public var regions = new Map<String, Region>();
 	public var rails = new Map<String, Rail>();
 	public var target_name:String;
-	
+
 	public function new(hub:Hub, target_name:String) {
 		this.target_name = target_name;
-		
+
 		for (namespace in hub.schema.root_namespace.children) {
 			if (namespace.name == 'metahub')
 				continue;
-				
+
 			var region = new Region(namespace, target_name);
 			regions[namespace.name] = region;
 		}
-		
+
 		for (trellis in hub.schema.trellises) {
 			if (trellis.namespace.name == 'metahub')
 				continue;
-				
+
 			rails[trellis.name] = new Rail(trellis, this);
 		}
 
@@ -85,7 +85,7 @@ class Railway {
 		var rail = rails[scope.definition.trellis.name];
 		var tie = rail.all_ties[reference[0].property.name];
 		tie.constraints.push(new Constraint(expression, rail.railway, scope));
-		trace("reference:", type);
+		trace("reference:", type, tie.name);
 	}
 
 	//function get_reference(reference:Expression) {

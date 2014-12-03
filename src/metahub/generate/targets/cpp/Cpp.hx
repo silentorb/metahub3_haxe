@@ -39,7 +39,7 @@ class Cpp extends Target{
 		for (rail in railway.rails) {
 			if (rail.is_external)
 				continue;
-			
+
 			//trace(rail.namespace.fullname);
 			var namespace = Generator.get_namespace_path(rail.trellis.namespace);
 			var dir = output_folder + "/" + namespace.join('/');
@@ -54,7 +54,7 @@ class Cpp extends Target{
 		var headers = [ "stdafx" ];
 		//if (rail.parent != null && rail.parent.source_file != null)
 			//headers.push(rail.parent.source_file);
-			
+
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
 			if (!d.allow_ambient)
@@ -101,7 +101,7 @@ class Cpp extends Target{
 				lines = true;
 			}
 		}
-		
+
 		if (result.length > 0)
 			result += render.newline();
 
@@ -141,7 +141,7 @@ class Cpp extends Target{
 	function render_functions(rail:Rail):String {
 		var result = "";
 		var definitions = [ render_initialize_definition(rail) ];
-					
+
 		for (tie in rail.all_ties) {
 			var definition = render_setter(tie);
 			if (definition.length > 0)
@@ -154,24 +154,24 @@ class Cpp extends Target{
 	function render_function_declarations(rail:Rail):String {
 		var declarations = [ render.line("virtual void initialize();") ]
 			.concat(rail.stubs.map(function(s) return render.line(s)));
-			
+
 		if (rail.hooks.exists("initialize_post")) {
 			declarations.push(render.line("void initialize_post(); // Externally defined."));
 		}
-		
+
 		for (tie in rail.all_ties) {
 			if (tie.has_set_post_hook)
 				declarations.push(render.line("void " + tie.get_setter_post_name() + "(" + get_property_type_string(tie, true) +  " value);"));
 		}
-		
+
 		for (tie in rail.all_ties) {
-			if (tie.has_setter)
+			if (tie.has_setter())
 				declarations.push(render.line(render_signature('set_' + tie.tie_name, tie) + ';'));
 		}
 
 		return declarations.join('');
 	}
-	
+
 	function render_initialize_definition(rail:Rail):String {
 		var result = render.line("void " + rail.rail_name + "::initialize() {");
 		render.indent();
@@ -179,18 +179,25 @@ class Cpp extends Target{
 			? rail.parent.rail_name + "::initialize();"
 			: ""
 		);
+		for (tie in rail.all_ties) {
+			if (tie.property.type == Kind.list) {
+				for (constraint in tie.constraints) {
+					result += Constraints.render_list_constraint(constraint, render, this);
+				}
+			}
+		}
 		if (rail.hooks.exists("initialize_post")) {
 			result += render.line("initialize_post();");
 		}
 		render.unindent();
-		return result + render.line("}");		
+		return result + render.line("}");
 	}
-	
+
 	function get_rail_type_string(rail:Rail):String {
 		var name = rail.rail_name;
 		if (rail.region.external_name != null)
 			name = rail.region.external_name + "::" + name;
-		
+
 		return name;
 	}
 
@@ -198,7 +205,7 @@ class Cpp extends Target{
 		var other_rail = tie.other_rail;
 		if (other_rail == null)
 			return Reflect.field(types, tie.property.type.to_string());
-			
+
 		var other_name = get_rail_type_string(other_rail);
 		if (tie.property.type == Kind.reference) {
 			return tie.is_value
@@ -226,8 +233,17 @@ class Cpp extends Target{
 		return 'void ' + right;
 	}
 
+	public function render_block(command:String, expression:String, action):String {
+		var result = render.line(command + ' (' + expression + ') {');
+		render.indent();
+		result += action();
+		render.unindent();
+		result += render.line('}');
+		return result;
+	}
+
 	function render_setter(tie:Tie):String {
-		if (!tie.has_setter)
+		if (!tie.has_setter())
 			return "";
 
 		var result = render.line(render_signature('set_' + tie.tie_name, tie, true) + ' {');
@@ -242,7 +258,7 @@ class Cpp extends Target{
 		+ render.line(tie.tie_name + ' = value;');
 		if (tie.has_set_post_hook)
 			result += render.line(tie.get_setter_post_name() + "(value);");
-		
+
 		render.unindent();
 		result += render.line('}');
 		return result;
@@ -251,11 +267,11 @@ class Cpp extends Target{
 	public function render_value_path(path:Array<Car>):String {
 		return ['value'].concat(path.slice(1).map(function(t) return render_car(t))).join('.');
 	}
-	
+
 	public function render_car(car:Car):String {
 		if (car.tie != null)
 			return car.tie.tie_name;
-			
+
 		return car.func.function_string;
 	}
 

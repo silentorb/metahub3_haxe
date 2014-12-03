@@ -1,9 +1,11 @@
 package metahub.generate;
 import metahub.code.expressions.Create_Constraint;
 import metahub.code.expressions.Expression;
+import metahub.code.expressions.Function_Call;
 import metahub.code.expressions.Property_Reference;
 import metahub.code.Scope;
 import metahub.code.Type_Signature;
+import metahub.code.expressions.Token_Expression;
 
 /**
  * ...
@@ -11,7 +13,7 @@ import metahub.code.Type_Signature;
  */
 class Constraint {
   public var type:Type_Signature;
-  public var reference:Array<Tie>;
+  public var reference:Array<Car>;
   public var expression:Expression;
 	public var is_back_referencing = false;
 	//public var children:Array<Expression>;
@@ -29,16 +31,25 @@ class Constraint {
 		this.scope = scope;
 	}
 
-	static function convert_reference(expression:Expression, railway:Railway):Array<Tie> {
-		var path:Array<Property_Reference> = cast expression.children;
+	static function convert_reference(expression:Expression, railway:Railway):Array<Car> {
+		var path:Array<Token_Expression> = cast expression.children;
 		var result = [];
-		var rail = railway.rails[path[0].property.trellis.name];
+		var first:Property_Reference = cast path[0];
+		var rail = railway.rails[first.property.trellis.name];
 		for (token in path) {
-			var tie = rail.all_ties[token.property.name];
-			if (tie == null)
-				throw new Exception("tie is null: " + token.property.fullname());
-			result.push(tie);
-			rail = tie.other_rail;
+			if (Reflect.hasField(token, 'property')) {
+				var property_token:Property_Reference = cast token;
+				var tie = rail.all_ties[property_token.property.name];
+				if (tie == null)
+					throw new Exception("tie is null: " + property_token.property.fullname());
+					
+				result.push(new Car(tie, null));
+				rail = tie.other_rail;
+			}
+			else {
+				var function_token:Function_Call = cast token;
+				result.push(new Car(null, function_token));
+			}
 		}
 		return result;
 	}

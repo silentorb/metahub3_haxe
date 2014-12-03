@@ -21,11 +21,17 @@ class Railway {
 		this.target_name = target_name;
 		
 		for (namespace in hub.schema.root_namespace.children) {
+			if (namespace.name == 'metahub')
+				continue;
+				
 			var region = new Region(namespace, target_name);
 			regions[namespace.name] = region;
 		}
 		
 		for (trellis in hub.schema.trellises) {
+			if (trellis.namespace.name == 'metahub')
+				continue;
+				
 			rails[trellis.name] = new Rail(trellis, this);
 		}
 

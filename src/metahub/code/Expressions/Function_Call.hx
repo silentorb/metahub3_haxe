@@ -23,7 +23,7 @@ typedef Function_Info = {
 
 class Function_Call implements Token_Expression {
   public var children:Array<Expression>;
-	var function_string:String;
+	public var function_string:String;
 	var hub:Hub;
 	var info:Function_Info;
 

@@ -66,14 +66,14 @@ import haxe.Json;
     root_scope = new Scope(this, root_scope_definition);
     schema = new Schema();
 
-		//function_library = new Core_Function_Library();
-		//metahub_namespace = schema.add_namespace('metahub', function_library);
-    //load_internal_trellises();
-		//function_library.load(this);
+		function_library = new Core_Function_Library();
+		metahub_namespace = schema.add_namespace('metahub', function_library);
+    load_internal_trellises();
+		function_library.load(this);
 
-		//var math_library = new Math_Library();
-		//metahub_namespace.children['Math'] = schema.add_namespace('Math', math_library);
-		//math_library.load(this);
+		var math_library = new Math_Library();
+		metahub_namespace.children['Math'] = schema.add_namespace('Math', math_library);
+		math_library.load(this);
   }
 
 	public function add_change(node:INode, index:Int, value:Dynamic, context:Context, source:General_Port = null) {

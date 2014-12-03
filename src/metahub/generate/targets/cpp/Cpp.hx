@@ -248,8 +248,15 @@ class Cpp extends Target{
 		return result;
 	}
 
-	public function render_value_path(path:Array<Tie>):String {
-		return ['value'].concat(path.slice(1).map(function(t) return t.tie_name)).join('.');
+	public function render_value_path(path:Array<Car>):String {
+		return ['value'].concat(path.slice(1).map(function(t) return render_car(t))).join('.');
+	}
+	
+	public function render_car(car:Car):String {
+		if (car.tie != null)
+			return car.tie.tie_name;
+			
+		return car.func.function_string;
 	}
 
 	function render_path(path:Array<Tie>):String {

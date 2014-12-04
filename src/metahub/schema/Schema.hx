@@ -5,8 +5,9 @@ import metahub.schema.Property;
 import metahub.schema.Trellis;
 
 class Schema {
-  public var trellises:Array<Trellis> = new Array<Trellis>();
+  //public var trellises:Array<Trellis> = new Array<Trellis>();
   public var root_namespace = new Namespace("root", "root");
+	private var trellis_counter:Int = 1;
 
 	public function add_namespace(name:String, function_library:Function_Library = null):Namespace {
 		if (root_namespace.children.exists(name))
@@ -19,8 +20,8 @@ class Schema {
 	}
 
   function add_trellis(name:String, trellis:Trellis):Trellis {
-		trellis.id = trellises.length;
-    trellises.push(trellis);
+		trellis.id = trellis_counter++;
+    //trellises.push(trellis);
     return trellis;
   }
 

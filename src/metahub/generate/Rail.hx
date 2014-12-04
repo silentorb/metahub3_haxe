@@ -74,7 +74,7 @@ class Rail {
 
 	public function process() {
 		if (trellis.parent != null) {
-			parent = railway.rails[trellis.parent.name];
+			parent = railway.get_rail(trellis.parent);
 			add_dependency(parent).allow_ambient = false;
 		}
 		for (property in trellis.properties) {
@@ -83,7 +83,7 @@ class Rail {
 			if (property.trellis == trellis) {
 				core_ties[tie.name] = tie;
 				if (property.other_trellis != null) {
-					var dependency = add_dependency(railway.rails[property.other_trellis.name]);
+					var dependency = add_dependency(railway.get_rail(property.other_trellis));
 					if (property.type == Kind.list)
 						dependency.allow_ambient = false;
 				}

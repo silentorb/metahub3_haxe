@@ -5,6 +5,7 @@ import metahub.code.Type_Signature;
 import metahub.Hub;
 import metahub.parser.Result;
 import metahub.schema.Kind;
+import metahub.schema.Trellis;
 
 /**
  * ...
@@ -14,7 +15,6 @@ import metahub.schema.Kind;
 class Railway {
 
 	public var regions = new Map<String, Region>();
-	public var rails = new Map<String, Rail>();
 	public var target_name:String;
 
 	public function new(hub:Hub, target_name:String) {
@@ -26,17 +26,16 @@ class Railway {
 
 			var region = new Region(namespace, target_name);
 			regions[namespace.name] = region;
+			
+			for (trellis in namespace.trellises) {
+				region.rails[trellis.name] = new Rail(trellis, this);
+			}
 		}
 
-		for (trellis in hub.schema.trellises) {
-			if (trellis.namespace.name == 'metahub')
-				continue;
-
-			rails[trellis.name] = new Rail(trellis, this);
-		}
-
-		for (rail in rails) {
-			rail.process();
+		for (region in regions) {
+			for (rail in region.rails) {
+				rail.process();
+			}
 		}
 	}
 
@@ -82,10 +81,14 @@ class Railway {
 		//else {
 //
 		//}
-		var rail = rails[scope.definition.trellis.name];
+		var rail = get_rail(scope.definition.trellis);
 		var tie = rail.all_ties[reference[0].property.name];
 		tie.constraints.push(new Constraint(expression, rail.railway, scope));
 		trace("reference:", type, tie.name);
+	}
+	
+	public function get_rail(trellis:Trellis):Rail {
+		return regions[trellis.namespace.name].rails[trellis.name];
 	}
 
 	//function get_reference(reference:Expression) {

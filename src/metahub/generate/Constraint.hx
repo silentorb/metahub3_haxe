@@ -35,7 +35,7 @@ class Constraint {
 		var path:Array<Token_Expression> = cast expression.children;
 		var result = [];
 		var first:Property_Reference = cast path[0];
-		var rail = railway.rails[first.property.trellis.name];
+		var rail = railway.get_rail(first.property.trellis);
 		for (token in path) {
 			if (Reflect.hasField(token, 'property')) {
 				var property_token:Property_Reference = cast token;

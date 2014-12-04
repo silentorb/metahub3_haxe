@@ -177,7 +177,7 @@ class Trellis implements INode {
   }
 
   public function initialize1(source:ITrellis_Source, namespace:Namespace) {
-    var trellises = this.schema.trellises;
+    //var trellises = this.schema.trellises;
     if (source.parent != null) {
       var trellis = this.schema.get_trellis(source.parent, namespace);
       this.set_parent(trellis);

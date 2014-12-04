@@ -28,7 +28,7 @@ class Tie {
 		tie_name = name = property.name;
 
 		if (property.other_trellis != null) {
-			other_rail = rail.railway.rails[property.other_trellis.name];
+			other_rail = rail.railway.get_rail(property.other_trellis);
 			is_value = property.other_trellis.is_value;
 			if (other_rail != null && property.other_property != null && other_rail.all_ties.exists(property.other_property.name)) {
 				other_tie = other_rail.all_ties[property.other_property.name];

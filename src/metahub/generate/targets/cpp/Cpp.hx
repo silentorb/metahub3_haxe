@@ -36,17 +36,19 @@ class Cpp extends Target{
 	}
 
 	override public function run(statement, output_folder:String) {
-		for (rail in railway.rails) {
-			if (rail.is_external)
-				continue;
+		for (region in railway.regions){
+			for (rail in region.rails) {
+				if (rail.is_external)
+					continue;
 
-			//trace(rail.namespace.fullname);
-			var namespace = Generator.get_namespace_path(rail.trellis.namespace);
-			var dir = output_folder + "/" + namespace.join('/');
-			Utility.create_folder(dir);
+				//trace(rail.namespace.fullname);
+				var namespace = Generator.get_namespace_path(rail.trellis.namespace);
+				var dir = output_folder + "/" + namespace.join('/');
+				Utility.create_folder(dir);
 
-			create_header_file(rail, namespace, dir);
-			create_class_file(rail, namespace, dir);
+				create_header_file(rail, namespace, dir);
+				create_class_file(rail, namespace, dir);
+			}
 		}
 	}
 

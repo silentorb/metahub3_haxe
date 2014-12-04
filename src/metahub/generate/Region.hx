@@ -11,6 +11,8 @@ class Region
 	public var is_external = false;
 	public var trellis_additional = new Map<String,Dynamic>();
 	public var external_name:String = null;
+	public var rails = new Map<String, Rail>();
+
 	public function new(namespace:Namespace, target_name:String) 
 	{
 		this.namespace = namespace;

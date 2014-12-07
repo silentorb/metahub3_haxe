@@ -63,12 +63,10 @@ class Cpp extends Target{
 		render = new Renderer();
 		var result = render.line('#pragma once')
 		+ render_includes(headers) + render.newline()
-		+ render.line("namespace " + namespace.join('::') + " {")
-		+ render.indent().newline()
-		+ render_ambient_dependencies(rail)
-		+ class_declaration(rail)
-		+ render.newline()
-		+ render.unindent().line("}");
+		+ render_region(rail.region, function() {
+			return render_ambient_dependencies(rail)
+				+ class_declaration(rail);
+		});
 		Utility.create_file(dir + "/" + rail.name + ".h", result);
 	}
 
@@ -82,12 +80,9 @@ class Cpp extends Target{
 		}
 		render = new Renderer();
 		var result = render_includes(headers) + render.newline()
-		+ render.line("namespace " + namespace.join('.') + " {");
-		current_region = rail.region;
-		render.indent();
-		result += class_definition(rail)
-		+ render.newline()
-		+ render.unindent().line("}");
+		+ render_region(rail.region, function() {
+			return class_definition(rail);
+		});
 		Utility.create_file(dir + "/" + rail.name + ".cpp", result);
 	}
 
@@ -139,6 +134,19 @@ class Cpp extends Target{
 		result += render.pad(render_functions(rail));
 		render.unindent();
 
+		return result;
+	}
+	
+	function render_region(region:Region, action) {
+		var namespace = Generator.get_namespace_path(region);
+		var result = line("namespace " + namespace.join('::') + " {");
+		current_region = region;
+		indent();
+		result += action()
+		+ newline()
+		+ unindent().line("}");
+		
+		current_region = null;
 		return result;
 	}
 
@@ -213,7 +221,9 @@ class Cpp extends Target{
 		var name = rail.rail_name;
 		if (rail.region.external_name != null)
 			name = rail.region.external_name + "::" + name;
-
+		else if (rail.region != current_region)
+			name = rail.region.name + "::" + name;
+			
 		return name;
 	}
 

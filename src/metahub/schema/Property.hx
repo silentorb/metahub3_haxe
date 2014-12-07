@@ -90,8 +90,19 @@ typedef IProperty_Source = {
     if (source.type != 'list' && source.type != 'reference')
       return;
 
-    if (source.other_property != null)
-      this.other_property = other_trellis.get_property(source.other_property);
+    if (source.other_property != null) {
+      other_property = other_trellis.get_property(source.other_property);
+			if (other_property == null) {
+				other_property = other_trellis.add_property(source.other_property, {
+					type: type == Kind.list ? "reference" : "list",
+					trellis: trellis.name,					
+					other_property: name
+				});
+				other_property.other_trellis = trellis;
+				other_property.other_property = this;
+				other_trellis.properties.push(other_property);
+			}
+		}
     else {
 
       var other_properties = Lambda.filter(this.other_trellis.properties, function(p) { return p.other_trellis == this.trellis; });

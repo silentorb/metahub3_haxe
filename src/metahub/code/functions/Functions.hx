@@ -29,6 +29,7 @@ enum Functions {
 	// List Functions
 	count;
 	first;
+	map;
 }
 
 class Function_Calls2 {

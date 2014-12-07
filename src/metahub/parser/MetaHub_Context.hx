@@ -118,6 +118,12 @@ typedef Reference_Or_Function = {
 			case "set_weight":
         return set_weight(data);
 
+			case "array":
+        return array_expression(data);
+
+			case "lambda":
+        return lambda_expression(data);
+
 //      default:
 //        throw new Exception("Invalid parser method: " + name + ".");
     }
@@ -140,28 +146,39 @@ typedef Reference_Or_Function = {
     };
   }
 
-  static function expression(data:Dynamic, match:Match):Dynamic {
+  static function expression(data:Array<Dynamic>, match:Match):Dynamic {
     if (data.length < 2)
       return data[0];
 
     var rep_match:Repetition_Match = cast match;
     var operator:String = cast rep_match.dividers[0].matches[1].get_data();
 
-    var operators = {
-			'+': 'add',
-			'-': 'subtract',
-			'*': 'multiply',
-			'/': 'divide',
-			'+=': 'add_equals',
-			'-=': 'subtract_equals',
-			'*=': 'multiply_equals',
-			'/=': 'divide_equals'
-    };
-    return {
-			type: "function",
-			"name": Reflect.field(operators, operator),
-			"inputs": data
-    }
+    //var operators = {
+			//'+': 'add',
+			//'-': 'subtract',
+			//'*': 'multiply',
+			//'/': 'divide',
+			//'+=': 'add_equals',
+			//'-=': 'subtract_equals',
+			//'*=': 'multiply_equals',
+			//'/=': 'divide_equals'
+    //};
+		
+		if (operator == '|') {
+			var function_name = data.pop();
+			return {
+				type: "function",
+				name: function_name.children[0].name,
+				inputs: data
+			}				
+		}
+		else {
+			return {
+				type: "function",
+				"name": operator,
+				"inputs": data
+			}	
+		}    
   }
 
 	static function method(data:Dynamic):Dynamic {
@@ -340,6 +357,21 @@ typedef Reference_Or_Function = {
 			//operator: Std.string(function_map[data[2]]),
 			operator: data[2],
 			expression: data[4]
+    };
+  }
+	
+	static function array_expression(data:Dynamic):Dynamic {
+    return {
+			"type": "array",
+			"items": data[2]
+    };
+  }
+
+	static function lambda_expression(data:Dynamic):Dynamic {
+    return {
+			type: "lambda",
+			parameters: [ data[0] ],
+			expressions: data[4]
     };
   }
 }

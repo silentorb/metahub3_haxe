@@ -46,6 +46,10 @@ class Coder {
         return conditions(source, scope_definition);
 			case 'condition':
         return condition(source, scope_definition);
+			case 'array':
+        return create_array(source, scope_definition);
+			case 'lambda':
+        return create_lambda(source, scope_definition);
     }
 
     throw new Exception("Invalid block: " + source.type);
@@ -296,4 +300,19 @@ class Coder {
 	function weight(source:Dynamic, scope_definition:Scope_Definition):Expression {
 		return new Set_Weight(source.weight, convert_statement(source.statement, scope_definition));
   }
+	
+  function create_array(source:Dynamic, scope_definition:Scope_Definition):Expression {
+		return create_block(source, scope_definition);
+  }
+	
+  function create_lambda(source:Dynamic, scope_definition:Scope_Definition):Expression {
+		var new_scope = new Scope_Definition(scope_definition);
+		var parameters:Array<String> = source.parameters;
+		for (parameter in parameters) {			
+			new_scope.add_symbol(parameter, new Type_Signature(Kind.unknown));
+		}		
+    
+		return create_block(source, new_scope);
+  }
+
 }

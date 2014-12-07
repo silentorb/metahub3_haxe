@@ -5,6 +5,7 @@ import metahub.code.expressions.Literal;
 import metahub.code.Scope;
 import metahub.generate.Rail;
 import metahub.generate.Railway;
+import metahub.generate.Region;
 import metahub.generate.Renderer;
 import metahub.generate.Tie;
 import metahub.Hub;
@@ -19,6 +20,7 @@ import metahub.schema.Kind;
  */
 class Cpp extends Target{
 
+	var current_region:Region;
 	static var types = {
 		"string": "std::string",
 		"int": "int",
@@ -37,7 +39,7 @@ class Cpp extends Target{
 					continue;
 
 				//trace(rail.namespace.fullname);
-				var namespace = Generator.get_namespace_path(rail.trellis.namespace);
+				var namespace = Generator.get_namespace_path(rail.region);
 				var dir = output_folder + "/" + namespace.join('/');
 				Utility.create_folder(dir);
 
@@ -61,7 +63,7 @@ class Cpp extends Target{
 		render = new Renderer();
 		var result = render.line('#pragma once')
 		+ render_includes(headers) + render.newline()
-		+ render.line("namespace " + namespace.join('.') + " {")
+		+ render.line("namespace " + namespace.join('::') + " {")
 		+ render.indent().newline()
 		+ render_ambient_dependencies(rail)
 		+ class_declaration(rail)
@@ -81,6 +83,7 @@ class Cpp extends Target{
 		render = new Renderer();
 		var result = render_includes(headers) + render.newline()
 		+ render.line("namespace " + namespace.join('.') + " {");
+		current_region = rail.region;
 		render.indent();
 		result += class_definition(rail)
 		+ render.newline()
@@ -113,7 +116,7 @@ class Cpp extends Target{
 		
 		first += rail.rail_name;
 		if (rail.trellis.parent != null) {
-			first += " : public " + rail.parent.rail_name;
+			first += " : public " + render_rail_name(rail.parent);
 		}
 
 		result = render.line(first + " {")
@@ -150,6 +153,18 @@ class Cpp extends Target{
 		}
 
 		return definitions.join(render.newline());
+	}
+	
+	function render_rail_name(rail:Rail):String {
+		if (rail.region != current_region)
+			return render_region_name(rail.region) + "::" + rail.rail_name;
+		
+		return rail.rail_name;
+	}
+	
+	function render_region_name(region:Region):String {
+		var path = Generator.get_namespace_path(region);
+		return path.join("::");
 	}
 
 	function render_function_declarations(rail:Rail):String {

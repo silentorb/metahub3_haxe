@@ -18,7 +18,7 @@ class Haxe_Target extends Target{
 			for (rail in region.rails) {
 				var trellis = rail.trellis;
 				//trace(trellis.namespace.fullname);
-				var namespace = Generator.get_namespace_path(trellis.namespace);
+				var namespace = Generator.get_namespace_path(rail.region);
 				var dir = output_folder + "/" + namespace.join('/');
 				Utility.create_folder(dir);
 

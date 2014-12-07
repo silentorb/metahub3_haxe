@@ -20,10 +20,13 @@ class Region
 	public var external_name:String = null;
 	public var rails = new Map<String, Rail>();
 	public var class_export:String = "";
+	public var name:String;
+	public var parent:Region = null;
 
 	public function new(namespace:Namespace, target_name:String) 
 	{
 		this.namespace = namespace;
+		name = namespace.name;
 		is_external = namespace.is_external;
 		
 		if (namespace.additional == null)

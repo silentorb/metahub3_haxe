@@ -36,11 +36,11 @@ import metahub.schema.Namespace;
 		target.run(statement, output_folder);
 	}
 
-	public static function get_namespace_path(namespace:Namespace):Array<String> {
+	public static function get_namespace_path(region:Region):Array<String> {
 		var tokens = [];
-		while(namespace != null && namespace.name != 'root') {
-			tokens.unshift(namespace.name);
-			namespace = namespace.parent;
+		while(region != null && region.name != 'root') {
+			tokens.unshift(region.name);
+			region = region.parent;
 		}
 
 		return tokens;

@@ -5,6 +5,13 @@ import metahub.schema.Namespace;
  * ...
  * @author Christopher W. Johnson
  */
+
+typedef Region_Additional = {
+	?is_external:Bool,
+	?namespace:String,
+	?class_export:String
+}
+ 
 class Region
 {
 	public var namespace:Namespace;
@@ -12,6 +19,7 @@ class Region
 	public var trellis_additional = new Map<String,Dynamic>();
 	public var external_name:String = null;
 	public var rails = new Map<String, Rail>();
+	public var class_export:String = "";
 
 	public function new(namespace:Namespace, target_name:String) 
 	{
@@ -21,16 +29,19 @@ class Region
 		if (namespace.additional == null)
 			return;
 			
-		var additional = namespace.additional[target_name];
+		var additional:Region_Additional = namespace.additional[target_name];
 		if (additional == null)
 			return;
 		
 		if (Reflect.hasField(additional, 'is_external'))
-			is_external = Reflect.field(additional, 'is_external');
+			is_external = additional.is_external;
 
 		if (Reflect.hasField(additional, 'namespace'))
-			external_name = Reflect.field(additional, 'namespace');
-		
+			external_name = additional.namespace;
+
+		if (Reflect.hasField(additional, 'class_export'))
+			class_export = additional.class_export;
+				
 		var trellises = Reflect.field(additional, 'trellises');
 		if (trellises != null) {
 			for (key in Reflect.fields(trellises)) {

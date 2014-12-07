@@ -28,11 +28,6 @@ class Cpp extends Target{
 
 	public function new(railway:Railway) {
 		super(railway);
-
-		//types[Kind.string] = {
-			//symbol: "std::string",
-			//default_value:
-		//}
 	}
 
 	override public function run(statement, output_folder:String) {
@@ -76,7 +71,7 @@ class Cpp extends Target{
 	}
 
 	function create_class_file(rail:Rail, namespace, dir) {
-		var headers = [ "stdafx", rail.rail_name ];
+		var headers = [ "stdafx", rail.source_file ];
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
 			if (dependency != rail.parent && dependency.source_file != null) {
@@ -112,7 +107,11 @@ class Cpp extends Target{
 
 	function class_declaration(rail:Rail):String {
 		var result = "";
-		var first = "class " + rail.name;
+		var first = "class ";
+		if (rail.class_export.length > 0)
+			first += rail.class_export + " ";
+		
+		first += rail.rail_name;
 		if (rail.trellis.parent != null) {
 			first += " : public " + rail.parent.rail_name;
 		}

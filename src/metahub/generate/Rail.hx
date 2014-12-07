@@ -7,6 +7,13 @@ import metahub.schema.Kind;
  * @author Christopher W. Johnson
  */
 
+typedef Rail_Additional = {
+	?name:String,
+	?is_external:Bool,
+	?source_file:String,
+	?class_export:String
+}
+ 
 class Rail {
 
 	public var trellis:Trellis;
@@ -23,6 +30,7 @@ class Rail {
 	public var hooks = new Map<String, Dynamic>();
 	public var stubs = new Array<String>();
 	public var property_additional = new Map<String, Property_Addition>();
+	public var class_export:String = "";
 
 	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
@@ -30,6 +38,7 @@ class Rail {
 		rail_name = this.name = trellis.name;
 		region = railway.regions[trellis.namespace.name];
 		is_external = region.is_external;
+		class_export = region.class_export;
 		load_additional();
 		if (!is_external && source_file == null)
 			source_file = trellis.namespace.name + '/' + rail_name;
@@ -39,17 +48,20 @@ class Rail {
 		if (!region.trellis_additional.exists(trellis.name))
 			return;
 
-		var map = region.trellis_additional[trellis.name];
+		var map:Rail_Additional = region.trellis_additional[trellis.name];
 
 		if (Reflect.hasField(map, 'is_external'))
-			is_external = Reflect.field(map, 'is_external');
+			is_external = map.is_external;
 
 		if (Reflect.hasField(map, 'name'))
-			rail_name = Reflect.field(map, 'name');
+			rail_name = map.name;
 
 		if (Reflect.hasField(map, 'source_file'))
-			source_file = Reflect.field(map, 'source_file');
+			source_file = map.source_file;
 
+		if (Reflect.hasField(map, 'class_export'))
+			class_export = map.class_export;
+			
 		if (Reflect.hasField(map, 'hooks')) {
 			var hook_source = Reflect.field(map, 'hooks');
 			for (key in Reflect.fields(hook_source)) {

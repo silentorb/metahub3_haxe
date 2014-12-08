@@ -5,5 +5,6 @@ package metahub.imperative;
  */
 
 typedef Block = {
-
+	type:String,
+	statements:Array<Dynamic>
 }

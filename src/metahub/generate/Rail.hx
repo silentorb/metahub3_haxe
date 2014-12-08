@@ -1,4 +1,7 @@
 package metahub.generate;
+import metahub.code.Type_Signature;
+import metahub.imperative.Block;
+import metahub.imperative.Function_Definition;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
 
@@ -13,7 +16,7 @@ typedef Rail_Additional = {
 	?source_file:String,
 	?class_export:String
 }
- 
+
 class Rail {
 
 	public var trellis:Trellis;
@@ -31,6 +34,7 @@ class Rail {
 	public var stubs = new Array<String>();
 	public var property_additional = new Map<String, Property_Addition>();
 	public var class_export:String = "";
+	public var code:Block;
 
 	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
@@ -61,7 +65,7 @@ class Rail {
 
 		if (Reflect.hasField(map, 'class_export'))
 			class_export = map.class_export;
-			
+
 		if (Reflect.hasField(map, 'hooks')) {
 			var hook_source = Reflect.field(map, 'hooks');
 			for (key in Reflect.fields(hook_source)) {
@@ -101,6 +105,8 @@ class Rail {
 				}
 			}
 		}
+
+		generate_code();
 	}
 
 	function add_dependency(rail:Rail):Dependency {
@@ -110,4 +116,68 @@ class Rail {
 		return dependencies[rail.name];
 	}
 
+	public function generate_code() {
+		var class_definition = {
+			"type": "class_definition",
+			"rail": this,
+			"statements": []
+		}
+		var namespace = {
+			type: "namespace",
+			region: region,
+			statements: [ class_definition ]
+		}
+
+		code = {
+			type: "block",
+			statements: [
+				namespace
+			]
+		};
+
+		var statements = class_definition.statements;
+
+		for (tie in all_ties) {
+			var definition = generate_setter(tie);
+			if (definition != null)
+				statements.push(definition);
+		}
+	}
+
+	function generate_setter(tie:Tie):Function_Definition {
+		if (!tie.has_setter())
+			return null;
+
+		var result:Function_Definition = {
+			type: "function_definition",
+			name: 'set_' + tie.tie_name,
+			return_type: { type: Kind.none },
+			parameters: [
+				{
+					name: "value",
+					type: tie.get_signature()
+				}
+			],
+			block: []
+		};
+
+		return result;
+
+		//var result = render.line(render_signature('set_' + tie.tie_name, tie, true) + ' {');
+		//render.indent();
+		//for (constraint in tie.constraints) {
+			//result += Constraints.render(constraint, render, this);
+		//}
+		//result +=
+			//render.line('if (' + tie.tie_name + ' == value)')
+		//+ render.indent().line('return;')
+		//+	render.unindent().newline()
+		//+ render.line(tie.tie_name + ' = value;');
+		//if (tie.has_set_post_hook)
+			//result += render.line(tie.get_setter_post_name() + "(value);");
+//
+		//render.unindent();
+		//result += render.line('}');
+		//return result;
+	}
 }

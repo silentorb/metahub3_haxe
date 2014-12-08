@@ -23,6 +23,7 @@ import metahub.schema.Namespace;
 		Utility.clear_folder(output_folder);
 		var railway = new Railway(hub, target_name);
 		railway.process(statement, hub.root_scope);
+		railway.generate_code();
 		var target:Target = null;
 
 		switch(target_name) {

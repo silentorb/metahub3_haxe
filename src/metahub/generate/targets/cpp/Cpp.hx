@@ -9,6 +9,9 @@ import metahub.generate.Region;
 import metahub.generate.Renderer;
 import metahub.generate.Tie;
 import metahub.Hub;
+import metahub.imperative.Block;
+import metahub.imperative.Function_Definition;
+import metahub.imperative.Statement;
 import metahub.schema.Namespace;
 import metahub.schema.Property;
 import metahub.schema.Trellis;
@@ -21,6 +24,8 @@ import metahub.schema.Kind;
 class Cpp extends Target{
 
 	var current_region:Region;
+	var current_rail:Rail;
+
 	static var types = {
 		"string": "std::string",
 		"int": "int",
@@ -80,10 +85,33 @@ class Cpp extends Target{
 		}
 		render = new Renderer();
 		var result = render_includes(headers) + render.newline()
-		+ render_region(rail.region, function() {
-			return class_definition(rail);
-		});
+		+ render_statements(rail.code.statements);
+		//+ render_region(rail.region, function() {
+			//return class_definition(rail);
+		//});
 		Utility.create_file(dir + "/" + rail.name + ".cpp", result);
+	}
+
+	function render_statements(statements:Array<Dynamic>):String {
+		return statements.map(function(s) return render_statement(s)).join(newline());
+	}
+
+	function render_statement(statement:Dynamic){
+		switch(statement.type) {
+			case "namespace":
+				return render_region(statement.region, function() {
+					return render_statements(statement.statements);
+				});
+
+			case "class_definition":
+				return class_definition(statement.rail, statement.statements);
+
+			case "function_definition":
+				return render_function_definition(statement);
+
+			default:
+				throw new Exception("Unsupported statement type: " + statement.type + ".");
+		}
 	}
 
 	function render_ambient_dependencies(rail:Rail):String {
@@ -104,11 +132,12 @@ class Cpp extends Target{
 	}
 
 	function class_declaration(rail:Rail):String {
+		current_rail = rail;
 		var result = "";
 		var first = "class ";
 		if (rail.class_export.length > 0)
 			first += rail.class_export + " ";
-		
+
 		first += rail.rail_name;
 		if (rail.trellis.parent != null) {
 			first += " : public " + render_rail_name(rail.parent);
@@ -125,18 +154,22 @@ class Cpp extends Target{
 		result += render.pad(render_function_declarations(rail))
 		+ render.unindent().line("};");
 
+		current_rail = null;
 		return result;
 	}
 
-	function class_definition(rail:Rail):String {
+	function class_definition(rail:Rail, statements:Array<Dynamic>):String {
+		current_rail = rail;
 		var result = "";
 
-		result += render.pad(render_functions(rail));
+		//result += render.pad(render_functions(rail));
+		result += render_statements(statements);
 		render.unindent();
 
+		current_rail = null;
 		return result;
 	}
-	
+
 	function render_region(region:Region, action) {
 		var namespace = Generator.get_namespace_path(region);
 		var result = line("namespace " + namespace.join('::') + " {");
@@ -145,7 +178,7 @@ class Cpp extends Target{
 		result += action()
 		+ newline()
 		+ unindent().line("}");
-		
+
 		current_region = null;
 		return result;
 	}
@@ -162,17 +195,21 @@ class Cpp extends Target{
 
 		return definitions.join(render.newline());
 	}
-	
+
 	function render_rail_name(rail:Rail):String {
 		if (rail.region != current_region)
 			return render_region_name(rail.region) + "::" + rail.rail_name;
-		
+
 		return rail.rail_name;
 	}
-	
+
 	function render_region_name(region:Region):String {
 		var path = Generator.get_namespace_path(region);
 		return path.join("::");
+	}
+
+	function render_function_definition(definition:Function_Definition):String {
+
 	}
 
 	function render_function_declarations(rail:Rail):String {
@@ -223,7 +260,7 @@ class Cpp extends Target{
 			name = rail.region.external_name + "::" + name;
 		else if (rail.region != current_region)
 			name = rail.region.name + "::" + name;
-			
+
 		return name;
 	}
 

@@ -26,7 +26,7 @@ class Railway {
 
 			var region = new Region(namespace, target_name);
 			regions[namespace.name] = region;
-			
+
 			for (trellis in namespace.trellises) {
 				region.rails[trellis.name] = new Rail(trellis, this);
 			}
@@ -41,6 +41,14 @@ class Railway {
 
 	public static function get_class_name(expression):String {
 		return Type.getClassName(Type.getClass(expression)).split('.').pop();
+	}
+
+	public function generate_code() {
+		for (region in regions) {
+			for (rail in region.rails) {
+				rail.generate_code();
+			}
+		}
 	}
 
 	public function process(expression:Expression, scope:Scope) {
@@ -86,7 +94,7 @@ class Railway {
 		tie.constraints.push(new Constraint(expression, rail.railway, scope));
 		trace("reference:", type, tie.name);
 	}
-	
+
 	public function get_rail(trellis:Trellis):Rail {
 		return regions[trellis.namespace.name].rails[trellis.name];
 	}

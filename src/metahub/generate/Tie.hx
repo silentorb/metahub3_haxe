@@ -1,4 +1,5 @@
 package metahub.generate;
+import metahub.imperative.Signature;
 import metahub.schema.Property;
 import metahub.schema.Kind;
 import metahub.code.expressions.Create_Constraint;
@@ -52,4 +53,10 @@ class Tie {
 		return "set_" + name + "_post";
 	}
 
+	public function get_signature():Signature {
+		return {
+			type: property.type,
+			rail: other_rail
+		};
+	}
 }

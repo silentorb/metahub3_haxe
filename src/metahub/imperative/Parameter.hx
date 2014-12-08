@@ -1,9 +1,10 @@
 package metahub.imperative;
 
 /**
- * ...
  * @author Christopher W. Johnson
  */
-typedef Expression = {
-	type:String
+
+typedef Parameter = {
+	name:String,
+	type:Signature
 }

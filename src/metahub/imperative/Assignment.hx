@@ -5,8 +5,10 @@ import metahub.generate.Car;
  * @author Christopher W. Johnson
  */
 
-typedef Expression = {
+typedef Assignment =
+{
 	type:String,
-	?value:Dynamic,
-	?path:Array<Car>
+	operator:String,
+	target:Array<Car>,
+	expression:Expression
 }

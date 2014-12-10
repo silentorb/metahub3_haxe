@@ -5,5 +5,6 @@ package metahub.imperative;
  */
 
 typedef Condition = {
-
+	operator:String,
+	expressions:Dynamic
 }

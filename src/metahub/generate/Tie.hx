@@ -56,7 +56,8 @@ class Tie {
 	public function get_signature():Signature {
 		return {
 			type: property.type,
-			rail: other_rail
+			rail: other_rail,
+			is_value: is_value
 		};
 	}
 }

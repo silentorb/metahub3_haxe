@@ -1,6 +1,7 @@
 package metahub.generate;
 import metahub.code.Type_Signature;
 import metahub.imperative.Block;
+import metahub.imperative.Code;
 import metahub.imperative.Function_Definition;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
@@ -160,6 +161,10 @@ class Rail {
 			],
 			block: []
 		};
+		
+		for (constraint in tie.constraints) {
+			result.block = result.block.concat(Code.constraint(constraint));
+		}
 
 		return result;
 

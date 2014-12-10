@@ -8,5 +8,6 @@ import metahub.generate.Rail;
 
 typedef Signature ={
 	type:Kind,
-	?rail:Rail
+	?rail:Rail,
+	?is_value:Bool
 }

@@ -5,7 +5,7 @@ package metahub.imperative;
  */
 
 typedef If = {
-		type:String,
-		condition:Condition,
-		block:Block
+	type:String,
+	condition:Condition,
+	statements:Array<Dynamic>
 }

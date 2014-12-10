@@ -1,6 +1,5 @@
 package metahub.generate.targets.cpp ;
 import haxe.Timer;
-import metahub.code.expressions.Expression;
 import metahub.code.expressions.Literal;
 import metahub.code.Scope;
 import metahub.generate.Rail;
@@ -9,8 +8,13 @@ import metahub.generate.Region;
 import metahub.generate.Renderer;
 import metahub.generate.Tie;
 import metahub.Hub;
+import metahub.imperative.Assignment;
 import metahub.imperative.Block;
+import metahub.imperative.Condition;
+import metahub.imperative.Expression;
 import metahub.imperative.Function_Definition;
+import metahub.imperative.If;
+import metahub.imperative.Signature;
 import metahub.imperative.Statement;
 import metahub.schema.Namespace;
 import metahub.schema.Property;
@@ -30,7 +34,8 @@ class Cpp extends Target{
 		"string": "std::string",
 		"int": "int",
 		"bool": "bool",
-		"float": "float"
+		"float": "float",
+		"none": "void"
 	}
 
 	public function new(railway:Railway) {
@@ -108,6 +113,12 @@ class Cpp extends Target{
 
 			case "function_definition":
 				return render_function_definition(statement);
+				
+			case "if":
+				return render_if(statement);
+				
+			case "assignment":
+				return render_assignment(statement);
 
 			default:
 				throw new Exception("Unsupported statement type: " + statement.type + ".");
@@ -183,18 +194,18 @@ class Cpp extends Target{
 		return result;
 	}
 
-	function render_functions(rail:Rail):String {
-		var result = "";
-		var definitions = [ render_initialize_definition(rail) ];
-
-		for (tie in rail.all_ties) {
-			var definition = render_setter(tie);
-			if (definition.length > 0)
-				definitions.push(definition);
-		}
-
-		return definitions.join(render.newline());
-	}
+	//function render_functions(rail:Rail):String {
+		//var result = "";
+		//var definitions = [ render_initialize_definition(rail) ];
+//
+		////for (tie in rail.all_ties) {
+			////var definition = render_setter(tie);
+			////if (definition.length > 0)
+				////definitions.push(definition);
+		////}
+////
+		//return definitions.join(render.newline());
+	//}
 
 	function render_rail_name(rail:Rail):String {
 		if (rail.region != current_region)
@@ -209,7 +220,10 @@ class Cpp extends Target{
 	}
 
 	function render_function_definition(definition:Function_Definition):String {
-
+		var intro = render_signature(definition.return_type) + ' ' + current_rail.rail_name + '::' + definition.name
+		+ "(" + definition.parameters.map(function(p) return render_signature(p.type, true) + ' ' + p.name).join(", ") + ")";
+		
+		return render_scope(intro, function() return render_statements(definition.block));
 	}
 
 	function render_function_declarations(rail:Rail):String {
@@ -227,32 +241,32 @@ class Cpp extends Target{
 
 		for (tie in rail.all_ties) {
 			if (tie.has_setter())
-				declarations.push(render.line(render_signature('set_' + tie.tie_name, tie) + ';'));
+				declarations.push(render.line(render_signature_old('set_' + tie.tie_name, tie) + ';'));
 		}
 
 		return declarations.join('');
 	}
 
-	function render_initialize_definition(rail:Rail):String {
-		var result = render.line("void " + rail.rail_name + "::initialize() {");
-		render.indent();
-		result += render.line(rail.parent != null
-			? rail.parent.rail_name + "::initialize();"
-			: ""
-		);
-		for (tie in rail.all_ties) {
-			if (tie.property.type == Kind.list) {
-				for (constraint in tie.constraints) {
-					result += Constraints.render_list_constraint(constraint, render, this);
-				}
-			}
-		}
-		if (rail.hooks.exists("initialize_post")) {
-			result += render.line("initialize_post();");
-		}
-		render.unindent();
-		return result + render.line("}");
-	}
+	//function render_initialize_definition(rail:Rail):String {
+		//var result = render.line("void " + rail.rail_name + "::initialize() {");
+		//render.indent();
+		//result += render.line(rail.parent != null
+			//? rail.parent.rail_name + "::initialize();"
+			//: ""
+		//);
+		//for (tie in rail.all_ties) {
+			//if (tie.property.type == Kind.list) {
+				//for (constraint in tie.constraints) {
+					//result += Constraints.render_list_constraint(constraint, render, this);
+				//}
+			//}
+		//}
+		//if (rail.hooks.exists("initialize_post")) {
+			//result += render.line("initialize_post();");
+		//}
+		//render.unindent();
+		//return result + render.line("}");
+	//}
 
 	function get_rail_type_string(rail:Rail):String {
 		var name = rail.rail_name;
@@ -288,12 +302,24 @@ class Cpp extends Target{
 		return headers.map(function(h) return render.line('#include "' + h + '.h"')).join('');
 	}
 
-	function render_signature(name, tie:Tie, is_definition = false):String {
+	function render_signature_old(name, tie:Tie):String {
 		var right = name + '(' + get_property_type_string(tie, true) + ' value)';
-		if (is_definition)
-			right = tie.rail.rail_name + "::" + right;
-
 		return 'void ' + right;
+	}
+	
+	function render_signature(signature:Signature, is_parameter = false):String {
+		if (signature.rail == null)
+			return Reflect.field(types, signature.type.to_string());
+
+		var name = get_rail_type_string(signature.rail);
+		if (signature.type == Kind.reference) {
+			return signature.is_value
+				? is_parameter ? name + '&' : name
+				: name + '*';
+		}
+		else {
+			return "std::vector<" + name + ">";
+		}
 	}
 
 	public function render_block(command:String, expression:String, action):String {
@@ -304,28 +330,46 @@ class Cpp extends Target{
 		result += render.line('}');
 		return result;
 	}
-
-	function render_setter(tie:Tie):String {
-		if (!tie.has_setter())
-			return "";
-
-		var result = render.line(render_signature('set_' + tie.tie_name, tie, true) + ' {');
+	
+	public function render_scope(intro:String, action):String {
+		var result = render.line(intro + ' {');
 		render.indent();
-		for (constraint in tie.constraints) {
-			result += Constraints.render(constraint, render, this);
-		}
-		result +=
-			render.line('if (' + tie.tie_name + ' == value)')
-		+ render.indent().line('return;')
-		+	render.unindent().newline()
-		+ render.line(tie.tie_name + ' = value;');
-		if (tie.has_set_post_hook)
-			result += render.line(tie.get_setter_post_name() + "(value);");
-
+		result += action();
 		render.unindent();
 		result += render.line('}');
 		return result;
 	}
+	
+	public function render_scope2(intro:String, statements:Array<Dynamic>):String {
+		var result = render.line(intro + ' {');
+		render.indent();
+		result += render_statements(statements);
+		render.unindent();
+		result += render.line('}');
+		return result;
+	}
+
+	//function render_setter(tie:Tie):String {
+		//if (!tie.has_setter())
+			//return "";
+
+		//var result = render.line(render_signature_old('set_' + tie.tie_name, tie) + ' {');
+		//render.indent();
+		//for (constraint in tie.constraints) {
+			//result += Constraints.render(constraint, render, this);
+		//}
+		//result +=
+			//render.line('if (' + tie.tie_name + ' == value)')
+		//+ render.indent().line('return;')
+		//+	render.unindent().newline()
+		//+ render.line(tie.tie_name + ' = value;');
+		//if (tie.has_set_post_hook)
+			//result += render.line(tie.get_setter_post_name() + "(value);");
+//
+		//render.unindent();
+		//result += render.line('}');
+		//return result;
+	//}
 
 	public function render_value_path(path:Array<Car>):String {
 		return ['value'].concat(path.slice(1).map(function(t) return render_car(t))).join('.');
@@ -341,20 +385,46 @@ class Cpp extends Target{
 	function render_path(path:Array<Tie>):String {
 		return path.map(function(t) return t.tie_name).join('.');
 	}
-
-	public function render_expression(expression:Expression, scope:Scope):Dynamic {
-		var type = Railway.get_class_name(expression);
-		trace("expression:", type);
-
-		switch(type) {
-			case "Literal":
-				return render_literal(cast expression);
+	
+	function render_if(statement:If):String {
+		return render_scope2(
+			"if (" + render_condition(statement.condition) + ")"
+		, statement.statements);
+	}
+	
+	function render_condition(condition:Condition):String {
+		return condition.expressions.map(function (c) return render_expression(c)).join(' ' + condition.operator + ' ');
+	}
+	
+	function render_expression(expression:Expression):String {
+		switch(expression.type) {
+			case "literal":
+				return Std.string(expression.value);
+			case "path":
+				return render_value_path(expression.path);
+			default:
+				throw new Exception("Unsupported expression type: " + expression.type + ".");
+				
 		}
-
-		throw new Exception("Cannot render expression " + type + ".");
+	}
+	
+	function render_assignment(statement:Assignment):String {
+		return line(render_value_path(statement.target) + ' ' + statement.operator + ' ' + render_expression(statement.expression) + ';');
 	}
 
-	function render_literal(expression:Literal):String {
-		return expression.value;
-	}
+	//public function render_expression(expression:Expression, scope:Scope):Dynamic {
+		//var type = Railway.get_class_name(expression);
+		//trace("expression:", type);
+//
+		//switch(type) {
+			//case "Literal":
+				//return render_literal(cast expression);
+		//}
+//
+		//throw new Exception("Cannot render expression " + type + ".");
+	//}
+//
+	//function render_literal(expression:Literal):String {
+		//return expression.value;
+	//}
 }

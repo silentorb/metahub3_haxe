@@ -9,5 +9,5 @@ typedef Function_Definition = {
 	return_type:Signature,
 	name:String,
 	parameters:Array<Parameter>,
-	block:Array<Statement>
+	block:Array<Dynamic>
 }

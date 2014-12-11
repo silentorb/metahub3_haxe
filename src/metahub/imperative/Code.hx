@@ -2,7 +2,9 @@ package metahub.imperative;
 import metahub.code.expressions.Literal;
 import metahub.code.Scope;
 import metahub.generate.Constraint;
+import metahub.generate.Rail;
 import metahub.generate.Railway;
+import metahub.schema.Kind;
 
 /**
  * ...
@@ -35,8 +37,9 @@ class Code
 				value = limit;
 		}
 		
-		var if_statement:If = {
-			type: "if",
+		var if_statement:Flow_Control = {
+			type: "flow_control",
+			name: "if",
 			condition: {
 				operator: inverse,
 				expressions: [
@@ -67,6 +70,61 @@ class Code
 		}
 
 		throw new Exception("Cannot render expression " + type + ".");
+	}
+	
+	public static function generate_initialize(rail:Rail):Function_Definition {
+		var block = new Array<Dynamic>();
+		
+		for (tie in rail.all_ties) {
+			if (tie.property.type == Kind.list) {
+				for (constraint in tie.constraints) {
+					block.push(generate_list_constraint(constraint));
+				}
+			}
+		}
+		if (rail.hooks.exists("initialize_post")) {
+			block.push({
+				type: "function_call",
+				caller: "this",
+				name: "initialize_post",
+				args: []
+			});
+		}
+		
+		return {
+			type: "function_definition",
+			name: 'initialize',
+			return_type: { type: Kind.none },
+			parameters: [],
+			block: block
+		};
+	}
+	
+	public static function generate_list_constraint(constraint:Constraint):Flow_Control {
+		var reference = constraint.reference[0].tie;
+		//var amount:Int = target.render_expression(constraint.expression, constraint.scope);
+		var instance_name = constraint.reference[0].tie.other_rail.rail_name;
+		return {
+			type: "flow_control",
+			name: "while",
+			condition: {
+				operator: "<",
+				expressions: [
+					{ type: "literal", value: "temp" },
+					//{ type: "path", path: constraint.reference },
+					{ type: "literal", value: "amount" }
+				]
+			},
+			statements: [
+			
+			]			
+		}
+		//return target.render_block('while', reference + '.size() < ' + amount, function() {
+			//return
+				//render.line(instance_name + '* _child = new ' + instance_name + '();')
+				//+ render.line('_child->initialize();')
+				//+ render.line(reference + '.push_back(*_child);');
+		//});
 	}
 	
 }

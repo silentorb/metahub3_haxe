@@ -123,20 +123,21 @@ class Rail {
 			"rail": this,
 			"statements": []
 		}
-		var namespace = {
-			type: "namespace",
-			region: region,
-			statements: [ class_definition ]
-		}
-
+		
 		code = {
 			type: "block",
 			statements: [
-				namespace
+				{
+					type: "namespace",
+					region: region,
+					statements: [ class_definition ]
+				}
 			]
 		};
 
 		var statements = class_definition.statements;
+		
+		statements.push(Code.generate_initialize(this));
 
 		for (tie in all_ties) {
 			var definition = generate_setter(tie);

@@ -1,6 +1,5 @@
 package metahub.generate.targets.cpp ;
 import haxe.Timer;
-import metahub.code.expressions.Literal;
 import metahub.code.Scope;
 import metahub.generate.Rail;
 import metahub.generate.Railway;
@@ -12,8 +11,9 @@ import metahub.imperative.Assignment;
 import metahub.imperative.Block;
 import metahub.imperative.Condition;
 import metahub.imperative.Expression;
+import metahub.imperative.Function_Call;
 import metahub.imperative.Function_Definition;
-import metahub.imperative.If;
+import metahub.imperative.Flow_Control;
 import metahub.imperative.Signature;
 import metahub.imperative.Statement;
 import metahub.schema.Namespace;
@@ -114,9 +114,12 @@ class Cpp extends Target{
 			case "function_definition":
 				return render_function_definition(statement);
 				
-			case "if":
+			case "flow_control":
 				return render_if(statement);
 				
+			case "function_call":
+				return render_function_call(statement);
+								
 			case "assignment":
 				return render_assignment(statement);
 
@@ -386,9 +389,13 @@ class Cpp extends Target{
 		return path.map(function(t) return t.tie_name).join('.');
 	}
 	
-	function render_if(statement:If):String {
+	function render_function_call(statement:Function_Call):String {
+		return line(statement.name + "();");
+	}
+	
+	function render_if(statement:Flow_Control):String {
 		return render_scope2(
-			"if (" + render_condition(statement.condition) + ")"
+			statement.name + " (" + render_condition(statement.condition) + ")"
 		, statement.statements);
 	}
 	

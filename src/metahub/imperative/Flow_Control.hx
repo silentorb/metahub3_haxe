@@ -4,8 +4,9 @@ package metahub.imperative;
  * @author Christopher W. Johnson
  */
 
-typedef If = {
+typedef Flow_Control = {
 	type:String,
+	name:String,
 	condition:Condition,
 	statements:Array<Dynamic>
 }

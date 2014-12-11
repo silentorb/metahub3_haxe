@@ -11,5 +11,5 @@ typedef Expression = {
 	?child:Expression,
 	?name:String,
 	?args:Array<Dynamic>,
-	?path:Dynamic
+	?path:Array<Dynamic>
 }

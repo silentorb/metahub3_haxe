@@ -411,7 +411,7 @@ class Cpp extends Target{
 				result = Std.string(expression.value);
 
 				case Expression_Type.path:
-				result = render_value_path(expression.path);
+				result = render_path_old(expression);
 
 			case Expression_Type.function_call:
 				result = expression.name + "(" + expression.args.join(", ") + ")";
@@ -422,6 +422,20 @@ class Cpp extends Target{
 
 		if (expression.child != null) {
 			result += "." + render_expression(expression.child, expression);
+		}
+
+		return result;
+	}
+
+	function render_path_old(expression:Expression) {
+		var parent:Expression = null;
+		var result = "";
+		for (child in expression.path) {
+			if (parent != null)
+				result == ".";
+
+			result += render_expression(child, parent);
+			parent = child;
 		}
 
 		return result;

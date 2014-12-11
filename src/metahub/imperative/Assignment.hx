@@ -9,6 +9,6 @@ typedef Assignment =
 {
 	type:String,
 	operator:String,
-	target:Array<Car>,
+	target:Expression,
 	expression:Expression
 }

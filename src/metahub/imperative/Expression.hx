@@ -6,7 +6,10 @@ import metahub.generate.Car;
  */
 
 typedef Expression = {
-	type:String,
+	type:Expression_Type,
 	?value:Dynamic,
-	?path:Array<Car>
+	?child:Expression,
+	?name:String,
+	?args:Array<Dynamic>,
+	?path:Dynamic
 }

@@ -20,6 +20,7 @@ import metahub.schema.Namespace;
 import metahub.schema.Property;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
+import metahub.imperative.Expression_Type;
 
 /**
  * ...
@@ -113,13 +114,13 @@ class Cpp extends Target{
 
 			case "function_definition":
 				return render_function_definition(statement);
-				
+
 			case "flow_control":
 				return render_if(statement);
-				
+
 			case "function_call":
 				return render_function_call(statement);
-								
+
 			case "assignment":
 				return render_assignment(statement);
 
@@ -225,7 +226,7 @@ class Cpp extends Target{
 	function render_function_definition(definition:Function_Definition):String {
 		var intro = render_signature(definition.return_type) + ' ' + current_rail.rail_name + '::' + definition.name
 		+ "(" + definition.parameters.map(function(p) return render_signature(p.type, true) + ' ' + p.name).join(", ") + ")";
-		
+
 		return render_scope(intro, function() return render_statements(definition.block));
 	}
 
@@ -309,7 +310,7 @@ class Cpp extends Target{
 		var right = name + '(' + get_property_type_string(tie, true) + ' value)';
 		return 'void ' + right;
 	}
-	
+
 	function render_signature(signature:Signature, is_parameter = false):String {
 		if (signature.rail == null)
 			return Reflect.field(types, signature.type.to_string());
@@ -333,7 +334,7 @@ class Cpp extends Target{
 		result += render.line('}');
 		return result;
 	}
-	
+
 	public function render_scope(intro:String, action):String {
 		var result = render.line(intro + ' {');
 		render.indent();
@@ -342,7 +343,7 @@ class Cpp extends Target{
 		result += render.line('}');
 		return result;
 	}
-	
+
 	public function render_scope2(intro:String, statements:Array<Dynamic>):String {
 		var result = render.line(intro + ' {');
 		render.indent();
@@ -388,35 +389,46 @@ class Cpp extends Target{
 	function render_path(path:Array<Tie>):String {
 		return path.map(function(t) return t.tie_name).join('.');
 	}
-	
+
 	function render_function_call(statement:Function_Call):String {
 		return line(statement.name + "();");
 	}
-	
+
 	function render_if(statement:Flow_Control):String {
 		return render_scope2(
 			statement.name + " (" + render_condition(statement.condition) + ")"
 		, statement.statements);
 	}
-	
+
 	function render_condition(condition:Condition):String {
 		return condition.expressions.map(function (c) return render_expression(c)).join(' ' + condition.operator + ' ');
 	}
-	
-	function render_expression(expression:Expression):String {
+
+	function render_expression(expression:Expression, parent:Expression = null):String {
+		var result:String;
 		switch(expression.type) {
-			case "literal":
-				return Std.string(expression.value);
-			case "path":
-				return render_value_path(expression.path);
+			case Expression_Type.literal:
+				result = Std.string(expression.value);
+
+				case Expression_Type.path:
+				result = render_value_path(expression.path);
+
+			case Expression_Type.function_call:
+				result = expression.name + "(" + expression.args.join(", ") + ")";
+
 			default:
 				throw new Exception("Unsupported expression type: " + expression.type + ".");
-				
 		}
+
+		if (expression.child != null) {
+			result += "." + render_expression(expression.child, expression);
+		}
+
+		return result;
 	}
-	
+
 	function render_assignment(statement:Assignment):String {
-		return line(render_value_path(statement.target) + ' ' + statement.operator + ' ' + render_expression(statement.expression) + ';');
+		return line(render_expression(statement.target) + ' ' + statement.operator + ' ' + render_expression(statement.expression) + ';');
 	}
 
 	//public function render_expression(expression:Expression, scope:Scope):Dynamic {

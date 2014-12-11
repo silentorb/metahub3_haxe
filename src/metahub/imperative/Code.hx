@@ -22,7 +22,7 @@ class Code
 	public static function constraint(constraint:Constraint):Array<Statement> {
 		var operator = constraint.operator;
 		var inverse = Reflect.field(inverse_operators, operator);
-		var limit:Float = convert_expression(constraint.expression, constraint.scope);
+		var limit:Float = convert_expression(constraint.expression, constraint.scope).value;
 
 		var min:Float = 0.0001;
 		var value:Float = 0;
@@ -36,15 +36,15 @@ class Code
 			case '>=':
 				value = limit;
 		}
-		
+
 		var if_statement:Flow_Control = {
 			type: "flow_control",
 			name: "if",
 			condition: {
 				operator: inverse,
 				expressions: [
-					{ type: "path", path: constraint.reference },
-					{ type: "literal", value: limit }
+					constraint.reference,
+					{ type: Expression_Type.literal, value: limit }
 				]
 			},
 			statements: [
@@ -52,29 +52,29 @@ class Code
 					type: "assignment",
 					operator: "=",
 					target: constraint.reference,
-					expression: { type: "literal", value: value }
+					expression: { type: Expression_Type.literal, value: value }
 				}
 			]
 		};
 		return [ if_statement ];
 	}
-	
-	public static function convert_expression(expression:metahub.code.expressions.Expression, scope:Scope):Dynamic {
+
+	public static function convert_expression(expression:metahub.code.expressions.Expression, scope:Scope):Expression {
 		var type = Railway.get_class_name(expression);
 		trace("expression:", type);
 
 		switch(type) {
 			case "Literal":
 				var literal:Literal = cast expression;
-				return literal.value;
+				return { type: Expression_Type.literal, value: literal.value };
 		}
 
-		throw new Exception("Cannot render expression " + type + ".");
+		throw new Exception("Cannot convert expression " + type + ".");
 	}
-	
+
 	public static function generate_initialize(rail:Rail):Function_Definition {
 		var block = new Array<Dynamic>();
-		
+
 		for (tie in rail.all_ties) {
 			if (tie.property.type == Kind.list) {
 				for (constraint in tie.constraints) {
@@ -90,7 +90,7 @@ class Code
 				args: []
 			});
 		}
-		
+
 		return {
 			type: "function_definition",
 			name: 'initialize',
@@ -99,25 +99,25 @@ class Code
 			block: block
 		};
 	}
-	
+
 	public static function generate_list_constraint(constraint:Constraint):Flow_Control {
-		var reference = constraint.reference[0].tie;
+		var reference = constraint.reference.path[0].tie;
 		//var amount:Int = target.render_expression(constraint.expression, constraint.scope);
-		var instance_name = constraint.reference[0].tie.other_rail.rail_name;
+		var instance_name = constraint.reference.path[0].tie.other_rail.rail_name;
 		return {
 			type: "flow_control",
 			name: "while",
 			condition: {
 				operator: "<",
 				expressions: [
-					{ type: "literal", value: "temp" },
+					constraint.reference,
 					//{ type: "path", path: constraint.reference },
-					{ type: "literal", value: "amount" }
+					convert_expression(constraint.expression, constraint.scope)
 				]
 			},
 			statements: [
-			
-			]			
+
+			]
 		}
 		//return target.render_block('while', reference + '.size() < ' + amount, function() {
 			//return
@@ -126,5 +126,5 @@ class Code
 				//+ render.line(reference + '.push_back(*_child);');
 		//});
 	}
-	
+
 }

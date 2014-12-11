@@ -6,6 +6,7 @@ import metahub.code.expressions.Property_Reference;
 import metahub.code.Scope;
 import metahub.code.Type_Signature;
 import metahub.code.expressions.Token_Expression;
+import metahub.imperative.Expression_Type;
 
 /**
  * ...
@@ -13,7 +14,7 @@ import metahub.code.expressions.Token_Expression;
  */
 class Constraint {
   public var type:Type_Signature;
-  public var reference:Array<Car>;
+  public var reference:metahub.imperative.Expression;
   public var expression:Expression;
 	public var is_back_referencing = false;
 	//public var children:Array<Expression>;
@@ -31,7 +32,7 @@ class Constraint {
 		this.scope = scope;
 	}
 
-	static function convert_reference(expression:Expression, railway:Railway):Array<Car> {
+	static function convert_reference(expression:Expression, railway:Railway):metahub.imperative.Expression {
 		var path:Array<Token_Expression> = cast expression.children;
 		var result = [];
 		var first:Property_Reference = cast path[0];
@@ -42,7 +43,7 @@ class Constraint {
 				var tie = rail.all_ties[property_token.property.name];
 				if (tie == null)
 					throw new Exception("tie is null: " + property_token.property.fullname());
-					
+
 				result.push(new Car(tie, null));
 				rail = tie.other_rail;
 			}
@@ -51,7 +52,7 @@ class Constraint {
 				result.push(new Car(null, function_token));
 			}
 		}
-		return result;
+		return { type: Expression_Type.path, path: result };
 	}
 
 }

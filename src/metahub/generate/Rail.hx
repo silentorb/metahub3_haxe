@@ -5,6 +5,7 @@ import metahub.imperative.Code;
 import metahub.imperative.Function_Definition;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
+import metahub.imperative.Expression_Type;
 
 /**
  * ...
@@ -119,7 +120,7 @@ class Rail {
 
 	public function generate_code() {
 		var class_definition = {
-			"type": "class_definition",
+			"type": Expression_Type.class_definition,
 			"rail": this,
 			"statements": []
 		}
@@ -128,7 +129,7 @@ class Rail {
 			type: "block",
 			statements: [
 				{
-					type: "namespace",
+					type: Expression_Type.namespace,
 					region: region,
 					statements: [ class_definition ]
 				}
@@ -151,7 +152,7 @@ class Rail {
 			return null;
 
 		var result:Function_Definition = {
-			type: "function_definition",
+			type: Expression_Type.function_definition,
 			name: 'set_' + tie.tie_name,
 			return_type: { type: Kind.none },
 			parameters: [
@@ -167,6 +168,19 @@ class Rail {
 			result.block = result.block.concat(Code.constraint(constraint));
 		}
 
+		if (tie.has_set_post_hook) {
+			result.block.push({
+				type: Expression_Type.function_call,
+				name: tie.get_setter_post_name(),
+				args: [
+					{
+						type: Expression_Type.variable,
+						name: "value"
+					}
+				]
+			});
+		}
+			
 		return result;
 
 		//var result = render.line(render_signature('set_' + tie.tie_name, tie, true) + ' {');

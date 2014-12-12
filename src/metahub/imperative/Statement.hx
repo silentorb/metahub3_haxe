@@ -6,5 +6,5 @@ package metahub.imperative;
  */
 
 typedef Statement = {
-	type:String
+	type:Expression_Type
 }

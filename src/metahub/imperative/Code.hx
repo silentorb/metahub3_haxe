@@ -38,7 +38,7 @@ class Code
 		}
 
 		var if_statement:Flow_Control = {
-			type: "flow_control",
+			type: Expression_Type.flow_control,
 			name: "if",
 			condition: {
 				operator: inverse,
@@ -49,7 +49,7 @@ class Code
 			},
 			statements: [
 				{
-					type: "assignment",
+					type: Expression_Type.assignment,
 					operator: "=",
 					target: constraint.reference,
 					expression: { type: Expression_Type.literal, value: value }
@@ -84,7 +84,7 @@ class Code
 		}
 		if (rail.hooks.exists("initialize_post")) {
 			block.push({
-				type: "function_call",
+				type: Expression_Type.function_call,
 				caller: "this",
 				name: "initialize_post",
 				args: []
@@ -92,7 +92,7 @@ class Code
 		}
 
 		return {
-			type: "function_definition",
+			type: Expression_Type.function_definition,
 			name: 'initialize',
 			return_type: { type: Kind.none },
 			parameters: [],
@@ -103,9 +103,11 @@ class Code
 	public static function generate_list_constraint(constraint:Constraint):Flow_Control {
 		var reference = constraint.reference.path[0].tie;
 		//var amount:Int = target.render_expression(constraint.expression, constraint.scope);
+		var rail = constraint.reference.path[0].tie.other_rail;
 		var instance_name = constraint.reference.path[0].tie.other_rail.rail_name;
+		var variables = new Map<String, Signature>();
 		return {
-			type: "flow_control",
+			type: Expression_Type.flow_control,
 			name: "while",
 			condition: {
 				operator: "<",
@@ -116,7 +118,44 @@ class Code
 				]
 			},
 			statements: [
-
+				{ 
+					type: Expression_Type.declare_variable,
+					name: "_child",
+					expression: {
+						type: Expression_Type.instantiate,
+						rail: rail
+					},
+					signature: {
+						type: Kind.reference,
+						rail: rail,
+						is_value: false
+					}
+				},
+				{
+					type: Expression_Type.variable,
+					name: "_child",
+					child: {
+						type: Expression_Type.function_call,
+						name: "initialize",
+						is_platform_specific: false,
+						args: []
+					}
+				},
+				{
+					type: Expression_Type.property,
+					tie: constraint.reference.path[0].tie,
+					child: {
+						type: Expression_Type.function_call,
+						name: "add",
+						is_platform_specific: true,
+						args: [
+							{
+								type: Expression_Type.variable,
+								name: "_child"
+							}
+						]
+					}
+				}
 			]
 		}
 		//return target.render_block('while', reference + '.size() < ' + amount, function() {

@@ -1,6 +1,5 @@
 package metahub.generate.targets.cpp ;
 import haxe.Timer;
-import metahub.code.Scope;
 import metahub.generate.Rail;
 import metahub.generate.Railway;
 import metahub.generate.Region;
@@ -10,10 +9,14 @@ import metahub.Hub;
 import metahub.imperative.Assignment;
 import metahub.imperative.Block;
 import metahub.imperative.Condition;
+import metahub.imperative.Declare_Variable;
 import metahub.imperative.Expression;
 import metahub.imperative.Function_Call;
 import metahub.imperative.Function_Definition;
 import metahub.imperative.Flow_Control;
+import metahub.imperative.Instantiate;
+import metahub.imperative.Parameter;
+import metahub.imperative.Scope;
 import metahub.imperative.Signature;
 import metahub.imperative.Statement;
 import metahub.schema.Namespace;
@@ -30,6 +33,8 @@ class Cpp extends Target{
 
 	var current_region:Region;
 	var current_rail:Rail;
+	var scopes = new Array<Map<String, Signature>>();
+	var current_scope:Map<String, Signature>;
 
 	static var types = {
 		"string": "std::string",
@@ -59,6 +64,16 @@ class Cpp extends Target{
 			}
 		}
 	}
+	
+	function push_scope() {
+		current_scope = new Map<String, Signature>();
+		scopes.push(current_scope);
+	}
+	
+	function pop_scope() {
+		scopes.pop();
+		current_scope = scopes[scopes.length - 1];
+	}
 
 	function create_header_file(rail:Rail, namespace, dir) {
 		var headers = [ "stdafx" ];
@@ -82,6 +97,7 @@ class Cpp extends Target{
 	}
 
 	function create_class_file(rail:Rail, namespace, dir) {
+		scopes = [];
 		var headers = [ "stdafx", rail.source_file ];
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
@@ -99,34 +115,48 @@ class Cpp extends Target{
 	}
 
 	function render_statements(statements:Array<Dynamic>):String {
-		return statements.map(function(s) return render_statement(s)).join(newline());
+		return statements.map(function(s) return render_statement(s)).join("");
 	}
 
-	function render_statement(statement:Dynamic){
-		switch(statement.type) {
-			case "namespace":
+	function render_statement(statement:Dynamic) {
+		var type:Expression_Type = statement.type;		
+		switch(type) {
+			case Expression_Type.namespace:
 				return render_region(statement.region, function() {
 					return render_statements(statement.statements);
 				});
 
-			case "class_definition":
+			case Expression_Type.class_definition:
 				return class_definition(statement.rail, statement.statements);
 
-			case "function_definition":
+			case Expression_Type.function_definition:
 				return render_function_definition(statement);
 
-			case "flow_control":
+			case Expression_Type.flow_control:
 				return render_if(statement);
 
-			case "function_call":
-				return render_function_call(statement);
+			case Expression_Type.function_call:
+				return line(render_function_call(statement, null) + ";");
 
-			case "assignment":
+			case Expression_Type.assignment:
 				return render_assignment(statement);
+				
+			case Expression_Type.declare_variable:
+				return render_variable_declaration(statement);
 
 			default:
-				throw new Exception("Unsupported statement type: " + statement.type + ".");
+				return line(render_expression(statement) + ";");
+				//throw new Exception("Unsupported statement type: " + statement.type + ".");
 		}
+	}
+	
+	function render_variable_declaration(declaration:Declare_Variable):String {
+		var first = render_signature(declaration.signature) + " " + declaration.name;
+		if (declaration.expression != null)
+			first += " = " + render_expression(declaration.expression);
+			
+		current_scope[declaration.name] = declaration.signature;
+		return line(first + ";");
 	}
 
 	function render_ambient_dependencies(rail:Rail):String {
@@ -225,9 +255,19 @@ class Cpp extends Target{
 
 	function render_function_definition(definition:Function_Definition):String {
 		var intro = render_signature(definition.return_type) + ' ' + current_rail.rail_name + '::' + definition.name
-		+ "(" + definition.parameters.map(function(p) return render_signature(p.type, true) + ' ' + p.name).join(", ") + ")";
+		+ "(" + definition.parameters.map(render_parameter).join(", ") + ")";
 
-		return render_scope(intro, function() return render_statements(definition.block));
+		return render_scope(intro, function() {
+			for (parameter in definition.parameters) {
+				current_scope[parameter.name] = parameter.type;
+			}
+
+		  return render_statements(definition.block);
+		});
+	}
+	
+	function render_parameter(parameter:Parameter):String {
+		return render_signature(parameter.type, true) + ' ' + parameter.name;
 	}
 
 	function render_function_declarations(rail:Rail):String {
@@ -289,9 +329,9 @@ class Cpp extends Target{
 
 		var other_name = get_rail_type_string(other_rail);
 		if (tie.property.type == Kind.reference) {
-			return tie.is_value
-				? is_parameter ? other_name + '&' : other_name
-				: other_name + '*';
+			return 
+			tie.is_value ? is_parameter ? other_name + '&' : other_name : 
+					other_name + '*';
 		}
 		else {
 			return "std::vector<" + other_name + ">";
@@ -317,9 +357,9 @@ class Cpp extends Target{
 
 		var name = get_rail_type_string(signature.rail);
 		if (signature.type == Kind.reference) {
-			return signature.is_value
-				? is_parameter ? name + '&' : name
-				: name + '*';
+			return 
+			signature.is_value ? is_parameter ? name + '&' : name :
+					name + '*';
 		}
 		else {
 			return "std::vector<" + name + ">";
@@ -336,11 +376,13 @@ class Cpp extends Target{
 	}
 
 	public function render_scope(intro:String, action):String {
+		push_scope();
 		var result = render.line(intro + ' {');
 		render.indent();
 		result += action();
 		render.unindent();
 		result += render.line('}');
+		pop_scope();
 		return result;
 	}
 
@@ -375,10 +417,6 @@ class Cpp extends Target{
 		//return result;
 	//}
 
-	public function render_value_path(path:Array<Car>):String {
-		return ['value'].concat(path.slice(1).map(function(t) return render_car(t))).join('.');
-	}
-
 	public function render_car(car:Car):String {
 		if (car.tie != null)
 			return car.tie.tie_name;
@@ -387,12 +425,12 @@ class Cpp extends Target{
 	}
 
 	function render_path(path:Array<Tie>):String {
-		return path.map(function(t) return t.tie_name).join('.');
+		return path.map(function(t) return t.tie_name).join('->');
 	}
 
-	function render_function_call(statement:Function_Call):String {
-		return line(statement.name + "();");
-	}
+	//function render_function_call(statement:Function_Call):String {
+		//return line(statement.name + "();");
+	//}
 
 	function render_if(statement:Flow_Control):String {
 		return render_scope2(
@@ -410,29 +448,100 @@ class Cpp extends Target{
 			case Expression_Type.literal:
 				result = Std.string(expression.value);
 
-				case Expression_Type.path:
+			case Expression_Type.path:
 				result = render_path_old(expression);
 
-			case Expression_Type.function_call:
-				result = expression.name + "(" + expression.args.join(", ") + ")";
+			case Expression_Type.property:
+				result = expression.tie.tie_name;
 
+			case Expression_Type.function_call:
+				result = render_function_call(cast expression, parent);
+				
+			case Expression_Type.instantiate:
+				result = render_instantiation(cast expression);
+				
+			case Expression_Type.variable:
+				if (find_variable(expression.name) == null)
+					throw new Exception("Could not find variable: " + expression.name + ".");
+				
+				result = expression.name;
+				
 			default:
 				throw new Exception("Unsupported expression type: " + expression.type + ".");
 		}
 
 		if (expression.child != null) {
-			result += "." + render_expression(expression.child, expression);
+			result += get_connector(expression) + render_expression(expression.child, expression);
 		}
 
 		return result;
 	}
+	
+	function get_signature(expression:Expression):Dynamic {
+		switch (expression.type) {
+			case Expression_Type.variable:
+				return find_variable(expression.name);
+			
+			case Expression_Type.property:
+				return expression.tie;
+				
+			default:
+				throw new Exception("Determining pointer is not yet implemented for expression type: " + expression.type + ".");
+		}
+	}
+	
+	function is_pointer(signature:Dynamic):Bool {
+		if (signature.type == null)
+			throw "";
+		trace('s', signature.is_value, signature.type);
+		return !signature.is_value && signature.type != Kind.list;
+	}
+	
+	function get_connector(expression:Expression) {
+		return is_pointer(get_signature(expression)) ? "->" : ".";
+	}
+	
+	function find_variable(name:String):Signature {
+		var i = scopes.length;
+		while (--i >= 0) {
+			if (scopes[i].exists(name))
+				return scopes[i][name];
+		}
+		
+		return null;
+	}
+	
+	function render_instantiation(expression:Instantiate):String {
+		return "new " + expression.rail.rail_name + "()";
+	}
+	
+	function render_function_call(expression:Function_Call, parent:Expression):String {
+		if (expression.is_platform_specific) {
+			//var args = expression.args.map(function(a) return a).join(", ");
+			
+			switch (expression.name) {
+				case "count":
+					return "size()";
+				
+				case "add":
+					var first = expression.args[0].name;
+					var dereference = is_pointer(find_variable(first)) ? "*" : "";
+					return "push_back(" + dereference + first + ")";
 
+				default:
+					throw new Exception("Unsupported platform-specific function: " + expression.name + ".");
+			}
+		}
+		
+		return expression.name + "(" + expression.args.join(", ") + ")";
+	}
+		
 	function render_path_old(expression:Expression) {
 		var parent:Expression = null;
 		var result = "";
 		for (child in expression.path) {
 			if (parent != null)
-				result == ".";
+				result += get_connector(parent);
 
 			result += render_expression(child, parent);
 			parent = child;

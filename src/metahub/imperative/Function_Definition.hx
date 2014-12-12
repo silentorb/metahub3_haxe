@@ -5,7 +5,7 @@ package metahub.imperative;
  */
 
 typedef Function_Definition = {
-	type:String,
+	type:Expression_Type,
 	return_type:Signature,
 	name:String,
 	parameters:Array<Parameter>,

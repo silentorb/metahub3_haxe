@@ -5,8 +5,8 @@ package metahub.imperative;
  */
 
 typedef Flow_Control = {
-	type:String,
+	type:Expression_Type,
 	name:String,
 	condition:Condition,
-	statements:Array<Dynamic>
+	statements:Array<Dynamic>,
 }

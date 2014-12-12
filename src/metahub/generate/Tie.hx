@@ -20,11 +20,13 @@ class Tie {
 	public var is_value = false;
 	public var has_getter = false;
 	public var has_set_post_hook = false;
+	public var type:Kind;
 
 	public var constraints = new Array<Constraint>();
 
 	public function new(rail:Rail, property:Property) {
 		this.rail = rail;
+		this.type = property.type;
 		this.property = property;
 		tie_name = name = property.name;
 

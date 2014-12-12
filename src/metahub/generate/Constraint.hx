@@ -34,7 +34,7 @@ class Constraint {
 
 	static function convert_reference(expression:Expression, railway:Railway):metahub.imperative.Expression {
 		var path:Array<Token_Expression> = cast expression.children;
-		var result = [];
+		var result = new Array<metahub.imperative.Expression>();
 		var first:Property_Reference = cast path[0];
 		var rail = railway.get_rail(first.property.trellis);
 		for (token in path) {
@@ -44,12 +44,17 @@ class Constraint {
 				if (tie == null)
 					throw new Exception("tie is null: " + property_token.property.fullname());
 
-				result.push(new Car(tie, null));
+				result.push({ type: Expression_Type.property, tie: tie });
 				rail = tie.other_rail;
 			}
 			else {
 				var function_token:Function_Call = cast token;
-				result.push(new Car(null, function_token));
+				result.push( { 
+					type: Expression_Type.function_call,
+					name: function_token.function_string,
+					args: [],
+					is_platform_specific: true
+				});
 			}
 		}
 		return { type: Expression_Type.path, path: result };

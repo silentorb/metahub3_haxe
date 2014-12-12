@@ -74,6 +74,17 @@ class Code
 
 	public static function generate_initialize(rail:Rail):Function_Definition {
 		var block = new Array<Dynamic>();
+		if (rail.parent != null) {
+			block.push({
+				type: Expression_Type.parent_class,
+				child: {
+					type: Expression_Type.function_call,
+					name: "initialize",
+					args: [],
+					is_platform_specific: false
+				}
+			});
+		}
 
 		for (tie in rail.all_ties) {
 			if (tie.property.type == Kind.list) {
@@ -118,7 +129,7 @@ class Code
 				]
 			},
 			statements: [
-				{ 
+				{
 					type: Expression_Type.declare_variable,
 					name: "_child",
 					expression: {

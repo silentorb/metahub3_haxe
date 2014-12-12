@@ -12,9 +12,10 @@ abstract Expression_Type(Int) {
   var variable = 3;
   var function_call = 4;
 	var instantiate = 5;
-	
+	var parent_class = 6;
+
 	var path = 200;
-	
+
 	// Statements
 	var namespace = 100;
 	var class_definition = 101;
@@ -23,5 +24,5 @@ abstract Expression_Type(Int) {
 	var assignment = 104;
 	var declare_variable = 105;
 	var scope = 106;
-	
+
 }

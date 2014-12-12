@@ -64,12 +64,12 @@ class Cpp extends Target{
 			}
 		}
 	}
-	
+
 	function push_scope() {
 		current_scope = new Map<String, Signature>();
 		scopes.push(current_scope);
 	}
-	
+
 	function pop_scope() {
 		scopes.pop();
 		current_scope = scopes[scopes.length - 1];
@@ -119,7 +119,7 @@ class Cpp extends Target{
 	}
 
 	function render_statement(statement:Dynamic) {
-		var type:Expression_Type = statement.type;		
+		var type:Expression_Type = statement.type;
 		switch(type) {
 			case Expression_Type.namespace:
 				return render_region(statement.region, function() {
@@ -140,7 +140,7 @@ class Cpp extends Target{
 
 			case Expression_Type.assignment:
 				return render_assignment(statement);
-				
+
 			case Expression_Type.declare_variable:
 				return render_variable_declaration(statement);
 
@@ -149,12 +149,12 @@ class Cpp extends Target{
 				//throw new Exception("Unsupported statement type: " + statement.type + ".");
 		}
 	}
-	
+
 	function render_variable_declaration(declaration:Declare_Variable):String {
 		var first = render_signature(declaration.signature) + " " + declaration.name;
 		if (declaration.expression != null)
 			first += " = " + render_expression(declaration.expression);
-			
+
 		current_scope[declaration.name] = declaration.signature;
 		return line(first + ";");
 	}
@@ -265,7 +265,7 @@ class Cpp extends Target{
 		  return render_statements(definition.block);
 		});
 	}
-	
+
 	function render_parameter(parameter:Parameter):String {
 		return render_signature(parameter.type, true) + ' ' + parameter.name;
 	}
@@ -329,8 +329,8 @@ class Cpp extends Target{
 
 		var other_name = get_rail_type_string(other_rail);
 		if (tie.property.type == Kind.reference) {
-			return 
-			tie.is_value ? is_parameter ? other_name + '&' : other_name : 
+			return
+			tie.is_value ? is_parameter ? other_name + '&' : other_name :
 					other_name + '*';
 		}
 		else {
@@ -357,7 +357,7 @@ class Cpp extends Target{
 
 		var name = get_rail_type_string(signature.rail);
 		if (signature.type == Kind.reference) {
-			return 
+			return
 			signature.is_value ? is_parameter ? name + '&' : name :
 					name + '*';
 		}
@@ -456,16 +456,19 @@ class Cpp extends Target{
 
 			case Expression_Type.function_call:
 				result = render_function_call(cast expression, parent);
-				
+
 			case Expression_Type.instantiate:
 				result = render_instantiation(cast expression);
-				
+
 			case Expression_Type.variable:
 				if (find_variable(expression.name) == null)
 					throw new Exception("Could not find variable: " + expression.name + ".");
-				
+
 				result = expression.name;
-				
+
+			case Expression_Type.parent_class:
+				result = current_rail.parent.rail_name;
+
 			default:
 				throw new Exception("Unsupported expression type: " + expression.type + ".");
 		}
@@ -476,53 +479,56 @@ class Cpp extends Target{
 
 		return result;
 	}
-	
+
 	function get_signature(expression:Expression):Dynamic {
 		switch (expression.type) {
 			case Expression_Type.variable:
 				return find_variable(expression.name);
-			
+
 			case Expression_Type.property:
 				return expression.tie;
-				
+
 			default:
 				throw new Exception("Determining pointer is not yet implemented for expression type: " + expression.type + ".");
 		}
 	}
-	
+
 	function is_pointer(signature:Dynamic):Bool {
 		if (signature.type == null)
 			throw "";
 		trace('s', signature.is_value, signature.type);
 		return !signature.is_value && signature.type != Kind.list;
 	}
-	
+
 	function get_connector(expression:Expression) {
+		if (expression.type == Expression_Type.parent_class)
+			return "::";
+
 		return is_pointer(get_signature(expression)) ? "->" : ".";
 	}
-	
+
 	function find_variable(name:String):Signature {
 		var i = scopes.length;
 		while (--i >= 0) {
 			if (scopes[i].exists(name))
 				return scopes[i][name];
 		}
-		
+
 		return null;
 	}
-	
+
 	function render_instantiation(expression:Instantiate):String {
 		return "new " + expression.rail.rail_name + "()";
 	}
-	
+
 	function render_function_call(expression:Function_Call, parent:Expression):String {
 		if (expression.is_platform_specific) {
 			//var args = expression.args.map(function(a) return a).join(", ");
-			
+
 			switch (expression.name) {
 				case "count":
 					return "size()";
-				
+
 				case "add":
 					var first = expression.args[0].name;
 					var dereference = is_pointer(find_variable(first)) ? "*" : "";
@@ -532,10 +538,12 @@ class Cpp extends Target{
 					throw new Exception("Unsupported platform-specific function: " + expression.name + ".");
 			}
 		}
-		
-		return expression.name + "(" + expression.args.join(", ") + ")";
+
+		return expression.name + "(" +
+			expression.args.map(function(a) return render_expression(a))
+			.join(", ") + ")";
 	}
-		
+
 	function render_path_old(expression:Expression) {
 		var parent:Expression = null;
 		var result = "";

@@ -58,25 +58,27 @@ class Code
 	}
 
 	public static function convert_expression(expression:metahub.meta.types.Expression, scope:Scope):Expression {
-		trace("expression:", type);
+		//trace("expression:", type);
 
 		switch(expression.type) {
-			case "Literal":
-				var literal:metahub.code.expressions.Literal = cast expression;
+			case Expression_Type.literal:
+				var literal:metahub.meta.types.Literal = cast expression;
 				return {
 					type: Expression_Type.literal,
 					value: literal.value
 				};
 
-			case "Function_Call":
-				var func:metahub.code.expressions.Function_Call = cast expression;
+			case Expression_Type.function_call:
+				var func:metahub.meta.types.Function_Call = cast expression;
 				return {
 					type: Expression_Type.function_call,
-					name: func.function_string
+					name: func.name
 				};
+
+			default:
+				throw new Exception("Cannot convert expression " + expression.type + ".");
 		}
 
-		throw new Exception("Cannot convert expression " + type + ".");
 	}
 
 	public static function generate_initialize(rail:Rail):Function_Definition {
@@ -126,11 +128,11 @@ class Code
 		throw "";
 		return list_size(constraint, expression);
 	}
-	
+
 	public static function list_size(constraint:Constraint, expression:Expression):Flow_Control {
 		var instance_name = constraint.reference.path[0].tie.other_rail.rail_name;
 		var rail = constraint.reference.path[0].tie.other_rail;
-		
+
 		return {
 			type: Expression_Type.flow_control,
 			name: "while",

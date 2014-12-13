@@ -54,7 +54,7 @@ class Railway {
 	}
 
 	public function process(expression:Expression, scope:Scope) {
-		switch(Expression.type) {
+		switch(expression.type) {
 			case Expression_Type.scope:
 				scope_expression(cast expression, scope);
 
@@ -63,35 +63,36 @@ class Railway {
 
 			case Expression_Type.constraint:
 				constraint(cast expression, scope);
+
+			default:
+				throw new Exception("Cannot process expression of type :" + expression.type + ".");
 		}
 	}
 
 	function scope_expression(expression:Scope_Expression, scope:Scope) {
-		var new_scope = new Scope(scope.hub, expression.scope_definition, scope);
-		for (child in expression.children) {
-			process(child, new_scope);
-		}
+		throw new Exception("Not implemented.");
+		//var new_scope = new Scope(scope.hub, expression.scope_definition, scope);
+		//for (child in expression.children) {
+			//process(child, new_scope);
+		//}
 	}
 
 	function block_expression(expression:Block, scope:Scope) {
-		for (child in expression.children) {
-			process(child, scope);
-		}
+		throw new Exception("Not implemented.");
+		//for (child in expression.children) {
+			//process(child, scope);
+		//}
 	}
 
 	function constraint(expression:Constraint, scope:Scope) {
-		var type = get_class_name(expression.reference);
-		var reference:Array<Property_Reference> = cast expression.reference.children;
-		//if (reference[0].property.other_trellis != null && reference[0].property.other_trellis.is_value) {
-			//
-		//}
-		//else {
+		throw new Exception("Not implemented.");
+		//var type = get_class_name(expression.reference);
+		//var reference:Array<Property_Reference> = cast expression.reference.children;
 //
-		//}
-		var rail = get_rail(scope.definition.trellis);
-		var tie = rail.all_ties[reference[0].property.name];
-		tie.constraints.push(new Constraint(expression, rail.railway, scope));
-		trace("reference:", type, tie.name);
+		//var rail = get_rail(scope.definition.trellis);
+		//var tie = rail.all_ties[reference[0].property.name];
+		//tie.constraints.push(new Constraint(expression, rail.railway, scope));
+		//trace("reference:", type, tie.name);
 	}
 
 	public function get_rail(trellis:Trellis):Rail {

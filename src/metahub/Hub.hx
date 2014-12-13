@@ -24,7 +24,8 @@ import haxe.Json;
 
   public function new() {
 		instances.push(this);
- 
+		schema = new Schema();
+
 		metahub_namespace = schema.add_namespace('metahub');
     load_internal_trellises();
 
@@ -174,11 +175,11 @@ import haxe.Json;
     schema.load_trellises(data.trellises, new Load_Settings(namespace, auto_identity));
 		if (Reflect.hasField(data, 'is_external') && Reflect.field(data, 'is_external') == true)
 			namespace.is_external = true;
-	
+
 		for (key in Reflect.fields(data)) {
 			if (key == 'trellises')
 				continue;
-				
+
 			namespace.additional[key] = Reflect.field(data, key);
 		}
   }

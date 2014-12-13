@@ -4,7 +4,9 @@ package metahub.meta.types;
  * @author Christopher W. Johnson
  */
 
-typedef Constraint =
+class Constraint extends Expression
 {
-		
+	public function new() {
+		this.type = Expression_Type.constraint;
+	}
 }

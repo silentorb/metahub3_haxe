@@ -1,5 +1,5 @@
 package metahub.parser;
-import metahub.code.functions.Functions;
+//import metahub.code.functions.Functions;
 
 typedef Assignment_Source = {
 	type:String,
@@ -18,35 +18,35 @@ typedef Reference_Or_Function = {
 
 @:expose class MetaHub_Context extends Context {
 
-	private static var function_map:Map<String, Functions>;
+	//private static var function_map:Map<String, Functions>;
 
   public function new(definition) {
 		super(definition);
 
-		if (function_map == null) {
-			function_map = new Map<String, Functions>();
-			var map = {
-				"+": Functions.add,
-				"-": Functions.subtract,
-				"*": Functions.multiply,
-				"/": Functions.divide,
-
-				"+=": Functions.add_equals,
-				"-=": Functions.subtract_equals,
-				"*=": Functions.multiply_equals,
-				"/=": Functions.divide_equals,
-
-				"=": Functions.equals,
-				"<": Functions.lesser_than,
-				">": Functions.greater_than,
-				"<=": Functions.lesser_than_or_equal_to,
-				">=": Functions.greater_than_or_equal_to,
-			}
-
-			for (i in Reflect.fields(map)) {
-				function_map[i] = Reflect.field(map, i);
-			}
-		}
+		//if (function_map == null) {
+			//function_map = new Map<String, Functions>();
+			//var map = {
+				//"+": Functions.add,
+				//"-": Functions.subtract,
+				//"*": Functions.multiply,
+				//"/": Functions.divide,
+//
+				//"+=": Functions.add_equals,
+				//"-=": Functions.subtract_equals,
+				//"*=": Functions.multiply_equals,
+				//"/=": Functions.divide_equals,
+//
+				//"=": Functions.equals,
+				//"<": Functions.lesser_than,
+				//">": Functions.greater_than,
+				//"<=": Functions.lesser_than_or_equal_to,
+				//">=": Functions.greater_than_or_equal_to,
+			//}
+//
+			//for (i in Reflect.fields(map)) {
+				//function_map[i] = Reflect.field(map, i);
+			//}
+		//}
 	}
 
   public override function perform_action(name:String, data:Dynamic, match:Match):Dynamic {
@@ -163,22 +163,22 @@ typedef Reference_Or_Function = {
 			//'*=': 'multiply_equals',
 			//'/=': 'divide_equals'
     //};
-		
+
 		if (operator == '|') {
 			var function_name = data.pop();
 			return {
 				type: "function",
 				name: function_name.children[0].name,
 				inputs: data
-			}				
+			}
 		}
 		else {
 			return {
 				type: "function",
 				"name": operator,
 				"inputs": data
-			}	
-		}    
+			}
+		}
   }
 
 	static function method(data:Dynamic):Dynamic {
@@ -318,7 +318,7 @@ typedef Reference_Or_Function = {
 		};
 
 		if (data[4].length > 0)
-			result.modifier = Std.string(function_map[data[4][0]]);
+			result.modifier = Std.string(data[4][0]);
 
 		return result;
   }
@@ -359,7 +359,7 @@ typedef Reference_Or_Function = {
 			expression: data[4]
     };
   }
-	
+
 	static function array_expression(data:Dynamic):Dynamic {
     return {
 			"type": "array",

@@ -5,6 +5,8 @@ import metahub.meta.types.Constraint;
 import metahub.meta.types.Expression;
 import metahub.meta.types.Expression_Type;
 import metahub.meta.Scope;
+import metahub.meta.types.Path;
+import metahub.meta.types.Property_Expression;
 import metahub.meta.types.Scope_Expression;
 import metahub.parser.Result;
 import metahub.schema.Kind;
@@ -72,9 +74,8 @@ class Railway {
 
 	function scope_expression(expression:Scope_Expression, scope:Scope) {
 		//var new_scope = new Scope(scope.hub, expression.scope_definition, scope);
-		//var new_scope = new Scope(
 		for (child in expression.children) {
-			process(child, null);
+			process(child, expression.scope);
 		}
 	}
 
@@ -85,14 +86,11 @@ class Railway {
 	}
 
 	function constraint(expression:Constraint, scope:Scope) {
-		throw new Exception("Not implemented.");
-		//var type = get_class_name(expression.reference);
-		//var reference:Array<Property_Reference> = cast expression.reference.children;
-//
-		//var rail = get_rail(scope.definition.trellis);
-		//var tie = rail.all_ties[reference[0].property.name];
-		//tie.constraints.push(new Constraint(expression, rail.railway, scope));
-		//trace("reference:", type, tie.name);
+		var rail = get_rail(scope.trellis);
+		var reference:Path = cast expression.first;
+		var property_expression:Property_Expression = cast reference.children[0];
+		var tie = rail.all_ties[property_expression.property.name];
+		tie.constraints.push(new metahub.imperative.schema.Constraint(expression, rail.railway, scope));
 	}
 
 	public function get_rail(trellis:Trellis):Rail {

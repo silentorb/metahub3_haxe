@@ -14,7 +14,7 @@ class Target{
 		this.railway = railway;
 	}
 
-	public function run(statement, output_folder:String) {
+	public function run(output_folder:String) {
 
 	}
 	

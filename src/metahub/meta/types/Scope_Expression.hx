@@ -1,4 +1,5 @@
 package metahub.meta.types;
+import metahub.meta.Scope;
 
 /**
  * @author Christopher W. Johnson
@@ -6,8 +7,11 @@ package metahub.meta.types;
 
 class Scope_Expression extends Block
 {
-	public function new() {
-		super([]);
+	public var scope:Scope;
+	
+	public function new(scope:Scope, expressions) {
+		super(expressions);
 		this.type = Expression_Type.scope;
+		this.scope = scope;
 	}
 }

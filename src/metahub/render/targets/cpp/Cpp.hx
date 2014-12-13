@@ -48,7 +48,7 @@ class Cpp extends Target{
 		super(railway);
 	}
 
-	override public function run(statement, output_folder:String) {
+	override public function run(output_folder:String) {
 		for (region in railway.regions){
 			for (rail in region.rails) {
 				if (rail.is_external)
@@ -489,7 +489,6 @@ class Cpp extends Target{
 	function is_pointer(signature:Dynamic):Bool {
 		if (signature.type == null)
 			throw "";
-		trace('s', signature.is_value, signature.type);
 		return !signature.is_value && signature.type != Kind.list;
 	}
 

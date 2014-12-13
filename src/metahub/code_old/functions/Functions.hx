@@ -64,7 +64,6 @@ class Function_Calls2 {
 
 	static function count(args:List<Dynamic>, type:Kind):Dynamic {
 		var result = args.first()[0].length;
-		trace('count', result);
 		return result;
 
   }

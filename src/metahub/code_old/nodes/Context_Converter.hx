@@ -87,7 +87,6 @@ class Context_Converter extends Standard_Node {
 			}));
 		}
 		else {
-			trace("get - Converting " + property.fullname() + " to " + property.other_property.fullname());
 			var node_id:Int = cast context.node.get_value(property.id);
 			if (node_id == 0)
 				throw new Exception("Context_Converter cannot get value for null reference.");

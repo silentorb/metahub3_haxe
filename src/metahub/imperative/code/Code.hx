@@ -1,7 +1,9 @@
-package metahub.imperative.types ;
-import metahub.imperative.code.Constraint;
+package metahub.imperative.code ;
+import metahub.imperative.schema.Constraint;
 import metahub.imperative.schema.Rail;
 import metahub.imperative.schema.Railway;
+import metahub.imperative.types.*;
+import metahub.meta.Scope;
 import metahub.schema.Kind;
 
 /**
@@ -58,7 +60,6 @@ class Code
 	}
 
 	public static function convert_expression(expression:metahub.meta.types.Expression, scope:Scope):Expression {
-		//trace("expression:", type);
 
 		switch(expression.type) {
 			case Expression_Type.literal:
@@ -125,7 +126,7 @@ class Code
 		//var amount:Int = target.render_expression(constraint.expression, constraint.scope);
 		var expression = convert_expression(constraint.expression, constraint.scope);
 
-		throw "";
+		//throw "";
 		return list_size(constraint, expression);
 	}
 

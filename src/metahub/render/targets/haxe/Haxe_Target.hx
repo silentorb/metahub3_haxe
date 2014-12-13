@@ -13,7 +13,7 @@ class Haxe_Target extends Target{
 		super(railway);
 	}
 
-	override public function run(statement, output_folder:String) {
+	override public function run(output_folder:String) {
 		for (region in railway.regions){
 			for (rail in region.rails) {
 				var trellis = rail.trellis;

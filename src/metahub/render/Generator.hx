@@ -20,12 +20,9 @@ import metahub.schema.Namespace;
 		this.hub = hub;
 	}
 
-	public function run(statement:Expression, target_name:String, output_folder:String) {
+	public function run(railway:Railway, target_name:String, output_folder:String) {
 		Utility.create_folder(output_folder);
 		Utility.clear_folder(output_folder);
-		var railway = new Railway(hub, target_name);
-		railway.process(statement, null);
-		railway.generate_code();
 		var target:Target = null;
 
 		switch(target_name) {
@@ -34,9 +31,12 @@ import metahub.schema.Namespace;
 
 			case "haxe":
 				target = new Haxe_Target(railway);
+				
+			default:
+				throw new Exception("Unsupported target: " + target_name + ".");
 		}
 
-		target.run(statement, output_folder);
+		target.run(output_folder);
 	}
 
 	public static function get_namespace_path(region:Region):Array<String> {

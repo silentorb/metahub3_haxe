@@ -1,9 +1,11 @@
 package metahub;
 import haxe.xml.Parser;
+import metahub.imperative.Imp;
 import metahub.meta.Coder;
 import metahub.meta.types.Expression;
 import metahub.parser.Definition;
 import metahub.parser.Match;
+import metahub.render.Generator;
 import metahub.schema.Load_Settings;
 import metahub.schema.Namespace;
 import metahub.schema.Schema;
@@ -230,6 +232,13 @@ import haxe.Json;
     var data = haxe.Json.parse(functions);
     schema.load_trellises(data.trellises, new Load_Settings(metahub_namespace));
   }
+	
+	public function generate(root, target_name:String, destination:String) {
+		var imp = new Imp(this, target_name);
+		imp.translate(root);
+		var generator = new Generator(this);
+		generator.run(imp.railway, 'cpp', destination);
+	}
 
 	//public function get_increment():INode {
 		//if (interval_node == null) {

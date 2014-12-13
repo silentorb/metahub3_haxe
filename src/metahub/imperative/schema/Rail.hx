@@ -1,6 +1,6 @@
 package metahub.imperative.schema ;
 import metahub.imperative.types.Block;
-import metahub.imperative.types.Code;
+import metahub.imperative.code.Code;
 import metahub.imperative.types.Function_Definition;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;

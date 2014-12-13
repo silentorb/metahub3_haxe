@@ -91,7 +91,7 @@ class Coder {
 		var expression = convert_expression(source.expression, scope);
 		//var expression = function_expression(source.expression, scope, name, back_reference);
 		//return new metahub.code.expressions.Create_Constraint(reference, expression, operator_name, back_reference != null);
-		return new Constraint();
+		return new Constraint(reference, expression, operator_name);
   }
 
   function create_block(source:Dynamic, scope:Scope):Expression {
@@ -277,11 +277,11 @@ class Coder {
 			throw new Exception("Scope path is empty for node creation.");
 
 		var expression:Expression = null;
-		var new_scope_definition = new Scope();
+		var new_scope = new Scope();
 		if (path.length == 1 && path[0] == 'new') {
 			//new_scope_definition.only_new = true;
-			expression = convert_statement(source.expression, new_scope_definition);
-			return new Scope_Expression();
+			expression = convert_statement(source.expression, new_scope);
+			return new Scope_Expression(new_scope, [expression]);
 			//return new Scope_Expression(expression, new_scope_definition);
 		}
 
@@ -289,10 +289,10 @@ class Coder {
 		var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
 
 		if (trellis != null) {
-			new_scope_definition.trellis = trellis;
-			expression = convert_statement(source.expression, new_scope_definition);
+			new_scope.trellis = trellis;
+			expression = convert_statement(source.expression, new_scope);
 			//return new Scope_Expression(expression, new_scope_definition);
-			return new Scope_Expression();
+			return new Scope_Expression(new_scope, [expression]);
 		}
 		else {
 			throw new Exception("Not implemented.");

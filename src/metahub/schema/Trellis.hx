@@ -1,10 +1,4 @@
 package metahub.schema;
-import metahub.code.Change;
-import metahub.code.nodes.Group;
-import metahub.engine.Context;
-import metahub.code.nodes.INode;
-import metahub.engine.General_Port;
-import metahub.engine.Node.Identity;
 import metahub.schema.Property;
 
 typedef ITrellis_Source = {
@@ -16,7 +10,9 @@ typedef ITrellis_Source = {
 	?is_value:Bool
 }
 
-class Trellis implements INode {
+typedef Identity = UInt;
+
+class Trellis {
   public var name:String;
   public var schema:Schema;
   public var core_properties:Array<Property> = new Array<Property>();
@@ -26,15 +22,11 @@ class Trellis implements INode {
 	public var identity_property:Property;
 	public var namespace:Namespace;
   var property_keys:Map<String, Property> = new Map<String, Property>();
-	var ports = new Array<General_Port>();
-	public var readonly_ports = new Array<General_Port>();
-	public var on_create_ports = new Array<General_Port>();
 	public var properties = new Array<Property>();
 	public var is_value:Bool = false;
 	public var events:Array<String>;
 	public var is_numeric:Bool = false;
 	var _tree:Array<Trellis> = null;
-	public var group = new Group(null);
 
   public function new(name:String, schema:Schema, namespace:Namespace) {
     this.name = name;
@@ -97,49 +89,49 @@ class Trellis implements INode {
     return properties[name];
   }
 
-  public function get_value(index:Int, context:Context):Change {
-		return new Change(context.node.get_value(index));
-	}
+  //public function get_value(index:Int, context:Context):Change {
+		//return new Change(context.node.get_value(index));
+	//}
 
-  public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
-		if (!context.node.trellis.is_a(this))
-			throw new Exception("Type mismatch: a " + context.node.trellis.name + " node was passed to trellis " + name + ".");
-
-		context.node.set_value(index, change.value, source);
-	}
-
-	 public function set_external_value(index:Int, value:Dynamic, context:Context, source:General_Port) {
-		#if trace
-			context.hub.history.start_anchor();
-		#end
-
-		var port = ports[index];
-		for (connection in port.connections) {
-			if (connection == source)
-				continue;
-
-			#if trace
-				context.hub.history.back_to_anchor();
-			#end
-
-			connection.set_node_value(new Change(value), context, port);
-		}
-
-		#if trace
-			context.hub.history.end_anchor();
-		#end
-	}
-
-	public function get_external_value(index:Int, change:Change, context:Context) {
-		var port = ports[index];
-		if (port.connections.length == 0)
-			return null;
-
-		if (port.connections.length > 1)
-			throw new Exception("Not yet supported.");
-
-		return port.connections[0].get_node_value(context);
-	}
+  //public function set_value(index:Int, change:Change, context:Context, source:General_Port = null) {
+		//if (!context.node.trellis.is_a(this))
+			//throw new Exception("Type mismatch: a " + context.node.trellis.name + " node was passed to trellis " + name + ".");
+//
+		//context.node.set_value(index, change.value, source);
+	//}
+//
+	 //public function set_external_value(index:Int, value:Dynamic, context:Context, source:General_Port) {
+		//#if trace
+			//context.hub.history.start_anchor();
+		//#end
+//
+		//var port = ports[index];
+		//for (connection in port.connections) {
+			//if (connection == source)
+				//continue;
+//
+			//#if trace
+				//context.hub.history.back_to_anchor();
+			//#end
+//
+			//connection.set_node_value(new Change(value), context, port);
+		//}
+//
+		//#if trace
+			//context.hub.history.end_anchor();
+		//#end
+	//}
+//
+	//public function get_external_value(index:Int, change:Change, context:Context) {
+		//var port = ports[index];
+		//if (port.connections.length == 0)
+			//return null;
+//
+		//if (port.connections.length > 1)
+			//throw new Exception("Not yet supported.");
+//
+		//return port.connections[0].get_node_value(context);
+	//}
 
   public function get_tree():Array<Trellis> {
 		if (_tree == null) {
@@ -204,8 +196,6 @@ class Trellis implements INode {
 				property.id = index++;
         properties.push(property);
 				property_keys[property.name] = property;
-				ports.push(new General_Port(this, ports.length));
-				readonly_ports.push(new General_Port(this, readonly_ports.length));
 			}
     }
 
@@ -249,26 +239,26 @@ class Trellis implements INode {
 //    this.identity = parent.identity.map((x) => x.clone(this))
   }
 
-	public function get_port(index:Int):General_Port {
-		return ports[index];
-	}
-
-	public function get_port_count():Int {
-		return ports.length;
-	}
+	//public function get_port(index:Int):General_Port {
+		//return ports[index];
+	//}
+//
+	//public function get_port_count():Int {
+		//return ports.length;
+	//}
 
 	public function to_string():String {
 		return name;
 	}
 
-	public function resolve(context:Context):Context {
-		throw new Exception("Not implemented.");
-	}
-
-	public function on_create_node(context:Context) {
-		for (port in on_create_ports) {
-			port.get_node_value(context);
-		}
-	}
+	//public function resolve(context:Context):Context {
+		//throw new Exception("Not implemented.");
+	//}
+//
+	//public function on_create_node(context:Context) {
+		//for (port in on_create_ports) {
+			//port.get_node_value(context);
+		//}
+	//}
 
 }

@@ -1,6 +1,4 @@
 package metahub.schema;
-import metahub.code.functions.Function_Library;
-import metahub.code.functions.Functions;
 
 /**
  * ...
@@ -11,17 +9,16 @@ class Namespace
 	public var name:String;
 	public var fullname:String;
 	public var trellises = new Map<String, Trellis>();
-	public var function_library:Function_Library;
+	//public var function_library:Function_Library;
 	public var children = new Map<String, Namespace>();
 	public var parent:Namespace;
 	public var additional = new Map<String, Dynamic>();
 	public var is_external = false;
 
-	public function new(name:String, fullname:String, function_library:Function_Library = null)
+	public function new(name:String, fullname:String)
 	{
 		this.name = name;
 		this.fullname = fullname;
-		this.function_library = function_library;
 	}
 
 	public function has_name(name:String):Bool {

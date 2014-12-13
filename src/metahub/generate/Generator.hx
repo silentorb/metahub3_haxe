@@ -1,9 +1,9 @@
 package metahub.generate;
-import metahub.code.expressions.Expression;
 import metahub.generate.targets.cpp.Cpp;
 import metahub.generate.targets.Haxe_Target;
 import metahub.generate.targets.Target;
 import metahub.Hub;
+import metahub.meta.types.Expression;
 import metahub.schema.Namespace;
 
 /**
@@ -22,7 +22,7 @@ import metahub.schema.Namespace;
 		Utility.create_folder(output_folder);
 		Utility.clear_folder(output_folder);
 		var railway = new Railway(hub, target_name);
-		railway.process(statement, hub.root_scope);
+		railway.process(statement, null);
 		railway.generate_code();
 		var target:Target = null;
 

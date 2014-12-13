@@ -1,8 +1,10 @@
 package metahub.generate;
-import metahub.code.expressions.*;
-import metahub.code.Scope;
-import metahub.code.Type_Signature;
 import metahub.Hub;
+import metahub.meta.types.Block;
+import metahub.meta.types.Expression;
+import metahub.meta.types.Expression_Type;
+import metahub.meta.Scope;
+import metahub.meta.types.Scope_Expression;
 import metahub.parser.Result;
 import metahub.schema.Kind;
 import metahub.schema.Trellis;
@@ -52,17 +54,14 @@ class Railway {
 	}
 
 	public function process(expression:Expression, scope:Scope) {
-		var type = get_class_name(expression);
-		trace("expression:", type);
-
-		switch(type) {
-			case "Scope_Expression":
+		switch(Expression.type) {
+			case Expression_Type.scope:
 				scope_expression(cast expression, scope);
 
-			case "Block":
+			case Expression_Type.block:
 				block_expression(cast expression, scope);
 
-			case "Create_Constraint":
+			case Expression_Type.constraint:
 				constraint(cast expression, scope);
 		}
 	}
@@ -80,7 +79,7 @@ class Railway {
 		}
 	}
 
-	function constraint(expression:Create_Constraint, scope:Scope) {
+	function constraint(expression:Constraint, scope:Scope) {
 		var type = get_class_name(expression.reference);
 		var reference:Array<Property_Reference> = cast expression.reference.children;
 		//if (reference[0].property.other_trellis != null && reference[0].property.other_trellis.is_value) {

@@ -6,24 +6,24 @@ import metahub.generate.Region;
 import metahub.generate.Renderer;
 import metahub.generate.Tie;
 import metahub.Hub;
-import metahub.imperative.Assignment;
-import metahub.imperative.Block;
-import metahub.imperative.Condition;
-import metahub.imperative.Declare_Variable;
-import metahub.imperative.Expression;
-import metahub.imperative.Function_Call;
-import metahub.imperative.Function_Definition;
-import metahub.imperative.Flow_Control;
-import metahub.imperative.Instantiate;
-import metahub.imperative.Parameter;
-import metahub.imperative.Scope;
-import metahub.imperative.Signature;
-import metahub.imperative.Statement;
+import metahub.imperative.types.Assignment;
+import metahub.imperative.types.Block;
+import metahub.imperative.types.Condition;
+import metahub.imperative.types.Declare_Variable;
+import metahub.imperative.types.Expression;
+import metahub.imperative.types.Function_Call;
+import metahub.imperative.types.Function_Definition;
+import metahub.imperative.types.Flow_Control;
+import metahub.imperative.types.Instantiate;
+import metahub.imperative.types.Parameter;
+import metahub.imperative.types.Scope;
+import metahub.imperative.types.Signature;
+import metahub.imperative.types.Statement;
 import metahub.schema.Namespace;
 import metahub.schema.Property;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
-import metahub.imperative.Expression_Type;
+import metahub.imperative.types.Expression_Type;
 
 /**
  * ...
@@ -416,13 +416,6 @@ class Cpp extends Target{
 		//result += render.line('}');
 		//return result;
 	//}
-
-	public function render_car(car:Car):String {
-		if (car.tie != null)
-			return car.tie.tie_name;
-
-		return car.func.function_string;
-	}
 
 	function render_path(path:Array<Tie>):String {
 		return path.map(function(t) return t.tie_name).join('->');

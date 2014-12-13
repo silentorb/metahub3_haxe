@@ -1,8 +1,5 @@
 package metahub.schema;
-import metahub.code.functions.Functions;
-import metahub.code.nodes.INode;
 import metahub.schema.Trellis;
-import metahub.code.Type_Signature;
 
 typedef IProperty_Source = {
 	type:String,
@@ -128,13 +125,13 @@ typedef IProperty_Source = {
     }
   }
 
-	public function get_signature() {
-		var result = new Type_Signature(type, other_trellis);
-
-		//if (other_trellis != null && other_trellis.is_value)
-			//result.is_numeric = other_trellis.is_numeric;
-
-		return result;
-	}
+	//public function get_signature() {
+		//var result = new Type_Signature(type, other_trellis);
+//
+		////if (other_trellis != null && other_trellis.is_value)
+			////result.is_numeric = other_trellis.is_numeric;
+//
+		//return result;
+	//}
 
 }

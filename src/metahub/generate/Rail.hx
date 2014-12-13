@@ -1,11 +1,10 @@
 package metahub.generate;
-import metahub.code.Type_Signature;
-import metahub.imperative.Block;
-import metahub.imperative.Code;
-import metahub.imperative.Function_Definition;
+import metahub.imperative.types.Block;
+import metahub.imperative.types.Code;
+import metahub.imperative.types.Function_Definition;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
-import metahub.imperative.Expression_Type;
+import metahub.imperative.types.Expression_Type;
 
 /**
  * ...

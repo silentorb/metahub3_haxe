@@ -1,6 +1,5 @@
 package metahub.schema;
 
-import metahub.code.functions.Function_Library;
 import metahub.schema.Property;
 import metahub.schema.Trellis;
 
@@ -9,11 +8,11 @@ class Schema {
   public var root_namespace = new Namespace("root", "root");
 	private var trellis_counter:Int = 1;
 
-	public function add_namespace(name:String, function_library:Function_Library = null):Namespace {
+	public function add_namespace(name:String):Namespace {
 		if (root_namespace.children.exists(name))
 			return root_namespace.children[name];
 
-		var namespace = new Namespace(name, name, function_library);
+		var namespace = new Namespace(name, name);
 		root_namespace.children[name] = namespace;
 		namespace.parent = root_namespace;
 		return namespace;

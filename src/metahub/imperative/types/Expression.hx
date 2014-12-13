@@ -1,5 +1,5 @@
 package metahub.imperative.types ;
-import metahub.generate.Tie;
+import metahub.imperative.schema.Tie;
 
 /**
  * @author Christopher W. Johnson

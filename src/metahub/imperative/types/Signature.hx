@@ -1,6 +1,6 @@
 package metahub.imperative.types ;
 import metahub.schema.Kind;
-import metahub.generate.Rail;
+import metahub.imperative.schema.Rail;
 
 /**
  * @author Christopher W. Johnson

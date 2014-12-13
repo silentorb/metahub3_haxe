@@ -1,7 +1,8 @@
-package metahub.generate;
+package metahub.imperative.schema ;
 import metahub.imperative.types.Signature;
 import metahub.schema.Property;
 import metahub.schema.Kind;
+import metahub.imperative.code.Constraint;
 
 /**
  * ...

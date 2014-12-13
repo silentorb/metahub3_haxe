@@ -1,5 +1,5 @@
-package metahub.generate.targets;
-import metahub.generate.Railway;
+package metahub.render.targets.haxe ;
+import metahub.imperative.schema.Railway;
 import metahub.Hub;
 import metahub.schema.Namespace;
 

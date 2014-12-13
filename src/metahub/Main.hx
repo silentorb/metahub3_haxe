@@ -1,5 +1,5 @@
 package metahub;
-import metahub.generate.Generator;
+import metahub.render.Generator;
 
 class Main {
 

@@ -5,7 +5,10 @@ import metahub.meta.types.Block;
 import metahub.meta.types.Constraint;
 import metahub.meta.types.Expression_Type;
 import metahub.meta.types.Expression;
+import metahub.meta.types.Function_Call;
 import metahub.meta.types.Literal;
+import metahub.meta.types.Path;
+import metahub.meta.types.Property_Expression;
 import metahub.meta.types.Scope_Expression;
 import metahub.schema.Kind;
 import metahub.schema.Namespace;
@@ -106,7 +109,7 @@ class Coder {
 
     for (e in fields) {
       var child = Reflect.field(source.expressions, e);
-      block.statements.push(convert_statement(child, scope));
+      block.children.push(convert_statement(child, scope));
     }
 
     return block;
@@ -127,7 +130,8 @@ class Coder {
 			//name = name.substring(0, 1);
 			inputs.unshift(reference);
 		}
-throw new Exception("Not implemented.");
+		
+		return new Function_Call(name);
 		//var info = Function_Call.get_function_info(name, hub);
     //return new metahub.code.expressions.Function_Call(name, info, inputs, hub);
   }
@@ -183,34 +187,35 @@ throw new Exception("Not implemented.");
 	}
 
   function create_path(source:Dynamic, scope:Scope):Expression {
-		throw new Exception("Not implemented.");
-		//var trellis:Trellis = scope.trellis;
-		//var expression:Expression = null;
-		//var children = new Array<Expression>();
-		//var expressions:Array<Dynamic> = source.children;
-		//if (expressions.length == 0)
-			//throw new Exception("Empty reference path.");
-//
-		//if (expressions[0].type == "reference" && trellis.get_property_or_null(expressions[0].name) == null) {
-				//return function_path(source, scope);
-		//}
-//
-		//for (item in expressions) {
-			//if (item.type == "function") {
+		//throw new Exception("Not implemented.");
+		var trellis:Trellis = scope.trellis;
+		var expression:Expression = null;
+		var children = new Array<Expression>();
+		var expressions:Array<Dynamic> = source.children;
+		if (expressions.length == 0)
+			throw new Exception("Empty reference path.");
+
+		if (expressions[0].type == "reference" && trellis.get_property_or_null(expressions[0].name) == null) {
+				return function_path(source, scope);
+		}
+
+		for (item in expressions) {
+			if (item.type == "function") {
+				children.push(new Function_Call(item.name));
 				//var info = Function_Call.get_function_info(item.name, hub);
 				//children.push(new metahub.code.expressions.Function_Call(item.name, info, [], hub));
-			//}
-			//else if (item.type == "reference") {
-				//var property = trellis.get_property_or_error(item.name);
-				//children.push(new Property_Reference(property, trellis));
-				//if (property.other_trellis != null)
-					//trellis = property.other_trellis;
-			//}
-			//else {
-				//throw new Exception("Invalid path token type: " + item.type);
-			//}
-		//}
-		//return new Path_Expression(children);
+			}
+			else if (item.type == "reference") {
+				var property = trellis.get_property_or_error(item.name);
+				children.push(new Property_Expression(property));
+				if (property.other_trellis != null)
+					trellis = property.other_trellis;
+			}
+			else {
+				throw new Exception("Invalid path token type: " + item.type);
+			}
+		}
+		return new Path(children);
   }
 
 	function function_path(source:Dynamic, scope:Scope):Expression {

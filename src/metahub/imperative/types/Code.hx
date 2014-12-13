@@ -1,7 +1,7 @@
 package metahub.imperative.types ;
-import metahub.generate.Constraint;
-import metahub.generate.Rail;
-import metahub.generate.Railway;
+import metahub.imperative.code.Constraint;
+import metahub.imperative.schema.Rail;
+import metahub.imperative.schema.Railway;
 import metahub.schema.Kind;
 
 /**

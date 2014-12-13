@@ -1,6 +1,7 @@
-package metahub.generate;
+package metahub.imperative.schema ;
 import metahub.Hub;
 import metahub.meta.types.Block;
+import metahub.meta.types.Constraint;
 import metahub.meta.types.Expression;
 import metahub.meta.types.Expression_Type;
 import metahub.meta.Scope;
@@ -70,18 +71,17 @@ class Railway {
 	}
 
 	function scope_expression(expression:Scope_Expression, scope:Scope) {
-		throw new Exception("Not implemented.");
 		//var new_scope = new Scope(scope.hub, expression.scope_definition, scope);
-		//for (child in expression.children) {
-			//process(child, new_scope);
-		//}
+		//var new_scope = new Scope(
+		for (child in expression.children) {
+			process(child, null);
+		}
 	}
 
 	function block_expression(expression:Block, scope:Scope) {
-		throw new Exception("Not implemented.");
-		//for (child in expression.children) {
-			//process(child, scope);
-		//}
+		for (child in expression.children) {
+			process(child, scope);
+		}
 	}
 
 	function constraint(expression:Constraint, scope:Scope) {

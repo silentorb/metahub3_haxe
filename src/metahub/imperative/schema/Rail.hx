@@ -1,4 +1,4 @@
-package metahub.generate;
+package metahub.imperative.schema ;
 import metahub.imperative.types.Block;
 import metahub.imperative.types.Code;
 import metahub.imperative.types.Function_Definition;

@@ -5,11 +5,11 @@ package metahub.meta.types;
  */
 
 class Block extends Expression{
-	public var statements = new Array<Dynamic>();
+	public var children = new Array<Dynamic>();
 
 	public function new(statements:Array<Dynamic> = null) {
 		if (statements != null)
-			this.statements = statements;
+			this.children = statements;
 
 		this.type = Expression_Type.block;
 	}

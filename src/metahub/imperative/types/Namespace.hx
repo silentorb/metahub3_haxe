@@ -1,5 +1,5 @@
 package metahub.imperative.types ;
-import metahub.generate.Region;
+import metahub.imperative.schema.Region;
 
 /**
  * @author Christopher W. Johnson

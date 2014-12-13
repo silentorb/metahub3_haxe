@@ -1,4 +1,4 @@
-package metahub.generate;
+package metahub.imperative.schema ;
 import metahub.schema.Namespace;
 
 /**

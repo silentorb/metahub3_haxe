@@ -1,4 +1,4 @@
-package metahub.generate;
+package metahub.render ;
 
 /**
  * ...

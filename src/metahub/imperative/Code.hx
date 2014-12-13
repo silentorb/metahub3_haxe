@@ -1,5 +1,4 @@
 package metahub.imperative;
-import metahub.code.expressions.Literal;
 import metahub.code.Scope;
 import metahub.generate.Constraint;
 import metahub.generate.Rail;
@@ -65,8 +64,19 @@ class Code
 
 		switch(type) {
 			case "Literal":
-				var literal:Literal = cast expression;
-				return { type: Expression_Type.literal, value: literal.value };
+				var literal:metahub.code.expressions.Literal = cast expression;
+				return {
+					type: Expression_Type.literal,
+					value: literal.value
+				};
+
+			case "Function_Call":
+				var func:metahub.code.expressions.Function_Call = cast expression;
+				throw "";
+				return {
+					type: Expression_Type.function_call,
+					name: func.function_string
+				};
 		}
 
 		throw new Exception("Cannot convert expression " + type + ".");

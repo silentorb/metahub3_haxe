@@ -46,20 +46,15 @@ class Constraint {
 				if (tie == null)
 					throw new Exception("tie is null: " + property_token.property.fullname());
 
-				result.push({ type: Expression_Type.property, tie: tie });
+				result.push(new metahub.imperative.types.Property_Expression(tie));
 				rail = tie.other_rail;
 			}
 			else {
 				var function_token:Function_Call = cast token;
-				result.push( { 
-					type: Expression_Type.function_call,
-					name: function_token.name,
-					args: [],
-					is_platform_specific: true
-				});
+				result.push(new metahub.imperative.types.Function_Call(function_token.name, [], true));
 			}
 		}
-		return { type: Expression_Type.path, path: result };
+		return new metahub.imperative.types.Path(result);
 	}
 
 }

@@ -1,13 +1,10 @@
 package metahub.imperative.schema ;
 import metahub.Hub;
-import metahub.meta.types.Block;
 import metahub.meta.types.Constraint;
 import metahub.meta.types.Expression;
 import metahub.meta.types.Expression_Type;
 import metahub.meta.Scope;
-import metahub.meta.types.Path;
-import metahub.meta.types.Property_Expression;
-import metahub.meta.types.Scope_Expression;
+
 import metahub.parser.Result;
 import metahub.schema.Kind;
 import metahub.schema.Trellis;
@@ -48,73 +45,7 @@ class Railway {
 		return Type.getClassName(Type.getClass(expression)).split('.').pop();
 	}
 
-	public function generate_code() {
-		for (region in regions) {
-			for (rail in region.rails) {
-				rail.generate_code();
-			}
-		}
-	}
-
-	public function process(expression:Expression, scope:Scope) {
-		switch(expression.type) {
-			case Expression_Type.scope:
-				scope_expression(cast expression, scope);
-
-			case Expression_Type.block:
-				block_expression(cast expression, scope);
-
-			case Expression_Type.constraint:
-				constraint(cast expression, scope);
-
-			default:
-				throw new Exception("Cannot process expression of type :" + expression.type + ".");
-		}
-	}
-
-	function scope_expression(expression:Scope_Expression, scope:Scope) {
-		//var new_scope = new Scope(scope.hub, expression.scope_definition, scope);
-		for (child in expression.children) {
-			process(child, expression.scope);
-		}
-	}
-
-	function block_expression(expression:Block, scope:Scope) {
-		for (child in expression.children) {
-			process(child, scope);
-		}
-	}
-
-	function constraint(expression:Constraint, scope:Scope) {
-		var rail = get_rail(scope.trellis);
-		var reference:Path = cast expression.first;
-		var property_expression:Property_Expression = cast reference.children[0];
-		var tie = rail.all_ties[property_expression.property.name];
-		tie.constraints.push(new metahub.imperative.schema.Constraint(expression, rail.railway, scope));
-	}
-
 	public function get_rail(trellis:Trellis):Rail {
 		return regions[trellis.namespace.name].rails[trellis.name];
 	}
-
-	//function get_reference(reference:Expression) {
-		//var children = reference.children;
-		//var type_unknown = new Type_Signature(Kind.unknown);
-//
-		//var token_port = result.get_port(1);
-		//var previous:Type_Signature = type_unknown.copy();
-		//var port:General_Port = null;
-//
-		//for (i in 0...children.length) {
-			//if (i > 0) {
-				//previous = children[i - 1].get_type(previous)[0].copy();
-			//}
-//
-			//var expression:Token_Expression = cast children[i];
-			//var signature = [ type_unknown.copy(), previous ];
-			//port = expression.to_token_port(scope, group, signature, i == children.length - 1, port);
-			//token_port.connect(port);
-		//}
-		//return result.get_port(0);
-	//}
 }

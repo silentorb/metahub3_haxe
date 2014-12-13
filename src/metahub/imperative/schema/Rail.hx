@@ -1,7 +1,11 @@
 package metahub.imperative.schema ;
+import metahub.imperative.code.List;
 import metahub.imperative.types.Block;
 import metahub.imperative.code.Code;
+import metahub.imperative.types.Expression;
+import metahub.imperative.types.Function_Call;
 import metahub.imperative.types.Function_Definition;
+import metahub.imperative.types.Parent_Class;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
 import metahub.imperative.types.Expression_Type;
@@ -36,6 +40,7 @@ class Rail {
 	public var property_additional = new Map<String, Property_Addition>();
 	public var class_export:String = "";
 	public var code:Block;
+	public var blocks = new Map<String, Array<metahub.imperative.types.Expression>>();
 
 	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
@@ -137,13 +142,23 @@ class Rail {
 
 		var statements = class_definition.statements;
 		
-		statements.push(Code.generate_initialize(this));
+		statements.push(generate_initialize());
 
 		for (tie in all_ties) {
 			var definition = generate_setter(tie);
 			if (definition != null)
 				statements.push(definition);
 		}
+	}
+	
+	public function add_to_block(path:String, code:Expression) {
+		if (!blocks.exists(path)) {
+		}
+		
+		if (!blocks.exists(path))
+			throw new Exception("Invalid rail block: " + path + ".");
+			
+		blocks[path].push(code);
 	}
 
 	function generate_setter(tie:Tie):Function_Definition {
@@ -198,5 +213,35 @@ class Rail {
 		//render.unindent();
 		//result += render.line('}');
 		//return result;
+	}
+	
+	public function generate_initialize():Function_Definition {
+		var block = [];
+		blocks["initialize"] = block;
+		if (parent != null) {
+			block.push(new Parent_Class(
+				new Function_Call("initialize")
+			));
+		}
+
+		for (tie in all_ties) {
+			if (tie.property.type == Kind.list) {
+				for (constraint in tie.constraints) {
+					List.generate_constraint(constraint);
+				}
+			}
+		}
+		if (hooks.exists("initialize_post")) {
+			block.push(new Function_Call("initialize_post"));
+		}
+
+		return {
+			type: Expression_Type.function_definition,
+			name: 'initialize',
+			return_type: { type: Kind.none },
+			parameters: [],
+			block: block
+		};
+		
 	}
 }

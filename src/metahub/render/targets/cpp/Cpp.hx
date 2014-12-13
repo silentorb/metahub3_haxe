@@ -3,6 +3,10 @@ import haxe.Timer;
 import metahub.imperative.schema.Rail;
 import metahub.imperative.schema.Railway;
 import metahub.imperative.schema.Region;
+import metahub.imperative.types.Path;
+import metahub.imperative.types.Variable;
+import metahub.meta.types.Literal;
+import metahub.imperative.types.Property_Expression;
 import metahub.render.Renderer;
 import metahub.imperative.schema.Tie;
 import metahub.Hub;
@@ -428,7 +432,7 @@ class Cpp extends Target{
 	function render_if(statement:Flow_Control):String {
 		return render_scope2(
 			statement.name + " (" + render_condition(statement.condition) + ")"
-		, statement.statements);
+		, statement.children);
 	}
 
 	function render_condition(condition:Condition):String {
@@ -439,13 +443,15 @@ class Cpp extends Target{
 		var result:String;
 		switch(expression.type) {
 			case Expression_Type.literal:
-				result = Std.string(expression.value);
+				var literal:Literal = cast expression;
+				result = Std.string(literal.value);
 
 			case Expression_Type.path:
-				result = render_path_old(expression);
+				result = render_path_old(cast expression);
 
 			case Expression_Type.property:
-				result = expression.tie.tie_name;
+				var property_expression:Property_Expression = cast expression;
+				result = property_expression.tie.tie_name;
 
 			case Expression_Type.function_call:
 				result = render_function_call(cast expression, parent);
@@ -454,10 +460,11 @@ class Cpp extends Target{
 				result = render_instantiation(cast expression);
 
 			case Expression_Type.variable:
-				if (find_variable(expression.name) == null)
-					throw new Exception("Could not find variable: " + expression.name + ".");
+				var variable_expression:Variable = cast expression;
+				if (find_variable(variable_expression.name) == null)
+					throw new Exception("Could not find variable: " + variable_expression.name + ".");
 
-				result = expression.name;
+				result = variable_expression.name;
 
 			case Expression_Type.parent_class:
 				result = current_rail.parent.rail_name;
@@ -476,10 +483,12 @@ class Cpp extends Target{
 	function get_signature(expression:Expression):Dynamic {
 		switch (expression.type) {
 			case Expression_Type.variable:
-				return find_variable(expression.name);
+				var variable_expression:Variable = cast expression;
+				return find_variable(variable_expression.name);
 
 			case Expression_Type.property:
-				return expression.tie;
+				var property_expression:Property_Expression = cast expression;
+				return property_expression.tie;
 
 			default:
 				throw new Exception("Determining pointer is not yet implemented for expression type: " + expression.type + ".");
@@ -536,10 +545,10 @@ class Cpp extends Target{
 			.join(", ") + ")";
 	}
 
-	function render_path_old(expression:Expression) {
+	function render_path_old(expression:Path) {
 		var parent:Expression = null;
 		var result = "";
-		for (child in expression.path) {
+		for (child in expression.children) {
 			if (parent != null)
 				result += get_connector(parent);
 

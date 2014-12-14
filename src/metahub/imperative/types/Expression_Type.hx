@@ -13,6 +13,7 @@ abstract Expression_Type(Int) {
   var function_call = 4;
 	var instantiate = 5;
 	var parent_class = 6;
+	var self = 7;
 
 	var path = 200;
 

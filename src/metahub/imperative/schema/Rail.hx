@@ -7,6 +7,7 @@ import metahub.imperative.types.Expression;
 import metahub.imperative.types.Flow_Control;
 import metahub.imperative.types.Function_Call;
 import metahub.imperative.types.Function_Definition;
+import metahub.imperative.types.Parameter;
 import metahub.imperative.types.Parent_Class;
 import metahub.imperative.types.Property_Expression;
 import metahub.imperative.types.Statement;
@@ -101,7 +102,7 @@ class Rail {
 		}
 	}
 
-	public function process() {
+	public function process1() {
 		if (trellis.parent != null) {
 			parent = railway.get_rail(trellis.parent);
 			add_dependency(parent).allow_ambient = false;
@@ -119,7 +120,13 @@ class Rail {
 			}
 		}
 
-		generate_code();
+		//generate_code();
+	}
+	
+	public function process2() {
+		for (tie in all_ties) {
+			tie.initialize_links();
+		}		
 	}
 
 	function add_dependency(rail:Rail):Dependency {
@@ -154,13 +161,19 @@ class Rail {
 		};
 
 		var statements = class_definition.statements;
+		blocks["/"] = statements;
 		
 		statements.push(generate_initialize());
 
 		for (tie in all_ties) {
-			var definition = generate_setter(tie);
-			if (definition != null)
-				statements.push(definition);
+			if (tie.type == Kind.list) {
+				List.common_functions(tie);
+			}
+			else {
+				var definition = generate_setter(tie);
+				if (definition != null)
+					statements.push(definition);
+			}
 		}
 	}
 	
@@ -205,10 +218,8 @@ class Rail {
 			return null;
 
 			var result = new Function_Definition('set_' + tie.tie_name, this, [
-			{
-				name: "value",
-				type: tie.get_signature()
-			}], []);
+				new Parameter("value", tie.get_signature())
+			], []);
 		
 		var zone = create_zone(result.block);
 		var pre = divide_zone(zone, tie.tie_name + "-set-pre");

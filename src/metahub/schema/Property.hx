@@ -7,6 +7,7 @@ typedef IProperty_Source = {
 	?allow_null:Bool,
 	?trellis:String,
   ?other_property:String,
+	?other_type: String,
 	?multiple:Bool
 }
 
@@ -91,7 +92,7 @@ typedef IProperty_Source = {
       other_property = other_trellis.get_property(source.other_property);
 			if (other_property == null) {
 				other_property = other_trellis.add_property(source.other_property, {
-					type: type == Kind.list ? "reference" : "list",
+					type: source.other_type,
 					trellis: trellis.name,					
 					other_property: name
 				});

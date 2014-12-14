@@ -36,7 +36,13 @@ class Railway {
 
 		for (region in regions) {
 			for (rail in region.rails) {
-				rail.process();
+				rail.process1();
+			}
+		}
+		
+		for (region in regions) {
+			for (rail in region.rails) {
+				rail.process2();
 			}
 		}
 	}

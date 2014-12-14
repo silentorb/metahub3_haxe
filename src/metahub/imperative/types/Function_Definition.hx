@@ -13,7 +13,7 @@ class Function_Definition extends Expression {
 	public var return_type:Signature;
 	public var rail:Rail;
 	
-	public function new(name:String, rail:Rail, parameters:Array<Parameter>,	block:Array<Expression>,	return_type:Signature = null) {
+	public function new(name:String, rail:Rail, parameters:Array<Parameter>,block:Array<Expression>,	return_type:Signature = null) {
 		super(Expression_Type.function_definition);
 		this.name = name;
 		this.parameters = parameters;
@@ -23,15 +23,7 @@ class Function_Definition extends Expression {
 		: return_type;
 		
 		this.rail = rail;
-		if (rail != null) {
+		if (rail != null)
 			rail.functions.push(this);
-		}
 	}
 }
-//typedef Function_Definition = {
-	//type:Expression_Type,
-	//return_type:Signature,
-	//name:String,
-	//parameters:Array<Parameter>,
-	//block:Array<Expression>
-//}

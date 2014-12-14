@@ -6,7 +6,7 @@ import metahub.imperative.schema.Rail;
  * @author Christopher W. Johnson
  */
 
-typedef Signature ={
+typedef Signature = {
 	type:Kind,
 	?rail:Rail,
 	?is_value:Bool,

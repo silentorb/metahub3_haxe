@@ -81,8 +81,6 @@ class Cpp extends Target{
 
 	function create_header_file(rail:Rail, namespace, dir) {
 		var headers = [ "stdafx" ];
-		//if (rail.parent != null && rail.parent.source_file != null)
-			//headers.push(rail.parent.source_file);
 
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
@@ -93,9 +91,9 @@ class Cpp extends Target{
 		render = new Renderer();
 		var result = line('#pragma once')
 		+ render_includes(headers) + newline()
+		+ render_outer_dependencies(rail)
 		+ render_region(rail.region, function() {
-			return render_ambient_dependencies(rail)
-				+ class_declaration(rail);
+			return newline() + render_inner_dependencies(rail) + class_declaration(rail);
 		});
 		Utility.create_file(dir + "/" + rail.name + ".h", result);
 	}
@@ -112,14 +110,12 @@ class Cpp extends Target{
 		render = new Renderer();
 		var result = render_includes(headers) + newline()
 		+ render_statements(rail.code.statements);
-		//+ render_region(rail.region, function() {
-			//return class_definition(rail);
-		//});
+
 		Utility.create_file(dir + "/" + rail.name + ".cpp", result);
 	}
 
-	function render_statements(statements:Array<Dynamic>):String {
-		return statements.map(function(s) return render_statement(s)).join("");
+	function render_statements(statements:Array<Dynamic>, glue = ""):String {
+		return statements.map(function(s) return render_statement(s)).join(glue);
 	}
 
 	function render_statement(statement:Dynamic) {
@@ -167,12 +163,45 @@ class Cpp extends Target{
 		return line(first + ";");
 	}
 
-	function render_ambient_dependencies(rail:Rail):String {
+	function render_outer_dependencies(rail:Rail):String {
+		var lines = false;
+		var result = "";
+		var regions = new Map<String, {region:Region, dependencies:Array<Rail>}>();
+		
+		for (d in rail.dependencies) {
+			var dependency = d.rail;
+			if (d.allow_ambient && dependency.region != rail.region) {
+				if (!regions.exists(dependency.region.name)) {
+					regions[dependency.region.name] = {
+						region: dependency.region,
+						dependencies: []
+					}
+				}
+				regions[dependency.region.name].dependencies.push(dependency);
+				lines = true;
+			}
+		}
+		
+		for (r in regions) {
+			result += render_region(r.region, function()
+				return r.dependencies.map(function(d) 
+					return line("class " + d.rail_name + ";"))
+					.join("")
+			);
+		}
+
+		if (result.length > 0)
+			result += newline();
+
+		return result;
+	}
+	
+	function render_inner_dependencies(rail:Rail):String {
 		var lines = false;
 		var result = "";
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
-			if (d.allow_ambient) {
+			if (d.allow_ambient && dependency.region == rail.region) {
 				result += line('class ' + get_rail_type_string(dependency) + ";");
 				lines = true;
 			}
@@ -216,7 +245,7 @@ class Cpp extends Target{
 		var result = "";
 
 		//result += pad(render_functions(rail));
-		result += render_statements(statements);
+		result += newline() + render_statements(statements, newline());
 		unindent();
 
 		current_rail = null;
@@ -229,7 +258,6 @@ class Cpp extends Target{
 		current_region = region;
 		indent();
 		result += action()
-		+ newline()
 		+ unindent().line("}");
 
 		current_region = null;
@@ -267,7 +295,7 @@ class Cpp extends Target{
 
 		return render_scope(intro, function() {
 			for (parameter in definition.parameters) {
-				current_scope[parameter.name] = parameter.type;
+				current_scope[parameter.name] = parameter.signature;
 			}
 
 		  return render_statements(definition.block);
@@ -275,11 +303,11 @@ class Cpp extends Target{
 	}
 
 	function render_parameter(parameter:Parameter):String {
-		return render_signature(parameter.type, true) + ' ' + parameter.name;
+		return render_signature(parameter.signature, true) + ' ' + parameter.name;
 	}
 
 	function render_function_declarations(rail:Rail):String {
-		var declarations = [ line("virtual void initialize();") ]
+		var declarations = [ ]
 			.concat(rail.stubs.map(function(s) return line(s)));
 
 		if (rail.hooks.exists("initialize_post")) {
@@ -291,9 +319,13 @@ class Cpp extends Target{
 				declarations.push(line("void " + tie.get_setter_post_name() + "(" + get_property_type_string(tie, true) +  " value);"));
 		}
 
-		for (tie in rail.all_ties) {
-			if (tie.has_setter())
-				declarations.push(line(render_signature_old('set_' + tie.tie_name, tie) + ';'));
+		//for (tie in rail.all_ties) {
+			//if (tie.has_setter())
+				//declarations.push(line(render_signature_old('set_' + tie.tie_name, tie) + ';'));
+		//}
+		
+		for (func in rail.functions) {
+			declarations.push(render_function_declaration(func));
 		}
 
 		return declarations.join('');
@@ -357,6 +389,12 @@ class Cpp extends Target{
 	function render_signature_old(name, tie:Tie):String {
 		var right = name + '(' + get_property_type_string(tie, true) + ' value)';
 		return 'void ' + right;
+	}
+	
+	function render_function_declaration(definition:Function_Definition):String {
+		return line("virtual " + render_signature(definition.return_type) + ' ' + definition.name
+		+ "(" + definition.parameters.map(render_parameter).join(", ") + ");");
+
 	}
 
 	function render_signature(signature:Signature, is_parameter = false):String {
@@ -468,6 +506,9 @@ class Cpp extends Target{
 
 			case Expression_Type.instantiate:
 				result = render_instantiation(cast expression);
+				
+			case Expression_Type.self:
+				result = "this";
 
 			case Expression_Type.variable:
 				var variable_expression:Variable = cast expression;

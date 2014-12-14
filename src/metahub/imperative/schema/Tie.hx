@@ -29,7 +29,9 @@ class Tie {
 		this.type = property.type;
 		this.property = property;
 		tie_name = name = property.name;
-
+	}
+	
+	public function initialize_links() {
 		if (property.other_trellis != null) {
 			other_rail = rail.railway.get_rail(property.other_trellis);
 			is_value = property.other_trellis.is_value;
@@ -58,6 +60,21 @@ class Tie {
 	public function get_signature():Signature {
 		return {
 			type: property.type,
+			rail: other_rail,
+			is_value: is_value
+		};
+	}
+	
+	public function get_other_signature():Signature {
+		if (other_rail == null)
+			throw new Exception("get_other_signature() can only be called on lists or references.");
+			
+		var other_type = other_tie != null
+		? other_tie.type
+		: type == Kind.list ? Kind.reference : Kind.list;
+			
+		return {
+			type: other_type,
 			rail: other_rail,
 			is_value: is_value
 		};

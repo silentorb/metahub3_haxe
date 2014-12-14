@@ -34,12 +34,18 @@ import metahub.meta.types.Expression_Type;
 			generate_constraint(constraint);
 		}
 		
-		flatten();
+		//flatten();
 	}
 	
 	public function generate_code() {
 		for (region in railway.regions) {
+			if (region.is_external)
+				continue;
+				
 			for (rail in region.rails) {
+				if (rail.is_external)
+					continue;
+					
 				rail.generate_code();
 			}
 		}
@@ -47,7 +53,13 @@ import metahub.meta.types.Expression_Type;
 
 	public function flatten() {
 		for (region in railway.regions) {
+			if (region.is_external)
+				continue;
+				
 			for (rail in region.rails) {
+				if (rail.is_external)
+					continue;
+
 				rail.flatten();
 			}
 		}

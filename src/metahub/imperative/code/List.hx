@@ -28,8 +28,8 @@ class List
 		size(constraint, expression);
 	}
 	
-	public static function map(constraint:Constraint, expression:Expression):Dynamic {
-		return null;
+	public static function map(constraint:Constraint, expression:Expression) {
+		
 	}
 
 	public static function size(constraint:Constraint, expression:Expression) {

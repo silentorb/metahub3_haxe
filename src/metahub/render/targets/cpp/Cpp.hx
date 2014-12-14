@@ -7,7 +7,6 @@ import metahub.imperative.types.Path;
 import metahub.imperative.types.Variable;
 import metahub.meta.types.Literal;
 import metahub.imperative.types.Property_Expression;
-import metahub.render.Renderer;
 import metahub.imperative.schema.Tie;
 import metahub.Hub;
 import metahub.imperative.types.Assignment;
@@ -63,6 +62,7 @@ class Cpp extends Target{
 				var dir = output_folder + "/" + namespace.join('/');
 				Utility.create_folder(dir);
 
+				line_count = 0;
 				create_header_file(rail, namespace, dir);
 				create_class_file(rail, namespace, dir);
 			}
@@ -91,8 +91,8 @@ class Cpp extends Target{
 		}
 
 		render = new Renderer();
-		var result = render.line('#pragma once')
-		+ render_includes(headers) + render.newline()
+		var result = line('#pragma once')
+		+ render_includes(headers) + newline()
 		+ render_region(rail.region, function() {
 			return render_ambient_dependencies(rail)
 				+ class_declaration(rail);
@@ -110,7 +110,7 @@ class Cpp extends Target{
 			}
 		}
 		render = new Renderer();
-		var result = render_includes(headers) + render.newline()
+		var result = render_includes(headers) + newline()
 		+ render_statements(rail.code.statements);
 		//+ render_region(rail.region, function() {
 			//return class_definition(rail);
@@ -148,6 +148,10 @@ class Cpp extends Target{
 			case Expression_Type.declare_variable:
 				return render_variable_declaration(statement);
 
+			case Expression_Type.statement:
+				var s:Statement = cast statement;
+				return line(s.name + ";");
+
 			default:
 				return line(render_expression(statement) + ";");
 				//throw new Exception("Unsupported statement type: " + statement.type + ".");
@@ -169,13 +173,13 @@ class Cpp extends Target{
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
 			if (d.allow_ambient) {
-				result += render.line('class ' + get_rail_type_string(dependency) + ";");
+				result += line('class ' + get_rail_type_string(dependency) + ";");
 				lines = true;
 			}
 		}
 
 		if (result.length > 0)
-			result += render.newline();
+			result += newline();
 
 		return result;
 	}
@@ -192,16 +196,16 @@ class Cpp extends Target{
 			first += " : public " + render_rail_name(rail.parent);
 		}
 
-		result = render.line(first + " {")
-		+ "public:" + render.newline();
-		render.indent();
+		result = line(first + " {")
+		+ "public:" + newline();
+		indent();
 
 		for (tie in rail.core_ties) {
 			result += property_declaration(tie);
 		}
 
-		result += render.pad(render_function_declarations(rail))
-		+ render.unindent().line("};");
+		result += pad(render_function_declarations(rail))
+		+ unindent().line("};");
 
 		current_rail = null;
 		return result;
@@ -211,9 +215,9 @@ class Cpp extends Target{
 		current_rail = rail;
 		var result = "";
 
-		//result += render.pad(render_functions(rail));
+		//result += pad(render_functions(rail));
 		result += render_statements(statements);
-		render.unindent();
+		unindent();
 
 		current_rail = null;
 		return result;
@@ -242,7 +246,7 @@ class Cpp extends Target{
 				////definitions.push(definition);
 		////}
 ////
-		//return definitions.join(render.newline());
+		//return definitions.join(newline());
 	//}
 
 	function render_rail_name(rail:Rail):String {
@@ -275,30 +279,30 @@ class Cpp extends Target{
 	}
 
 	function render_function_declarations(rail:Rail):String {
-		var declarations = [ render.line("virtual void initialize();") ]
-			.concat(rail.stubs.map(function(s) return render.line(s)));
+		var declarations = [ line("virtual void initialize();") ]
+			.concat(rail.stubs.map(function(s) return line(s)));
 
 		if (rail.hooks.exists("initialize_post")) {
-			declarations.push(render.line("void initialize_post(); // Externally defined."));
+			declarations.push(line("void initialize_post(); // Externally defined."));
 		}
 
 		for (tie in rail.all_ties) {
 			if (tie.has_set_post_hook)
-				declarations.push(render.line("void " + tie.get_setter_post_name() + "(" + get_property_type_string(tie, true) +  " value);"));
+				declarations.push(line("void " + tie.get_setter_post_name() + "(" + get_property_type_string(tie, true) +  " value);"));
 		}
 
 		for (tie in rail.all_ties) {
 			if (tie.has_setter())
-				declarations.push(render.line(render_signature_old('set_' + tie.tie_name, tie) + ';'));
+				declarations.push(line(render_signature_old('set_' + tie.tie_name, tie) + ';'));
 		}
 
 		return declarations.join('');
 	}
 
 	//function render_initialize_definition(rail:Rail):String {
-		//var result = render.line("void " + rail.rail_name + "::initialize() {");
-		//render.indent();
-		//result += render.line(rail.parent != null
+		//var result = line("void " + rail.rail_name + "::initialize() {");
+		//indent();
+		//result += line(rail.parent != null
 			//? rail.parent.rail_name + "::initialize();"
 			//: ""
 		//);
@@ -310,10 +314,10 @@ class Cpp extends Target{
 			//}
 		//}
 		//if (rail.hooks.exists("initialize_post")) {
-			//result += render.line("initialize_post();");
+			//result += line("initialize_post();");
 		//}
-		//render.unindent();
-		//return result + render.line("}");
+		//unindent();
+		//return result + line("}");
 	//}
 
 	function get_rail_type_string(rail:Rail):String {
@@ -343,11 +347,11 @@ class Cpp extends Target{
 	}
 
 	function property_declaration(tie:Tie):String {
-		return render.line(get_property_type_string(tie) + " " +	tie.tie_name + ";");
+		return line(get_property_type_string(tie) + " " +	tie.tie_name + ";");
 	}
 
 	function render_includes(headers:Array<String>):String {
-		return headers.map(function(h) return render.line('#include "' + h + '.h"')).join('');
+		return headers.map(function(h) return line('#include "' + h + '.h"')).join('');
 	}
 
 	function render_signature_old(name, tie:Tie):String {
@@ -371,31 +375,37 @@ class Cpp extends Target{
 	}
 
 	public function render_block(command:String, expression:String, action):String {
-		var result = render.line(command + ' (' + expression + ') {');
-		render.indent();
+		var result = line(command + ' (' + expression + ') {');
+		indent();
 		result += action();
-		render.unindent();
-		result += render.line('}');
+		unindent();
+		result += line('}');
 		return result;
 	}
 
 	public function render_scope(intro:String, action):String {
 		push_scope();
-		var result = render.line(intro + ' {');
-		render.indent();
+		var result = line(intro + ' {');
+		indent();
 		result += action();
-		render.unindent();
-		result += render.line('}');
+		unindent();
+		result += line('}');
 		pop_scope();
 		return result;
 	}
 
-	public function render_scope2(intro:String, statements:Array<Dynamic>):String {
-		var result = render.line(intro + ' {');
-		render.indent();
-		result += render_statements(statements);
-		render.unindent();
-		result += render.line('}');
+	public function render_scope2(intro:String, statements:Array<Dynamic>, minimal = false):String {
+		indent();
+		var lines = line_count;
+		var block = render_statements(statements);
+		unindent();
+	
+		if (minimal) {
+			minimal = line_count == lines + 1;
+		}
+		var result = line(intro + (minimal ? '' : ' {'));
+		result += block;
+		result += line((minimal ? '' : '}'));
 		return result;
 	}
 
@@ -403,21 +413,21 @@ class Cpp extends Target{
 		//if (!tie.has_setter())
 			//return "";
 
-		//var result = render.line(render_signature_old('set_' + tie.tie_name, tie) + ' {');
-		//render.indent();
+		//var result = line(render_signature_old('set_' + tie.tie_name, tie) + ' {');
+		//indent();
 		//for (constraint in tie.constraints) {
 			//result += Constraints.render(constraint, render, this);
 		//}
 		//result +=
-			//render.line('if (' + tie.tie_name + ' == value)')
-		//+ render.indent().line('return;')
-		//+	render.unindent().newline()
-		//+ render.line(tie.tie_name + ' = value;');
+			//line('if (' + tie.tie_name + ' == value)')
+		//+ indent().line('return;')
+		//+	unindent().newline()
+		//+ line(tie.tie_name + ' = value;');
 		//if (tie.has_set_post_hook)
-			//result += render.line(tie.get_setter_post_name() + "(value);");
+			//result += line(tie.get_setter_post_name() + "(value);");
 //
-		//render.unindent();
-		//result += render.line('}');
+		//unindent();
+		//result += line('}');
 		//return result;
 	//}
 
@@ -432,7 +442,7 @@ class Cpp extends Target{
 	function render_if(statement:Flow_Control):String {
 		return render_scope2(
 			statement.name + " (" + render_condition(statement.condition) + ")"
-		, statement.children);
+		, statement.children, statement.name == "if");
 	}
 
 	function render_condition(condition:Condition):String {

@@ -1,11 +1,16 @@
 package metahub.imperative.schema ;
 import metahub.imperative.code.List;
+import metahub.imperative.types.Assignment;
 import metahub.imperative.types.Block;
 import metahub.imperative.code.Code;
 import metahub.imperative.types.Expression;
+import metahub.imperative.types.Flow_Control;
 import metahub.imperative.types.Function_Call;
 import metahub.imperative.types.Function_Definition;
 import metahub.imperative.types.Parent_Class;
+import metahub.imperative.types.Property_Expression;
+import metahub.imperative.types.Statement;
+import metahub.imperative.types.Variable;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
 import metahub.imperative.types.Expression_Type;
@@ -40,7 +45,9 @@ class Rail {
 	public var property_additional = new Map<String, Property_Addition>();
 	public var class_export:String = "";
 	public var code:Block;
-	public var blocks = new Map<String, Array<metahub.imperative.types.Expression>>();
+	var blocks = new Map<String, Array<metahub.imperative.types.Expression>>();
+	var zones = new Array<Zone>();
+	public var functions = new Array<Function_Definition>();
 
 	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
@@ -121,6 +128,12 @@ class Rail {
 
 		return dependencies[rail.name];
 	}
+	
+	public function flatten() {
+		for (zone in zones) {
+			zone.flatten();
+		}
+	}
 
 	public function generate_code() {
 		var class_definition = {
@@ -151,68 +164,76 @@ class Rail {
 		}
 	}
 	
-	public function add_to_block(path:String, code:Expression) {
+	public function get_block(path:String) {
 		if (!blocks.exists(path)) {
 		}
 		
 		if (!blocks.exists(path))
 			throw new Exception("Invalid rail block: " + path + ".");
+		
+		return blocks[path];
+	}
+	
+	public function add_to_block(path:String, code:Expression) {
+		var block = get_block(path);
+		block.push(code);
+	}
+	
+	public function concat_block(path:String, code:Array<Expression>) {
+		var block = get_block(path);
+		for (expression in code) {
+			block.push(expression);
+		}
+	}
+	
+	function create_zone(target = null) {
+		var zone = new Zone(target);
+		zones.push(zone);
+		return zone;
+	}
+	
+	function divide_zone(zone:Zone, block_name:String = null, division:Array<Expression> = null) {
+		division = zone.add_zone(division);
+		if (block_name != null)
+			blocks[block_name] = division;		
 			
-		blocks[path].push(code);
+		return division;
 	}
 
 	function generate_setter(tie:Tie):Function_Definition {
 		if (!tie.has_setter())
 			return null;
 
-		var result:Function_Definition = {
-			type: Expression_Type.function_definition,
-			name: 'set_' + tie.tie_name,
-			return_type: { type: Kind.none },
-			parameters: [
-				{
-					name: "value",
-					type: tie.get_signature()
-				}
-			],
-			block: []
-		};
+			var result = new Function_Definition('set_' + tie.tie_name, this, [
+			{
+				name: "value",
+				type: tie.get_signature()
+			}], []);
 		
-		for (constraint in tie.constraints) {
-			result.block = result.block.concat(Code.constraint(constraint));
-		}
+		var zone = create_zone(result.block);
+		var pre = divide_zone(zone, tie.tie_name + "-set-pre");
+		
+		var mid = divide_zone(zone, [
+			new Flow_Control("if", { operator: "==", expressions: [
+					new Property_Expression(tie), new Variable("value")
+				]},
+				[
+					new Statement("return")
+			]),
+			new Assignment(new Property_Expression(tie), "=", new Variable("value"))
+		]);
+		
+		var post = divide_zone(zone, tie.tie_name + "-set-post");
 
 		if (tie.has_set_post_hook) {
-			result.block.push({
-				type: Expression_Type.function_call,
-				name: tie.get_setter_post_name(),
-				args: [
-					{
-						type: Expression_Type.variable,
-						name: "value"
-					}
+			post.push(new Function_Call(tie.get_setter_post_name(), [
+					new Variable("value")
 				]
-			});
+			));
 		}
 			
 		return result;
 
-		//var result = render.line(render_signature('set_' + tie.tie_name, tie, true) + ' {');
-		//render.indent();
-		//for (constraint in tie.constraints) {
-			//result += Constraints.render(constraint, render, this);
-		//}
-		//result +=
-			//render.line('if (' + tie.tie_name + ' == value)')
-		//+ render.indent().line('return;')
-		//+	render.unindent().newline()
-		//+ render.line(tie.tie_name + ' = value;');
-		//if (tie.has_set_post_hook)
-			//result += render.line(tie.get_setter_post_name() + "(value);");
-//
-		//render.unindent();
-		//result += render.line('}');
-		//return result;
 	}
 	
 	public function generate_initialize():Function_Definition {
@@ -224,24 +245,10 @@ class Rail {
 			));
 		}
 
-		for (tie in all_ties) {
-			if (tie.property.type == Kind.list) {
-				for (constraint in tie.constraints) {
-					List.generate_constraint(constraint);
-				}
-			}
-		}
 		if (hooks.exists("initialize_post")) {
 			block.push(new Function_Call("initialize_post"));
 		}
 
-		return {
-			type: Expression_Type.function_definition,
-			name: 'initialize',
-			return_type: { type: Kind.none },
-			parameters: [],
-			block: block
-		};
-		
+		return new Function_Definition("initialize", this, [], block);		
 	}
 }

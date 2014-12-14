@@ -1,4 +1,6 @@
 package metahub.imperative;
+import metahub.imperative.code.Code;
+import metahub.imperative.code.List;
 import metahub.imperative.schema.*;
 import metahub.meta.Scope;
 import metahub.meta.types.Expression;
@@ -27,8 +29,14 @@ import metahub.meta.types.Expression_Type;
 	public function translate(root:Expression) {
 		process(root, null);
 		generate_code();
-	}
 		
+		for (constraint in constraints) {
+			generate_constraint(constraint);
+		}
+		
+		flatten();
+	}
+	
 	public function generate_code() {
 		for (region in railway.regions) {
 			for (rail in region.rails) {
@@ -37,6 +45,14 @@ import metahub.meta.types.Expression_Type;
 		}
 	}
 
+	public function flatten() {
+		for (region in railway.regions) {
+			for (rail in region.rails) {
+				rail.flatten();
+			}
+		}
+	}
+	
 	public function process(expression:Expression, scope:Scope) {
 		switch(expression.type) {
 			case Expression_Type.scope:
@@ -46,7 +62,7 @@ import metahub.meta.types.Expression_Type;
 				block_expression(cast expression, scope);
 
 			case Expression_Type.constraint:
-				constraint(cast expression, scope);
+				create_constraint(cast expression, scope);
 
 			default:
 				throw new Exception("Cannot process expression of type :" + expression.type + ".");
@@ -66,16 +82,31 @@ import metahub.meta.types.Expression_Type;
 		}
 	}
 
-	function constraint(expression:metahub.meta.types.Constraint, scope:Scope) {
+	function create_constraint(expression:metahub.meta.types.Constraint, scope:Scope) {
 		var rail = get_rail(scope.trellis);
 		var reference:Path = cast expression.first;
 		var property_expression:Property_Expression = cast reference.children[0];
-		//var tie = rail.all_ties[property_expression.property.name];
-		constraints.push(new metahub.imperative.schema.Constraint(expression, rail.railway, scope));
+		var constraint = new metahub.imperative.schema.Constraint(expression, rail.railway, scope);
+		var tie = rail.all_ties[property_expression.property.name];
+		constraints.push(constraint);
+		tie.constraints.push(constraint);
 	}
 
 	public function get_rail(trellis:Trellis):Rail {
 		return railway.get_rail(trellis);
 	}
 
+	public function generate_constraint(constraint:Constraint) {
+		var path:Path = cast constraint.reference;
+		var property_expression:metahub.imperative.types.Property_Expression = cast path.children[0];
+		var tie = property_expression.tie;
+		
+		if (tie.type == Kind.list) {
+			List.generate_constraint(constraint);
+		}
+		else {
+			
+			tie.rail.concat_block(tie.tie_name + "-set-pre", Code.constraint(constraint));
+		}
+	}
 }

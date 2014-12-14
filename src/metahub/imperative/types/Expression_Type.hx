@@ -17,6 +17,7 @@ abstract Expression_Type(Int) {
 	var path = 200;
 
 	// Statements
+	var statement = 99;
 	var namespace = 100;
 	var class_definition = 101;
 	var function_definition = 102;
@@ -24,5 +25,4 @@ abstract Expression_Type(Int) {
 	var assignment = 104;
 	var declare_variable = 105;
 	var scope = 106;
-
 }

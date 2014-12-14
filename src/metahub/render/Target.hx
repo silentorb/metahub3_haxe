@@ -9,7 +9,8 @@ import metahub.render.Renderer;
 class Target{
 	var railway:Railway;
 	var render = new Renderer();
-
+	var line_count = 0;
+	
 	public function new(railway:Railway) {
 		this.railway = railway;
 	}
@@ -19,6 +20,7 @@ class Target{
 	}
 	
 	public function line(text:String):String {
+		++line_count;
 		return render.line(text);
 	}
 
@@ -31,7 +33,14 @@ class Target{
 	}
 
 	public function newline(amount:Int = 1):String {
+		++line_count;
 		return render.newline(amount);
+	}
+	
+	public function pad(content:String) {
+		return content == ""
+		? content
+		: newline() + content;
 	}
 
 }

@@ -199,18 +199,10 @@ class Rail {
 		}
 	}
 	
-	function create_zone(target = null) {
-		var zone = new Zone(target);
+	public function create_zone(target = null) {
+		var zone = new Zone(target, blocks);
 		zones.push(zone);
 		return zone;
-	}
-	
-	function divide_zone(zone:Zone, block_name:String = null, division:Array<Expression> = null) {
-		division = zone.add_zone(division);
-		if (block_name != null)
-			blocks[block_name] = division;		
-			
-		return division;
 	}
 
 	function generate_setter(tie:Tie):Function_Definition {
@@ -222,9 +214,9 @@ class Rail {
 			], []);
 		
 		var zone = create_zone(result.block);
-		var pre = divide_zone(zone, tie.tie_name + "-set-pre");
+		var pre = zone.divide(tie.tie_name + "-set-pre");
 		
-		var mid = divide_zone(zone, [
+		var mid = zone.divide([
 			new Flow_Control("if", { operator: "==", expressions: [
 					new Property_Expression(tie), new Variable("value")
 				]},
@@ -234,7 +226,7 @@ class Rail {
 			new Assignment(new Property_Expression(tie), "=", new Variable("value"))
 		]);
 		
-		var post = divide_zone(zone, tie.tie_name + "-set-post");
+		var post = zone.divide(tie.tie_name + "-set-post");
 
 		if (tie.has_set_post_hook) {
 			post.push(new Function_Call(tie.get_setter_post_name(), [
@@ -262,4 +254,5 @@ class Rail {
 
 		return new Function_Definition("initialize", this, [], block);		
 	}
+	
 }

@@ -7,33 +7,40 @@ import metahub.imperative.types.Expression;
  */
 class Zone
 {
-	//var zone_map = new Map<String, Array<Expression>>();
-	var zones = new Array<Array<Expression>>();
+	var divisions = new Array<Array<Expression>>();
 	var target:Array<Expression>;
+	var blocks:Map<String, Array<metahub.imperative.types.Expression>>;
 	
-	public function new(target:Array<Expression>) 
+	public function new(target:Array<Expression>, blocks) 
 	{
 		this.target = target;
+		this.blocks = blocks;
+	}
+		
+	public function divide(block_name:String = null, division:Array<Expression> = null) {
+		division = add_zone(division);
+		if (block_name != null)
+			blocks[block_name] = division;		
+			
+		return division;
 	}
 	
-	public function add_zone(/*path:String, */zone:Array<Expression> = null):Array<Expression> {
+	public function add_zone(zone:Array<Expression> = null):Array<Expression> {
 		if (zone == null)
 			zone = [];
 			
-		//zone_map[path] = zone;
-		zones.push(zone);
+		divisions.push(zone);
 		return zone;
 	}
 	
 	public function flatten() {
-		for (zone in zones) {
-			for (expression in zone) {
+		for (division in divisions) {
+			for (expression in division) {
 				target.push(expression);
 			}
 		}
 		
-		//zone_map = new Map<String, Array<Expression>>();
-		zones = new Array<Array<Expression>>();
+		divisions = new Array<Array<Expression>>();
 	}
 	
 }

@@ -34,7 +34,7 @@ import metahub.meta.types.Expression_Type;
 			generate_constraint(constraint);
 		}
 		
-		//flatten();
+		flatten();
 	}
 	
 	public function generate_code() {

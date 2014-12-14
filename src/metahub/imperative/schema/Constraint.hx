@@ -57,4 +57,9 @@ class Constraint {
 		return new metahub.imperative.types.Path(result);
 	}
 
+	public function get_reference_property():Tie {
+		var path:Path = cast reference;
+		var property_expression:metahub.imperative.types.Property_Expression = cast path.children[0];
+		return property_expression.tie;
+	}
 }

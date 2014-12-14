@@ -13,16 +13,21 @@ class List
 {
 	public static function common_functions(tie:Tie) {
 		var rail = tie.rail;
-		var definition = new Function_Definition(tie.tie_name + "_add", rail, [
-			new Parameter("item", tie.get_other_signature())], [
+		var function_name = tie.tie_name + "_add";
+		var definition = new Function_Definition(function_name, rail, [
+			new Parameter("item", tie.get_other_signature())], []);
+
+		var zone = rail.create_zone(definition.block);
+		var mid = zone.divide(null, [
 			new Property_Expression(tie,
 				new Function_Call("add", [ new Variable("item") ], true)
 			)		
 		]);
-		
+		var post = zone.divide(function_name + "_post");
+				
 		if (tie.other_tie != null) {
 			//throw "";
-			definition.block.push(
+			mid.push(
 				new Assignment(new Variable("item", new Property_Expression(tie.other_tie)),
 				"=", new Self())
 			);
@@ -50,6 +55,15 @@ class List
 	}
 	
 	public static function map(constraint:Constraint, expression:Expression) {
+		var tie = constraint.get_reference_property();
+		tie.rail.add_to_block(tie.tie_name + "_add_post", 
+			new Assignment(new Variable("item", new Property_Expression(tie.other_tie)),
+				"=", new Self()		
+			)
+		);
+	}
+	
+	public static function link() {
 		
 	}
 

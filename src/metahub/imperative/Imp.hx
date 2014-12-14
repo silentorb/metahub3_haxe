@@ -1,16 +1,13 @@
 package metahub.imperative;
-import metahub.imperative.code.Code;
+import metahub.imperative.code.Reference;
 import metahub.imperative.code.List;
 import metahub.imperative.schema.*;
 import metahub.meta.Scope;
-import metahub.meta.types.Expression;
-import metahub.meta.types.Path;
-import metahub.meta.types.Property_Expression;
+import metahub.imperative.types.*;
 import metahub.meta.types.Scope_Expression;
-import metahub.meta.types.Block;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
-import metahub.meta.types.Expression_Type;
+import metahub.imperative.code.Parse;
 
 /**
  * ...
@@ -26,12 +23,12 @@ import metahub.meta.types.Expression_Type;
 		railway = new Railway(hub, target_name);
 	}
 	
-	public function translate(root:Expression) {
+	public function run(root:Expression) {
 		process(root, null);
 		generate_code();
 		
 		for (constraint in constraints) {
-			generate_constraint(constraint);
+			implement_constraint(constraint);
 		}
 		
 		flatten();
@@ -67,13 +64,13 @@ import metahub.meta.types.Expression_Type;
 	
 	public function process(expression:Expression, scope:Scope) {
 		switch(expression.type) {
-			case Expression_Type.scope:
+			case metahub.meta.types.Expression_Type.scope:
 				scope_expression(cast expression, scope);
 
-			case Expression_Type.block:
+			case metahub.meta.types.Expression_Type.block:
 				block_expression(cast expression, scope);
 
-			case Expression_Type.constraint:
+			case metahub.meta.types.Expression_Type.constraint:
 				create_constraint(cast expression, scope);
 
 			default:
@@ -88,7 +85,7 @@ import metahub.meta.types.Expression_Type;
 		}
 	}
 
-	function block_expression(expression:Block, scope:Scope) {
+	function block_expression(expression:metahub.meta.types.Block, scope:Scope) {
 		for (child in expression.children) {
 			process(child, scope);
 		}
@@ -96,29 +93,68 @@ import metahub.meta.types.Expression_Type;
 
 	function create_constraint(expression:metahub.meta.types.Constraint, scope:Scope) {
 		var rail = get_rail(scope.trellis);
-		var reference:Path = cast expression.first;
-		var property_expression:Property_Expression = cast reference.children[0];
-		var constraint = new metahub.imperative.schema.Constraint(expression, rail.railway, scope);
-		var tie = rail.all_ties[property_expression.property.name];
-		constraints.push(constraint);
+		var constraint = new metahub.imperative.schema.Constraint(expression, this, scope);
+		var tie = Parse.get_end_tie(constraint.reference);
+		trace('tie', tie.rail.name + "." + tie.name);
 		tie.constraints.push(constraint);
+		constraints.push(constraint);
 	}
 
 	public function get_rail(trellis:Trellis):Rail {
 		return railway.get_rail(trellis);
 	}
 
-	public function generate_constraint(constraint:Constraint) {
-		var path:Path = cast constraint.reference;
-		var property_expression:metahub.imperative.types.Property_Expression = cast path.children[0];
-		var tie = property_expression.tie;
+	public function implement_constraint(constraint:Constraint) {
+		var tie = Parse.get_end_tie(constraint.reference);
 		
 		if (tie.type == Kind.list) {
 			List.generate_constraint(constraint);
 		}
 		else {
-			
-			tie.rail.concat_block(tie.tie_name + "-set-pre", Code.constraint(constraint));
+			tie.rail.concat_block(tie.tie_name + "_set_pre", Reference.constraint(constraint));
 		}
+	}
+	
+	public function translate(expression:metahub.meta.types.Expression):Expression {
+		switch(expression.type) {
+			case metahub.meta.types.Expression_Type.literal:
+				var literal:metahub.meta.types.Literal = cast expression;
+				return new Literal(literal.value);
+
+			case metahub.meta.types.Expression_Type.function_call:
+				var func:metahub.meta.types.Function_Call = cast expression;
+				return new Function_Call(func.name);
+				
+			case metahub.meta.types.Expression_Type.path:
+				return convert_path(cast expression);
+
+			default:
+				throw new Exception("Cannot convert expression " + expression.type + ".");
+		}
+		
+		
+	}
+	
+	public function convert_path(expression:metahub.meta.types.Path):Expression {
+		var path = expression.children;
+		var result = new Array<metahub.imperative.types.Expression>();
+		var first:metahub.meta.types.Property_Expression = cast path[0];
+		var rail = railway.get_rail(first.property.trellis);
+		for (token in path) {
+			if (token.type == metahub.meta.types.Expression_Type.property) {
+				var property_token:metahub.meta.types.Property_Expression = cast token;
+				var tie = rail.all_ties[property_token.property.name];
+				if (tie == null)
+					throw new Exception("tie is null: " + property_token.property.fullname());
+
+				result.push(new Property_Expression(tie));
+				rail = tie.other_rail;
+			}
+			else {
+				var function_token:metahub.meta.types.Function_Call = cast token;
+				result.push(new Function_Call(function_token.name, [], true));
+			}
+		}
+		return new metahub.imperative.types.Path(result);
 	}
 }

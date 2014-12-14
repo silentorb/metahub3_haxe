@@ -235,7 +235,7 @@ import haxe.Json;
 	
 	public function generate(root, target_name:String, destination:String) {
 		var imp = new Imp(this, target_name);
-		imp.translate(root);
+		imp.run(root);
 		var generator = new Generator(this);
 		generator.run(imp.railway, 'cpp', destination);
 	}

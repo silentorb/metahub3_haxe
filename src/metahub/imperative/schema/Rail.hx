@@ -2,7 +2,7 @@ package metahub.imperative.schema ;
 import metahub.imperative.code.List;
 import metahub.imperative.types.Assignment;
 import metahub.imperative.types.Block;
-import metahub.imperative.code.Code;
+import metahub.imperative.code.Reference;
 import metahub.imperative.types.Expression;
 import metahub.imperative.types.Flow_Control;
 import metahub.imperative.types.Function_Call;
@@ -214,7 +214,7 @@ class Rail {
 			], []);
 		
 		var zone = create_zone(result.block);
-		var pre = zone.divide(tie.tie_name + "-set-pre");
+		var pre = zone.divide(tie.tie_name + "_set_pre");
 		
 		var mid = zone.divide([
 			new Flow_Control("if", { operator: "==", expressions: [
@@ -226,7 +226,7 @@ class Rail {
 			new Assignment(new Property_Expression(tie), "=", new Variable("value"))
 		]);
 		
-		var post = zone.divide(tie.tie_name + "-set-post");
+		var post = zone.divide(tie.tie_name + "_set_post");
 
 		if (tie.has_set_post_hook) {
 			post.push(new Function_Call(tie.get_setter_post_name(), [

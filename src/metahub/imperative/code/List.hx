@@ -1,4 +1,5 @@
 package metahub.imperative.code;
+import metahub.imperative.Imp;
 import metahub.imperative.schema.Constraint;
 import metahub.imperative.schema.Rail;
 import metahub.imperative.schema.Tie;
@@ -41,9 +42,9 @@ class List
 		var property_expression:Property_Expression = cast path.children[0];
 		var reference = property_expression.tie;
 		//var amount:Int = target.render_expression(constraint.expression, constraint.scope);
-		var expression = Code.convert_expression(constraint.expression, constraint.scope);
+		var expression = constraint.expression;
 
-		if (constraint.expression.type == metahub.meta.types.Expression_Type.function_call) {
+		if (constraint.expression.type == Expression_Type.function_call) {
 			var func:metahub.meta.types.Function_Call = cast constraint.expression;
 			if (func.name == "map") {
 				map(constraint, expression);
@@ -55,12 +56,12 @@ class List
 	}
 	
 	public static function map(constraint:Constraint, expression:Expression) {
-		var tie = constraint.get_reference_property();
-		tie.rail.add_to_block(tie.tie_name + "_add_post", 
-			new Assignment(new Variable("item", new Property_Expression(tie.other_tie)),
-				"=", new Self()		
-			)
-		);
+		//var tie = Parse.get_start_tie(constraint.reference);
+		//tie.rail.add_to_block(tie.tie_name + "_add_post", 
+			//new Assignment(new Variable("item", new Property_Expression(tie.other_tie)),
+				//"=", new Self()		
+			//)
+		//);
 	}
 	
 	public static function link() {

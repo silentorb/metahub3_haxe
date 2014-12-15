@@ -142,7 +142,7 @@ class Rail {
 		}
 	}
 
-	public function generate_code() {
+	public function generate_code1() {
 		var class_definition = {
 			"type": Expression_Type.class_definition,
 			"rail": this,
@@ -162,7 +162,10 @@ class Rail {
 
 		var statements = class_definition.statements;
 		blocks["/"] = statements;
-		
+	}
+	
+	public function generate_code2() {
+		var statements = blocks["/"];
 		statements.push(generate_initialize());
 
 		for (tie in all_ties) {

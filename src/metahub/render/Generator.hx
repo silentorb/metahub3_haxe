@@ -19,23 +19,23 @@ import metahub.schema.Namespace;
 	public function new(hub:Hub) {
 		this.hub = hub;
 	}
-
-	public function run(railway:Railway, target_name:String, output_folder:String) {
-		Utility.create_folder(output_folder);
-		Utility.clear_folder(output_folder);
-		var target:Target = null;
-
+	
+	public function create_target(railway:Railway, target_name:String):Target {
 		switch(target_name) {
 			case "cpp":
-				target = new Cpp(railway);
+				return new Cpp(railway);
 
 			case "haxe":
-				target = new Haxe_Target(railway);
+				return new Haxe_Target(railway);
 				
 			default:
 				throw new Exception("Unsupported target: " + target_name + ".");
-		}
+		}		
+	}
 
+	public function run(target:Target, output_folder:String) {
+		Utility.create_folder(output_folder);
+		Utility.clear_folder(output_folder);
 		target.run(output_folder);
 	}
 

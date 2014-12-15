@@ -60,13 +60,14 @@ class List
 		var end = Parse.get_end_tie(constraint.reference);
 		var func:Function_Call = cast constraint.expression;
 		var array:Create_Array = func.args[0];
-		var other:Property_Expression = cast array.children[0];
-		var item_name = other.tie.rail.name.toLowerCase() + "_item";
+		var other:Tie = cast Parse.get_end_tie(array.children[0]);
+		var item_name = other.rail.name.toLowerCase() + "_item";
 		end.rail.concat_block(end.tie_name + "_add_post", [
-			new Declare_Variable(item_name, other.tie.get_signature(), new Instantiate(other.tie.rail)),
+			new Declare_Variable(item_name, other.get_other_signature(), new Instantiate(other.other_rail)),
+			new Variable(item_name, new Function_Call("initialize")),
 			new Property_Expression(start.other_tie, 
-				new Function_Call(end.tie_name + "_add", 
-					[new Variable("item_name")])
+				new Function_Call(other.tie_name + "_add", 
+					[new Variable(item_name)])
 			)			
 		]);
 	}

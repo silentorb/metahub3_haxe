@@ -5,6 +5,7 @@ import metahub.imperative.schema.*;
 import metahub.meta.Scope;
 import metahub.imperative.types.*;
 import metahub.meta.types.Scope_Expression;
+import metahub.render.Target;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
 import metahub.imperative.code.Parse;
@@ -23,9 +24,9 @@ import metahub.imperative.code.Parse;
 		railway = new Railway(hub, target_name);
 	}
 	
-	public function run(root:Expression) {
+	public function run(root:Expression, target:Target) {
 		process(root, null);
-		generate_code();
+		generate_code(target);
 		
 		for (constraint in constraints) {
 			implement_constraint(constraint);
@@ -34,7 +35,7 @@ import metahub.imperative.code.Parse;
 		flatten();
 	}
 	
-	public function generate_code() {
+	public function generate_code(target:Target) {
 		for (region in railway.regions) {
 			if (region.is_external)
 				continue;
@@ -42,8 +43,10 @@ import metahub.imperative.code.Parse;
 			for (rail in region.rails) {
 				if (rail.is_external)
 					continue;
-					
-				rail.generate_code();
+				
+				rail.generate_code1();
+				target.generate_rail_code(rail);
+				rail.generate_code2();
 			}
 		}
 	}

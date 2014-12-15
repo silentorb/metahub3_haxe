@@ -3,6 +3,7 @@ import haxe.Timer;
 import metahub.imperative.schema.Rail;
 import metahub.imperative.schema.Railway;
 import metahub.imperative.schema.Region;
+import metahub.imperative.types.Null;
 import metahub.imperative.types.Path;
 import metahub.imperative.types.Variable;
 import metahub.meta.types.Literal;
@@ -56,7 +57,7 @@ class Cpp extends Target{
 			for (rail in region.rails) {
 				if (rail.is_external)
 					continue;
-
+					
 				//trace(rail.namespace.fullname);
 				var namespace = Generator.get_namespace_path(rail.region);
 				var dir = output_folder + "/" + namespace.join('/');
@@ -67,6 +68,30 @@ class Cpp extends Target{
 				create_class_file(rail, namespace, dir);
 			}
 		}
+	}
+	
+	override function generate_rail_code(rail:Rail) {
+		var root = rail.get_block("/");
+		var references = new Array<Tie>();
+		for (tie in rail.core_ties) {
+			if (tie.type == Kind.reference && !tie.is_value)
+				references.push(tie);
+		}
+		
+		var func = new Function_Definition(rail.rail_name, rail, [], 
+			cast references.map(function(tie) return new Assignment(
+				new Property_Expression(tie), "=", new Null())
+			)
+		);
+		func.return_type = null;
+		root.push(func);
+		func = new Function_Definition("~" + rail.rail_name, rail, [],
+			cast references.map(function(tie) return new Function_Call("SAFE_DELETE",
+				[new Property_Expression(tie)])
+			)
+		);
+		func.return_type = null;
+		root.push(func);
 	}
 
 	function push_scope() {
@@ -290,7 +315,8 @@ class Cpp extends Target{
 	}
 
 	function render_function_definition(definition:Function_Definition):String {
-		var intro = render_signature(definition.return_type) + ' ' + current_rail.rail_name + '::' + definition.name
+		var intro = (definition.return_type != null ? render_signature(definition.return_type) + " " : "")
+		+ current_rail.rail_name + '::' + definition.name
 		+ "(" + definition.parameters.map(render_parameter).join(", ") + ")";
 
 		return render_scope(intro, function() {
@@ -392,7 +418,9 @@ class Cpp extends Target{
 	}
 	
 	function render_function_declaration(definition:Function_Definition):String {
-		return line("virtual " + render_signature(definition.return_type) + ' ' + definition.name
+		return line((definition.return_type != null ? "virtual " : "")
+		+ (definition.return_type != null ? render_signature(definition.return_type) + " " : "")
+		+ definition.name
 		+ "(" + definition.parameters.map(render_parameter).join(", ") + ");");
 
 	}
@@ -509,6 +537,9 @@ class Cpp extends Target{
 				
 			case Expression_Type.self:
 				result = "this";
+			
+			case Expression_Type.null_value:
+				return "NULL";
 
 			case Expression_Type.variable:
 				var variable_expression:Variable = cast expression;
@@ -570,7 +601,7 @@ class Cpp extends Target{
 	}
 
 	function render_instantiation(expression:Instantiate):String {
-		return "new " + expression.rail.rail_name + "()";
+		return "new " + get_rail_type_string(expression.rail) + "()";
 	}
 
 	function render_function_call(expression:Function_Call, parent:Expression):String {

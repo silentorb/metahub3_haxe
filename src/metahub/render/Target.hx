@@ -1,4 +1,5 @@
 package metahub.render ;
+import metahub.imperative.schema.Rail;
 import metahub.imperative.schema.Railway;
 import metahub.render.Renderer;
 
@@ -15,6 +16,10 @@ class Target{
 		this.railway = railway;
 	}
 
+	public function generate_rail_code(rail:Rail) {
+	
+	}
+	
 	public function run(output_folder:String) {
 
 	}

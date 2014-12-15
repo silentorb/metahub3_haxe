@@ -235,9 +235,10 @@ import haxe.Json;
 	
 	public function generate(root, target_name:String, destination:String) {
 		var imp = new Imp(this, target_name);
-		imp.run(root);
 		var generator = new Generator(this);
-		generator.run(imp.railway, 'cpp', destination);
+		var target = generator.create_target(imp.railway, target_name); 
+		imp.run(root, target);
+		generator.run(target, destination);
 	}
 
 	//public function get_increment():INode {

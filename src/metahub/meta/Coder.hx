@@ -320,7 +320,8 @@ class Coder {
 			//new_scope.add_symbol(parameter, new Signature(Kind.unknown));
 		}
 
-		return create_block(source, new_scope);
+		return new Literal("stub");
+		//return create_block(source, new_scope);
   }
 
 }

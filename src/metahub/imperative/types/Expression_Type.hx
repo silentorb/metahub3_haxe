@@ -14,6 +14,7 @@ abstract Expression_Type(Int) {
 	var instantiate = 5;
 	var parent_class = 6;
 	var self = 7;
+	var create_array = 8;
 
 	var path = 200;
 

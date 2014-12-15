@@ -6,10 +6,12 @@ package metahub.meta.types;
  */
 class Function_Call extends Expression {
 	public var name:String;
+	public var input:Expression;
 
-	public function new(name:String) {
+	public function new(name:String, input:Expression) {
 		type = Expression_Type.function_call;
 		this.name = name;
+		this.input = input;
 	}
 
 }

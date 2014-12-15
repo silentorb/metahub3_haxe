@@ -123,10 +123,14 @@ import metahub.imperative.code.Parse;
 
 			case metahub.meta.types.Expression_Type.function_call:
 				var func:metahub.meta.types.Function_Call = cast expression;
-				return new Function_Call(func.name);
+				return new Function_Call(func.name, [translate(func.input)]);
 				
 			case metahub.meta.types.Expression_Type.path:
 				return convert_path(cast expression);
+				
+			case metahub.meta.types.Expression_Type.block:
+				var array:metahub.meta.types.Block = cast expression;
+				return new Create_Array(array.children.map(function(e) return translate(e)));
 
 			default:
 				throw new Exception("Cannot convert expression " + expression.type + ".");

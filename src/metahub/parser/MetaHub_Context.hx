@@ -363,7 +363,7 @@ typedef Reference_Or_Function = {
 	static function array_expression(data:Dynamic):Dynamic {
     return {
 			"type": "array",
-			"items": data[2]
+			"expressions": data[2]
     };
   }
 
@@ -371,7 +371,7 @@ typedef Reference_Or_Function = {
     return {
 			type: "lambda",
 			parameters: [ data[0] ],
-			expressions: data[4]
+			expressions: data[4].expressions
     };
   }
 }

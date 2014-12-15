@@ -130,8 +130,7 @@ class Coder {
 			//name = name.substring(0, 1);
 			inputs.unshift(reference);
 		}
-		
-		return new Function_Call(name);
+		return new Function_Call(name, inputs[0]);
 		//var info = Function_Call.get_function_info(name, hub);
     //return new metahub.code.expressions.Function_Call(name, info, inputs, hub);
   }
@@ -201,7 +200,7 @@ class Coder {
 
 		for (item in expressions) {
 			if (item.type == "function") {
-				children.push(new Function_Call(item.name));
+				children.push(new Function_Call(item.name, null));
 				//var info = Function_Call.get_function_info(item.name, hub);
 				//children.push(new metahub.code.expressions.Function_Call(item.name, info, [], hub));
 			}
@@ -309,14 +308,15 @@ class Coder {
   //}
 
   function create_array(source:Dynamic, scope:Scope):Expression {
-		return create_block(source, scope);
+		var expressions:Array<Dynamic> = source.expressions;
+		return new Block(expressions.map(function(e) return convert_expression(e, scope)));
   }
 
   function create_lambda(source:Dynamic, scope:Scope):Expression {
 		var new_scope = new Scope(scope);
 		var parameters:Array<String> = source.parameters;
 		for (parameter in parameters) {
-			throw new Exception("Not implemented.");
+			//throw new Exception("Not implemented.");
 			//new_scope.add_symbol(parameter, new Signature(Kind.unknown));
 		}
 

@@ -12,6 +12,8 @@ class Scope {
 
 	public function new(parent:Scope = null) {
 		this.parent = parent;
+		if (parent != null)
+			trellis = parent.trellis;
 	}
 
 	public function find(name:String) {

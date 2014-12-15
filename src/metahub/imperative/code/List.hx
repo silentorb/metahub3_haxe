@@ -56,12 +56,19 @@ class List
 	}
 	
 	public static function map(constraint:Constraint, expression:Expression) {
-		//var tie = Parse.get_start_tie(constraint.reference);
-		//tie.rail.add_to_block(tie.tie_name + "_add_post", 
-			//new Assignment(new Variable("item", new Property_Expression(tie.other_tie)),
-				//"=", new Self()		
-			//)
-		//);
+		var start = Parse.get_start_tie(constraint.reference);
+		var end = Parse.get_end_tie(constraint.reference);
+		var func:Function_Call = cast constraint.expression;
+		var array:Create_Array = func.args[0];
+		var other:Property_Expression = cast array.children[0];
+		var item_name = other.tie.rail.name.toLowerCase() + "_item";
+		end.rail.concat_block(end.tie_name + "_add_post", [
+			new Declare_Variable(item_name, other.tie.get_signature(), new Instantiate(other.tie.rail)),
+			new Property_Expression(start.other_tie, 
+				new Function_Call(end.tie_name + "_add", 
+					[new Variable("item_name")])
+			)			
+		]);
 	}
 	
 	public static function link() {

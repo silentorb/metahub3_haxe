@@ -38,13 +38,12 @@ class Reference
 				value = limit;
 		}
 
-		return [ new Flow_Control("if",	{
-				operator: inverse,
-				expressions: [
+		return [ new Flow_Control("if",	new Condition(inverse,
+				[
 					constraint.reference,
 					{ type: Expression_Type.literal, value: limit }
 				]
-			},
+			),
 			[
 				new Assignment(constraint.reference, "=", new Literal(value))
 			]

@@ -28,4 +28,5 @@ abstract Expression_Type(Int) {
 	var assignment = 104;
 	var declare_variable = 105;
 	var scope = 106;
+	var insert = 107;
 }

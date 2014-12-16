@@ -3,10 +3,14 @@ import metahub.imperative.code.List;
 import metahub.imperative.types.Assignment;
 import metahub.imperative.types.Block;
 import metahub.imperative.code.Reference;
+import metahub.imperative.types.Class_Definition;
+import metahub.imperative.types.Condition;
 import metahub.imperative.types.Expression;
 import metahub.imperative.types.Flow_Control;
 import metahub.imperative.types.Function_Call;
 import metahub.imperative.types.Function_Definition;
+import metahub.imperative.types.Insert;
+import metahub.imperative.types.Namespace;
 import metahub.imperative.types.Parameter;
 import metahub.imperative.types.Parent_Class;
 import metahub.imperative.types.Property_Expression;
@@ -25,7 +29,8 @@ typedef Rail_Additional = {
 	?name:String,
 	?is_external:Bool,
 	?source_file:String,
-	?class_export:String
+	?class_export:String,
+	?inserts:Dynamic
 }
 
 class Rail {
@@ -46,6 +51,7 @@ class Rail {
 	public var property_additional = new Map<String, Property_Addition>();
 	public var class_export:String = "";
 	public var code:Block;
+	var inserts:Dynamic;
 	var blocks = new Map<String, Array<metahub.imperative.types.Expression>>();
 	var zones = new Array<Zone>();
 	public var functions = new Array<Function_Definition>();
@@ -76,7 +82,10 @@ class Rail {
 
 		if (Reflect.hasField(map, 'source_file'))
 			source_file = map.source_file;
-
+			
+		if (Reflect.hasField(map, 'inserts'))
+			inserts = map.inserts;
+			
 		if (Reflect.hasField(map, 'class_export'))
 			class_export = map.class_export;
 
@@ -143,25 +152,21 @@ class Rail {
 	}
 
 	public function generate_code1() {
-		var class_definition = {
-			"type": Expression_Type.class_definition,
-			"rail": this,
-			"statements": []
-		}
+		var definition = new Class_Definition(this, []);
+		var statements = [];
+		var zone = create_zone(statements);
+		zone.divide("..pre");
+		var mid = zone.divide(null, [
+			new Namespace(region, [ definition ])
+		]);
+		zone.divide("..post");
 		
 		code = {
 			type: "block",
-			statements: [
-				{
-					type: Expression_Type.namespace,
-					region: region,
-					statements: [ class_definition ]
-				}
-			]
+			statements: statements
 		};
 
-		var statements = class_definition.statements;
-		blocks["/"] = statements;
+		blocks["/"] = definition.expressions;
 	}
 	
 	public function generate_code2() {
@@ -176,6 +181,13 @@ class Rail {
 				var definition = generate_setter(tie);
 				if (definition != null)
 					statements.push(definition);
+			}
+		}
+		
+		if (inserts != null) {
+			for (path in Reflect.fields(inserts)) {
+				var lines:Array<String> = Reflect.field(inserts, path);
+				concat_block(path, cast lines.map(function(s) return new Insert(s)));
 			}
 		}
 	}
@@ -219,10 +231,10 @@ class Rail {
 		var zone = create_zone(result.block);
 		var pre = zone.divide(tie.tie_name + "_set_pre");
 		
-		var mid = zone.divide([
-			new Flow_Control("if", { operator: "==", expressions: [
+		var mid = zone.divide(null, [
+			new Flow_Control("if", new Condition("==", [
 					new Property_Expression(tie), new Variable("value")
-				]},
+				]),
 				[
 					new Statement("return")
 			]),

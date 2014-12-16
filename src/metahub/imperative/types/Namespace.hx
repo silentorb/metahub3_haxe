@@ -5,7 +5,14 @@ import metahub.imperative.schema.Region;
  * @author Christopher W. Johnson
  */
 
-typedef Namespace ={
-		region:Region,
-		block:Block
+class Namespace extends Expression {
+	public var region:Region;
+	public var expressions:Array<Expression>;
+	
+	public function new(region:Region, block:Array<Expression>) 
+	{
+		super(Expression_Type.namespace);
+		this.region = region;
+		this.expressions = block;
+	}
 }

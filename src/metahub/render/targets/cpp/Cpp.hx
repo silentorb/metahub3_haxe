@@ -3,6 +3,7 @@ import haxe.Timer;
 import metahub.imperative.schema.Rail;
 import metahub.imperative.schema.Railway;
 import metahub.imperative.schema.Region;
+import metahub.imperative.types.Insert;
 import metahub.imperative.types.Null_Value;
 import metahub.imperative.types.Path;
 import metahub.imperative.types.Variable;
@@ -86,9 +87,9 @@ class Cpp extends Target{
 		func.return_type = null;
 		root.push(func);
 		func = new Function_Definition("~" + rail.rail_name, rail, [],
-			cast references.map(function(tie) return new Function_Call("SAFE_DELETE",
-				[new Property_Expression(tie)])
-			)
+		[]	//cast references.map(function(tie) return new Function_Call("SAFE_DELETE",
+				//[new Property_Expression(tie)])
+			//)
 		);
 		func.return_type = null;
 		root.push(func);
@@ -148,11 +149,11 @@ class Cpp extends Target{
 		switch(type) {
 			case Expression_Type.namespace:
 				return render_region(statement.region, function() {
-					return render_statements(statement.statements);
+					return render_statements(statement.expressions);
 				});
 
 			case Expression_Type.class_definition:
-				return class_definition(statement.rail, statement.statements);
+				return class_definition(statement.rail, statement.expressions);
 
 			case Expression_Type.function_definition:
 				return render_function_definition(statement);
@@ -172,6 +173,10 @@ class Cpp extends Target{
 			case Expression_Type.statement:
 				var s:Statement = cast statement;
 				return line(s.name + ";");
+
+			case Expression_Type.insert:
+				var insert:Insert = cast statement;
+				return line(insert.code);
 
 			default:
 				return line(render_expression(statement) + ";");
@@ -426,8 +431,11 @@ class Cpp extends Target{
 	}
 
 	function render_signature(signature:Signature, is_parameter = false):String {
-		if (signature.rail == null)
-			return Reflect.field(types, signature.type.to_string());
+		if (signature.rail == null) {
+			return signature.type == Kind.reference
+				? "void*"
+				: Reflect.field(types, signature.type.to_string());
+		}
 
 		var name = get_rail_type_string(signature.rail);
 		if (signature.type == Kind.reference) {

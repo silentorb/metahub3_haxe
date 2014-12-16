@@ -18,32 +18,32 @@ import metahub.imperative.code.Parse;
 {
 	public var railway:Railway;
 	public var constraints = new Array<Constraint>();
-	
-	public function new(hub:Hub, target_name:String) 
+
+	public function new(hub:Hub, target_name:String)
 	{
 		railway = new Railway(hub, target_name);
 	}
-	
+
 	public function run(root:Expression, target:Target) {
 		process(root, null);
 		generate_code(target);
-		
+
 		for (constraint in constraints) {
 			implement_constraint(constraint);
 		}
-		
+
 		flatten();
 	}
-	
+
 	public function generate_code(target:Target) {
 		for (region in railway.regions) {
 			if (region.is_external)
 				continue;
-				
+
 			for (rail in region.rails) {
 				if (rail.is_external)
 					continue;
-				
+
 				rail.generate_code1();
 				target.generate_rail_code(rail);
 				rail.generate_code2();
@@ -55,7 +55,7 @@ import metahub.imperative.code.Parse;
 		for (region in railway.regions) {
 			if (region.is_external)
 				continue;
-				
+
 			for (rail in region.rails) {
 				if (rail.is_external)
 					continue;
@@ -64,7 +64,7 @@ import metahub.imperative.code.Parse;
 			}
 		}
 	}
-	
+
 	public function process(expression:Expression, scope:Scope) {
 		switch(expression.type) {
 			case metahub.meta.types.Expression_Type.scope:
@@ -109,7 +109,7 @@ import metahub.imperative.code.Parse;
 
 	public function implement_constraint(constraint:Constraint) {
 		var tie = Parse.get_end_tie(constraint.reference);
-		
+
 		if (tie.type == Kind.list) {
 			List.generate_constraint(constraint);
 		}
@@ -117,7 +117,7 @@ import metahub.imperative.code.Parse;
 			tie.rail.concat_block(tie.tie_name + "_set_pre", Reference.constraint(constraint));
 		}
 	}
-	
+
 	public function translate(expression:metahub.meta.types.Expression):Expression {
 		switch(expression.type) {
 			case metahub.meta.types.Expression_Type.literal:
@@ -127,10 +127,10 @@ import metahub.imperative.code.Parse;
 			case metahub.meta.types.Expression_Type.function_call:
 				var func:metahub.meta.types.Function_Call = cast expression;
 				return new Function_Call(func.name, [translate(func.input)]);
-				
+
 			case metahub.meta.types.Expression_Type.path:
 				return convert_path(cast expression);
-				
+
 			case metahub.meta.types.Expression_Type.block:
 				var array:metahub.meta.types.Block = cast expression;
 				return new Create_Array(array.children.map(function(e) return translate(e)));
@@ -138,10 +138,8 @@ import metahub.imperative.code.Parse;
 			default:
 				throw new Exception("Cannot convert expression " + expression.type + ".");
 		}
-		
-		
 	}
-	
+
 	public function convert_path(expression:metahub.meta.types.Path):Expression {
 		var path = expression.children;
 		var result = new Array<metahub.imperative.types.Expression>();

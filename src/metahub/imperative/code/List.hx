@@ -22,10 +22,10 @@ class List
 		var mid = zone.divide(null, [
 			new Property_Expression(tie,
 				new Function_Call("add", [ new Variable("item") ], true)
-			)		
+			)
 		]);
 		var post = zone.divide(function_name + "_post");
-				
+
 		if (tie.other_tie != null) {
 			//throw "";
 			mid.push(
@@ -33,10 +33,10 @@ class List
 				"=", new Self())
 			);
 		}
-		
+
 		rail.add_to_block("/", definition);
 	}
-	
+
 	public static function generate_constraint(constraint:Constraint) {
 		var path:Path = cast constraint.reference;
 		var property_expression:Property_Expression = cast path.children[0];
@@ -51,36 +51,53 @@ class List
 				return;
 			}
 		}
-			
+
 		size(constraint, expression);
 	}
-	
+
 	public static function map(constraint:Constraint, expression:Expression) {
 		var start = Parse.get_start_tie(constraint.reference);
 		var end = Parse.get_end_tie(constraint.reference);
 		var func:Function_Call = cast constraint.expression;
 		var array:Create_Array = func.args[0];
-		var other:Tie = cast Parse.get_end_tie(array.children[0]);
-		var item_name = other.rail.name.toLowerCase() + "_item";
-		end.rail.concat_block(end.tie_name + "_add_post", [
-			new Declare_Variable(item_name, other.get_other_signature(), new Instantiate(other.other_rail)),
-			new Variable(item_name, new Function_Call("initialize")),
-			new Property_Expression(start.other_tie, 
-				new Function_Call(other.tie_name + "_add", 
-					[new Variable(item_name)])
-			)			
-		]);
+		var first:Tie = cast Parse.get_start_tie(array.children[0]);
+
+		link(constraint.reference, array.children[0]);
+		link(array.children[0], constraint.reference);
 	}
-	
-	public static function link() {
-		
+
+	public static function link(a:Expression, b:Expression) {
+		var start = Parse.get_start_tie(a);
+		var end = Parse.get_end_tie(a);
+		var first:Tie = cast Parse.get_start_tie(b);
+		var second:Tie = cast Parse.get_end_tie(b);
+
+		var item_name = second.rail.name.toLowerCase() + "_item";
+		var block = [
+			new Declare_Variable(item_name, second.get_other_signature(), new Instantiate(second.other_rail)),
+			new Variable(item_name, new Function_Call("initialize")),
+			new Property_Expression(first,
+				new Function_Call(second.tie_name + "_add",
+					[new Variable(item_name)])
+			)
+		];
+
+		if (start.other_tie.property.allow_null) {
+			block = [
+				new Flow_Control("if",
+					{ operator: "!=", expressions: [ new Property_Expression(start.other_tie),
+					new Null_Value() ] }, block
+				)
+			];
+		}
+		end.rail.concat_block(end.tie_name + "_add_post", block);
 	}
 
 	public static function size(constraint:Constraint, expression:Expression) {
 		var path:Path = cast constraint.reference;
 		var property_expression:Property_Expression = cast path.children[0];
 		var reference = property_expression.tie;
-		
+
 		var instance_name = reference.other_rail.rail_name;
 		var rail = reference.other_rail;
 		var local_rail:Rail = reference.rail;
@@ -99,11 +116,9 @@ class List
 					is_value: false
 			}, new Instantiate(rail)),
 			new Variable(child, new Function_Call("initialize")),
-			new Function_Call(reference.tie_name + "_add", 
+			new Function_Call(reference.tie_name + "_add",
 				[new Variable(child)])
-
 	]);
-		
 
 		local_rail.add_to_block("initialize", flow_control);
 	}

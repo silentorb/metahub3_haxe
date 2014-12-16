@@ -3,7 +3,7 @@ import haxe.Timer;
 import metahub.imperative.schema.Rail;
 import metahub.imperative.schema.Railway;
 import metahub.imperative.schema.Region;
-import metahub.imperative.types.Null;
+import metahub.imperative.types.Null_Value;
 import metahub.imperative.types.Path;
 import metahub.imperative.types.Variable;
 import metahub.meta.types.Literal;
@@ -57,7 +57,7 @@ class Cpp extends Target{
 			for (rail in region.rails) {
 				if (rail.is_external)
 					continue;
-					
+
 				//trace(rail.namespace.fullname);
 				var namespace = Generator.get_namespace_path(rail.region);
 				var dir = output_folder + "/" + namespace.join('/');
@@ -69,7 +69,7 @@ class Cpp extends Target{
 			}
 		}
 	}
-	
+
 	override function generate_rail_code(rail:Rail) {
 		var root = rail.get_block("/");
 		var references = new Array<Tie>();
@@ -77,10 +77,10 @@ class Cpp extends Target{
 			if (tie.type == Kind.reference && !tie.is_value)
 				references.push(tie);
 		}
-		
-		var func = new Function_Definition(rail.rail_name, rail, [], 
+
+		var func = new Function_Definition(rail.rail_name, rail, [],
 			cast references.map(function(tie) return new Assignment(
-				new Property_Expression(tie), "=", new Null())
+				new Property_Expression(tie), "=", new Null_Value())
 			)
 		);
 		func.return_type = null;
@@ -192,7 +192,7 @@ class Cpp extends Target{
 		var lines = false;
 		var result = "";
 		var regions = new Map<String, {region:Region, dependencies:Array<Rail>}>();
-		
+
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
 			if (d.allow_ambient && dependency.region != rail.region) {
@@ -206,10 +206,10 @@ class Cpp extends Target{
 				lines = true;
 			}
 		}
-		
+
 		for (r in regions) {
 			result += render_region(r.region, function()
-				return r.dependencies.map(function(d) 
+				return r.dependencies.map(function(d)
 					return line("class " + d.rail_name + ";"))
 					.join("")
 			);
@@ -220,7 +220,7 @@ class Cpp extends Target{
 
 		return result;
 	}
-	
+
 	function render_inner_dependencies(rail:Rail):String {
 		var lines = false;
 		var result = "";
@@ -349,7 +349,7 @@ class Cpp extends Target{
 			//if (tie.has_setter())
 				//declarations.push(line(render_signature_old('set_' + tie.tie_name, tie) + ';'));
 		//}
-		
+
 		for (func in rail.functions) {
 			declarations.push(render_function_declaration(func));
 		}
@@ -416,7 +416,7 @@ class Cpp extends Target{
 		var right = name + '(' + get_property_type_string(tie, true) + ' value)';
 		return 'void ' + right;
 	}
-	
+
 	function render_function_declaration(definition:Function_Definition):String {
 		return line((definition.return_type != null ? "virtual " : "")
 		+ (definition.return_type != null ? render_signature(definition.return_type) + " " : "")
@@ -465,7 +465,7 @@ class Cpp extends Target{
 		var lines = line_count;
 		var block = render_statements(statements);
 		unindent();
-	
+
 		if (minimal) {
 			minimal = line_count == lines + 1;
 		}
@@ -534,10 +534,10 @@ class Cpp extends Target{
 
 			case Expression_Type.instantiate:
 				result = render_instantiation(cast expression);
-				
+
 			case Expression_Type.self:
 				result = "this";
-			
+
 			case Expression_Type.null_value:
 				return "NULL";
 

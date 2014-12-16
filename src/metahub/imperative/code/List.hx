@@ -79,15 +79,16 @@ class List
 		var second_end = b[b.length - 1];
 
 		var item_name = second_end.rail.name.toLowerCase() + "_item";
-		var block = [
-				new Flow_Control("if", new Condition("==", [
-				new Variable("origin"), new Self()]), [ new Statement("return") ]),
-			new Declare_Variable(item_name, second_end.get_other_signature(), new Instantiate(second_end.other_rail)),
-			new Variable(item_name, new Function_Call("initialize")),
-			new Property_Expression(c[0],
-				new Function_Call(second_end.tie_name + "_add",
-					[new Variable(item_name), new Self()])
-			)
+		var block:Array<Expression> = [
+				new Flow_Control("if", new Condition("!=", [
+				new Variable("origin"), new Property_Expression(c[0])]), [
+					new Declare_Variable(item_name, second_end.get_other_signature(), new Instantiate(second_end.other_rail)),
+					new Variable(item_name, new Function_Call("initialize")),
+					new Property_Expression(c[0],
+						new Function_Call(second_end.tie_name + "_add",
+							[new Variable(item_name), new Self()])
+					)				
+				])
 		];
 
 		if (a_start.other_tie.property.allow_null) {
@@ -123,7 +124,7 @@ class List
 			}, new Instantiate(rail)),
 			new Variable(child, new Function_Call("initialize")),
 			new Function_Call(reference.tie_name + "_add",
-				[new Variable(child), new Self()])
+				[new Variable(child), new Null_Value()])
 	]);
 
 		local_rail.add_to_block("initialize", flow_control);

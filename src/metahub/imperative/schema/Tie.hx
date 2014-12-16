@@ -30,7 +30,7 @@ class Tie {
 		this.property = property;
 		tie_name = name = property.name;
 	}
-	
+
 	public function initialize_links() {
 		if (property.other_trellis != null) {
 			other_rail = rail.railway.get_rail(property.other_trellis);
@@ -50,7 +50,7 @@ class Tie {
 
 	public function has_setter() {
 		return (property.type != Kind.list && constraints.length > 0)
-		|| has_set_post_hook;
+		|| has_set_post_hook || (property.type == Kind.reference && !is_inherited());
 	}
 
 	public function get_setter_post_name() {
@@ -64,19 +64,23 @@ class Tie {
 			is_value: is_value
 		};
 	}
-	
+
 	public function get_other_signature():Signature {
 		if (other_rail == null)
 			throw new Exception("get_other_signature() can only be called on lists or references.");
-			
+
 		var other_type = other_tie != null
 		? other_tie.type
 		: type == Kind.list ? Kind.reference : Kind.list;
-			
+
 		return {
 			type: other_type,
 			rail: other_rail,
 			is_value: is_value
 		};
+	}
+
+	public function is_inherited():Bool {
+		return rail.parent != null && rail.parent.all_ties.exists(name);
 	}
 }

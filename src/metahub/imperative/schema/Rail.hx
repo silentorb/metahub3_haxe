@@ -14,6 +14,7 @@ import metahub.imperative.types.Namespace;
 import metahub.imperative.types.Parameter;
 import metahub.imperative.types.Parent_Class;
 import metahub.imperative.types.Property_Expression;
+import metahub.imperative.types.Self;
 import metahub.imperative.types.Statement;
 import metahub.imperative.types.Variable;
 import metahub.schema.Trellis;
@@ -82,10 +83,10 @@ class Rail {
 
 		if (Reflect.hasField(map, 'source_file'))
 			source_file = map.source_file;
-			
+
 		if (Reflect.hasField(map, 'inserts'))
 			inserts = map.inserts;
-			
+
 		if (Reflect.hasField(map, 'class_export'))
 			class_export = map.class_export;
 
@@ -131,11 +132,11 @@ class Rail {
 
 		//generate_code();
 	}
-	
+
 	public function process2() {
 		for (tie in all_ties) {
 			tie.initialize_links();
-		}		
+		}
 	}
 
 	function add_dependency(rail:Rail):Dependency {
@@ -144,7 +145,7 @@ class Rail {
 
 		return dependencies[rail.name];
 	}
-	
+
 	public function flatten() {
 		for (zone in zones) {
 			zone.flatten();
@@ -160,7 +161,7 @@ class Rail {
 			new Namespace(region, [ definition ])
 		]);
 		zone.divide("..post");
-		
+
 		code = {
 			type: "block",
 			statements: statements
@@ -168,7 +169,7 @@ class Rail {
 
 		blocks["/"] = definition.expressions;
 	}
-	
+
 	public function generate_code2() {
 		var statements = blocks["/"];
 		statements.push(generate_initialize());
@@ -183,7 +184,7 @@ class Rail {
 					statements.push(definition);
 			}
 		}
-		
+
 		if (inserts != null) {
 			for (path in Reflect.fields(inserts)) {
 				var lines:Array<String> = Reflect.field(inserts, path);
@@ -191,29 +192,29 @@ class Rail {
 			}
 		}
 	}
-	
+
 	public function get_block(path:String) {
 		if (!blocks.exists(path)) {
 		}
-		
+
 		if (!blocks.exists(path))
 			throw new Exception("Invalid rail block: " + path + ".");
-		
+
 		return blocks[path];
 	}
-	
+
 	public function add_to_block(path:String, code:Expression) {
 		var block = get_block(path);
 		block.push(code);
 	}
-	
+
 	public function concat_block(path:String, code:Array<Expression>) {
 		var block = get_block(path);
 		for (expression in code) {
 			block.push(expression);
 		}
 	}
-	
+
 	public function create_zone(target = null) {
 		var zone = new Zone(target, blocks);
 		zones.push(zone);
@@ -227,10 +228,10 @@ class Rail {
 			var result = new Function_Definition('set_' + tie.tie_name, this, [
 				new Parameter("value", tie.get_signature())
 			], []);
-		
+
 		var zone = create_zone(result.block);
 		var pre = zone.divide(tie.tie_name + "_set_pre");
-		
+
 		var mid = zone.divide(null, [
 			new Flow_Control("if", new Condition("==", [
 					new Property_Expression(tie), new Variable("value")
@@ -240,7 +241,19 @@ class Rail {
 			]),
 			new Assignment(new Property_Expression(tie), "=", new Variable("value"))
 		]);
-		
+		if (tie.type == Kind.reference && tie.other_tie != null) {
+			if (tie.other_tie.type == Kind.reference) {
+				mid.push(new Property_Expression(tie,
+					new Function_Call("set_" + tie.other_tie.tie_name, [new Self()]))
+				);
+			}
+			else {
+				mid.push(new Property_Expression(tie,
+					new Function_Call(tie.other_tie.tie_name + "_add", [new Self(), new Self()]))
+				);
+			}
+		}
+
 		var post = zone.divide(tie.tie_name + "_set_post");
 
 		if (tie.has_set_post_hook) {
@@ -249,11 +262,11 @@ class Rail {
 				]
 			));
 		}
-			
+
 		return result;
 
 	}
-	
+
 	public function generate_initialize():Function_Definition {
 		var block = [];
 		blocks["initialize"] = block;
@@ -267,7 +280,7 @@ class Rail {
 			block.push(new Function_Call("initialize_post"));
 		}
 
-		return new Function_Definition("initialize", this, [], block);		
+		return new Function_Definition("initialize", this, [], block);
 	}
-	
+
 }

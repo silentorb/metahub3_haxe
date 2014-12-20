@@ -1,5 +1,5 @@
 package metahub.imperative.types ;
-import metahub.imperative.schema.Rail;
+import metahub.logic.schema.Rail;
 import metahub.schema.Kind;
 
 /**

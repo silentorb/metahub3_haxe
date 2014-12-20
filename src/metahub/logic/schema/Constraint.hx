@@ -1,5 +1,6 @@
-package metahub.imperative.schema ;
-import metahub.imperative.schema.Railway;
+package metahub.logic.schema ;
+import metahub.imperative.Imp;
+import metahub.logic.schema.Railway;
 import metahub.imperative.types.Expression_Type;
 import metahub.imperative.types.Signature;
 import metahub.meta.Scope;

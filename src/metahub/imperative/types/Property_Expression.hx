@@ -1,5 +1,5 @@
 package metahub.imperative.types;
-import metahub.imperative.schema.Tie;
+import metahub.logic.schema.Tie;
 
 /**
  * ...

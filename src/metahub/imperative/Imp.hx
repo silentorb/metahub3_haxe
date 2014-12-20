@@ -2,6 +2,7 @@ package metahub.imperative;
 import metahub.imperative.code.Reference;
 import metahub.imperative.code.List;
 import metahub.imperative.schema.*;
+import metahub.logic.schema.*;
 import metahub.meta.Scope;
 import metahub.imperative.types.*;
 import metahub.meta.types.Scope_Expression;
@@ -96,7 +97,7 @@ import metahub.imperative.code.Parse;
 
 	function create_constraint(expression:metahub.meta.types.Constraint, scope:Scope) {
 		var rail = get_rail(scope.trellis);
-		var constraint = new metahub.imperative.schema.Constraint(expression, this, scope);
+		var constraint = new metahub.logic.schema.Constraint(expression, this, scope);
 		var tie = Parse.get_end_tie(constraint.reference);
 		trace('tie', tie.rail.name + "." + tie.name);
 		tie.constraints.push(constraint);
@@ -162,4 +163,5 @@ import metahub.imperative.code.Parse;
 		}
 		return new metahub.imperative.types.Path(result);
 	}
+		
 }

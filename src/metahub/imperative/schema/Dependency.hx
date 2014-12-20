@@ -1,4 +1,5 @@
 package metahub.imperative.schema ;
+import metahub.logic.schema.Rail;
 
 /**
  * ...

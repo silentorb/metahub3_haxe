@@ -1,6 +1,6 @@
 package metahub.render ;
-import metahub.imperative.schema.Rail;
-import metahub.imperative.schema.Railway;
+import metahub.logic.schema.Rail;
+import metahub.logic.schema.Railway;
 import metahub.render.Renderer;
 
 /**

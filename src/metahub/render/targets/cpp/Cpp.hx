@@ -1,15 +1,16 @@
 package metahub.render.targets.cpp ;
 import haxe.Timer;
-import metahub.imperative.schema.Rail;
-import metahub.imperative.schema.Railway;
-import metahub.imperative.schema.Region;
+import metahub.imperative.schema.Dungeon;
+import metahub.logic.schema.Rail;
+import metahub.logic.schema.Railway;
+import metahub.logic.schema.Region;
 import metahub.imperative.types.Insert;
 import metahub.imperative.types.Null_Value;
 import metahub.imperative.types.Path;
 import metahub.imperative.types.Variable;
 import metahub.meta.types.Literal;
 import metahub.imperative.types.Property_Expression;
-import metahub.imperative.schema.Tie;
+import metahub.logic.schema.Tie;
 import metahub.Hub;
 import metahub.imperative.types.Assignment;
 import metahub.imperative.types.Block;
@@ -40,6 +41,7 @@ class Cpp extends Target{
 	var current_rail:Rail;
 	var scopes = new Array<Map<String, Signature>>();
 	var current_scope:Map<String, Signature>;
+	var dungeon:Dungeon;
 
 	static var types = {
 		"string": "std::string",

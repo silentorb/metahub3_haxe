@@ -1,4 +1,4 @@
-package metahub.imperative.schema ;
+package metahub.logic.schema ;
 import metahub.schema.Namespace;
 
 /**

@@ -1,5 +1,5 @@
 package metahub.imperative.code;
-import metahub.imperative.schema.Tie;
+import metahub.logic.schema.Tie;
 import metahub.imperative.types.Function_Call;
 import metahub.imperative.types.Path;
 import metahub.imperative.types.Expression;

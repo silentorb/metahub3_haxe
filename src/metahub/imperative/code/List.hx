@@ -1,8 +1,8 @@
 package metahub.imperative.code;
 import metahub.imperative.Imp;
-import metahub.imperative.schema.Constraint;
-import metahub.imperative.schema.Rail;
-import metahub.imperative.schema.Tie;
+import metahub.logic.schema.Constraint;
+import metahub.logic.schema.Rail;
+import metahub.logic.schema.Tie;
 import metahub.imperative.types.*;
 import metahub.schema.Kind;
 

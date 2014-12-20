@@ -1,4 +1,5 @@
 package metahub.render.targets.haxe ;
+import metahub.imperative.Imp;
 import metahub.logic.schema.Railway;
 import metahub.Hub;
 import metahub.schema.Namespace;
@@ -9,8 +10,8 @@ import metahub.schema.Namespace;
  */
 class Haxe_Target extends Target{
 
-	public function new(railway:Railway) {
-		super(railway);
+	public function new(railway:Railway, imp:Imp) {
+		super(railway, imp);
 	}
 
 	override public function run(output_folder:String) {

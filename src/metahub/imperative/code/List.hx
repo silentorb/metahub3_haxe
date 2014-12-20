@@ -12,15 +12,17 @@ import metahub.schema.Kind;
  */
 class List
 {
-	public static function common_functions(tie:Tie) {
+	public static function common_functions(tie:Tie, imp:Imp) {
 		var rail = tie.rail;
+		var dungeon = imp.get_dungeon(tie.rail);
+		
 		var function_name = tie.tie_name + "_add";
-		var definition = new Function_Definition(function_name, rail, [
+		var definition = new Function_Definition(function_name, dungeon, [
 			new Parameter("item", tie.get_other_signature()),
 			new Parameter("origin", { type: Kind.reference, rail: null })
 			], []);
 
-		var zone = rail.create_zone(definition.block);
+		var zone = dungeon.create_zone(definition.block);
 		var mid = zone.divide(null, [
 			new Property_Expression(tie,
 				new Function_Call("add", [ new Variable("item") ], true)
@@ -36,10 +38,10 @@ class List
 			);
 		}
 
-		rail.add_to_block("/", definition);
+		dungeon.add_to_block("/", definition);
 	}
 
-	public static function generate_constraint(constraint:Constraint) {
+	public static function generate_constraint(constraint:Constraint, imp:Imp) {
 		var path:Path = cast constraint.reference;
 		var property_expression:Property_Expression = cast path.children[0];
 		var reference = property_expression.tie;
@@ -49,15 +51,15 @@ class List
 		if (constraint.expression.type == Expression_Type.function_call) {
 			var func:metahub.meta.types.Function_Call = cast constraint.expression;
 			if (func.name == "map") {
-				map(constraint, expression);
+				map(constraint, expression, imp);
 				return;
 			}
 		}
 
-		size(constraint, expression);
+		size(constraint, expression, imp);
 	}
 
-	public static function map(constraint:Constraint, expression:Expression) {
+	public static function map(constraint:Constraint, expression:Expression, imp:Imp) {
 		var start = Parse.get_start_tie(constraint.reference);
 		var end = Parse.get_end_tie(constraint.reference);
 		var func:Function_Call = cast constraint.expression;
@@ -67,11 +69,11 @@ class List
 		var a = Parse.get_path(constraint.reference);
 		var b = Parse.get_path(array.children[0]);
 
-		link(a, b, Parse.reverse_path(b.slice(0, a.length - 1)));
-		link(b, a, a.slice(0, a.length - 1));
+		link(a, b, Parse.reverse_path(b.slice(0, a.length - 1)), imp);
+		link(b, a, a.slice(0, a.length - 1), imp);
 	}
 
-	public static function link(a:Array<Tie>, b:Array<Tie>, c:Array<Tie>) {
+	public static function link(a:Array<Tie>, b:Array<Tie>, c:Array<Tie>, imp:Imp) {
 		var a_start = a[0];
 		var a_end = a[a.length - 1];
 		
@@ -99,10 +101,10 @@ class List
 				)
 			];
 		}
-		a_end.rail.concat_block(a_end.tie_name + "_add_post", block);
+		imp.get_dungeon(a_end.rail).concat_block(a_end.tie_name + "_add_post", block);
 	}
 
-	public static function size(constraint:Constraint, expression:Expression) {
+	public static function size(constraint:Constraint, expression:Expression, imp:Imp) {
 		var path:Path = cast constraint.reference;
 		var property_expression:Property_Expression = cast path.children[0];
 		var reference = property_expression.tie;
@@ -126,8 +128,7 @@ class List
 			new Function_Call(reference.tie_name + "_add",
 				[new Variable(child), new Null_Value()])
 	]);
-
-		local_rail.add_to_block("initialize", flow_control);
+		imp.get_dungeon(local_rail).add_to_block("initialize", flow_control);
 	}
 
 }

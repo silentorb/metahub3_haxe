@@ -1,5 +1,6 @@
 package metahub.render.targets.cpp ;
 import haxe.Timer;
+import metahub.imperative.Imp;
 import metahub.imperative.schema.Dungeon;
 import metahub.logic.schema.Rail;
 import metahub.logic.schema.Railway;
@@ -41,7 +42,7 @@ class Cpp extends Target{
 	var current_rail:Rail;
 	var scopes = new Array<Map<String, Signature>>();
 	var current_scope:Map<String, Signature>;
-	var dungeon:Dungeon;
+	var current_dungeon:Dungeon;
 
 	static var types = {
 		"string": "std::string",
@@ -51,8 +52,8 @@ class Cpp extends Target{
 		"none": "void"
 	}
 
-	public function new(railway:Railway) {
-		super(railway);
+	public function new(railway:Railway, imp:Imp) {
+		super(railway, imp);
 	}
 
 	override public function run(output_folder:String) {
@@ -67,28 +68,30 @@ class Cpp extends Target{
 				Utility.create_folder(dir);
 
 				line_count = 0;
-				create_header_file(rail, namespace, dir);
-				create_class_file(rail, namespace, dir);
+				var dungeon = imp.get_dungeon(rail);
+				create_header_file(dungeon, namespace, dir);
+				create_class_file(dungeon, namespace, dir);
 			}
 		}
 	}
 
-	override function generate_rail_code(rail:Rail) {
-		var root = rail.get_block("/");
+	override function generate_rail_code(dungeon:Dungeon) {
+		var rail = dungeon.rail;
+		var root = dungeon.get_block("/");
 		var references = new Array<Tie>();
 		for (tie in rail.core_ties) {
 			if (tie.type == Kind.reference && !tie.is_value)
 				references.push(tie);
 		}
 
-		var func = new Function_Definition(rail.rail_name, rail, [],
+		var func = new Function_Definition(rail.rail_name, dungeon, [],
 			cast references.map(function(tie) return new Assignment(
 				new Property_Expression(tie), "=", new Null_Value())
 			)
 		);
 		func.return_type = null;
 		root.push(func);
-		func = new Function_Definition("~" + rail.rail_name, rail, [],
+		func = new Function_Definition("~" + rail.rail_name, dungeon, [],
 		[]	//cast references.map(function(tie) return new Function_Call("SAFE_DELETE",
 				//[new Property_Expression(tie)])
 			//)
@@ -107,7 +110,8 @@ class Cpp extends Target{
 		current_scope = scopes[scopes.length - 1];
 	}
 
-	function create_header_file(rail:Rail, namespace, dir) {
+	function create_header_file(dungeon:Dungeon, namespace, dir) {
+		var rail = dungeon.rail;
 		var headers = [ "stdafx" ];
 
 		for (d in rail.dependencies) {
@@ -121,12 +125,13 @@ class Cpp extends Target{
 		+ render_includes(headers) + newline()
 		+ render_outer_dependencies(rail)
 		+ render_region(rail.region, function() {
-			return newline() + render_inner_dependencies(rail) + class_declaration(rail);
+			return newline() + render_inner_dependencies(rail) + class_declaration(dungeon);
 		});
 		Utility.create_file(dir + "/" + rail.name + ".h", result);
 	}
 
-	function create_class_file(rail:Rail, namespace, dir) {
+	function create_class_file(dungeon:Dungeon, namespace, dir) {
+		var rail = dungeon.rail;
 		scopes = [];
 		var headers = [ "stdafx", rail.source_file ];
 		for (d in rail.dependencies) {
@@ -137,7 +142,7 @@ class Cpp extends Target{
 		}
 		render = new Renderer();
 		var result = render_includes(headers) + newline()
-		+ render_statements(rail.code.statements);
+		+ render_statements(dungeon.code.statements);
 
 		Utility.create_file(dir + "/" + rail.name + ".cpp", result);
 	}
@@ -245,7 +250,8 @@ class Cpp extends Target{
 		return result;
 	}
 
-	function class_declaration(rail:Rail):String {
+	function class_declaration(dungeon:Dungeon):String {
+		var rail = dungeon.rail;
 		current_rail = rail;
 		var result = "";
 		var first = "class ";
@@ -265,7 +271,7 @@ class Cpp extends Target{
 			result += property_declaration(tie);
 		}
 
-		result += pad(render_function_declarations(rail))
+		result += pad(render_function_declarations(dungeon))
 		+ unindent().line("};");
 
 		current_rail = null;
@@ -339,15 +345,15 @@ class Cpp extends Target{
 		return render_signature(parameter.signature, true) + ' ' + parameter.name;
 	}
 
-	function render_function_declarations(rail:Rail):String {
+	function render_function_declarations(dungeon:Dungeon):String {
 		var declarations = [ ]
-			.concat(rail.stubs.map(function(s) return line(s)));
+			.concat(dungeon.rail.stubs.map(function(s) return line(s)));
 
-		if (rail.hooks.exists("initialize_post")) {
+		if (dungeon.rail.hooks.exists("initialize_post")) {
 			declarations.push(line("void initialize_post(); // Externally defined."));
 		}
 
-		for (tie in rail.all_ties) {
+		for (tie in dungeon.rail.all_ties) {
 			if (tie.has_set_post_hook)
 				declarations.push(line("void " + tie.get_setter_post_name() + "(" + get_property_type_string(tie, true) +  " value);"));
 		}
@@ -357,7 +363,7 @@ class Cpp extends Target{
 				//declarations.push(line(render_signature_old('set_' + tie.tie_name, tie) + ';'));
 		//}
 
-		for (func in rail.functions) {
+		for (func in dungeon.functions) {
 			declarations.push(render_function_declaration(func));
 		}
 

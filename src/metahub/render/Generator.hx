@@ -1,4 +1,5 @@
 package metahub.render ;
+import metahub.imperative.Imp;
 import metahub.render.targets.cpp.Cpp;
 import metahub.render.targets.haxe.Haxe_Target;
 import metahub.render.Target;
@@ -20,13 +21,13 @@ import metahub.schema.Namespace;
 		this.hub = hub;
 	}
 	
-	public function create_target(railway:Railway, target_name:String):Target {
+	public function create_target(imp:Imp, target_name:String):Target {
 		switch(target_name) {
 			case "cpp":
-				return new Cpp(railway);
+				return new Cpp(imp.railway, imp);
 
 			case "haxe":
-				return new Haxe_Target(railway);
+				return new Haxe_Target(imp.railway, imp);
 				
 			default:
 				throw new Exception("Unsupported target: " + target_name + ".");

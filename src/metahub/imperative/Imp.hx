@@ -19,6 +19,8 @@ import metahub.imperative.code.Parse;
 {
 	public var railway:Railway;
 	public var constraints = new Array<Constraint>();
+	public var dungeons = new Array<Dungeon>();
+	var rail_map = new Map<Rail, Dungeon>();
 
 	public function new(hub:Hub, target_name:String)
 	{
@@ -37,6 +39,7 @@ import metahub.imperative.code.Parse;
 	}
 
 	public function generate_code(target:Target) {
+		
 		for (region in railway.regions) {
 			if (region.is_external)
 				continue;
@@ -44,26 +47,28 @@ import metahub.imperative.code.Parse;
 			for (rail in region.rails) {
 				if (rail.is_external)
 					continue;
-
-				rail.generate_code1();
-				target.generate_rail_code(rail);
-				rail.generate_code2();
+				
+				var dungeon = new Dungeon(rail, this);
+				dungeons.push(dungeon);
+				rail_map[rail] = dungeon;
 			}
+		}
+		
+		for (dungeon in dungeons) {
+			dungeon.generate_code1();
+			target.generate_rail_code(dungeon);
+			dungeon.generate_code2();
 		}
 	}
 
 	public function flatten() {
-		for (region in railway.regions) {
-			if (region.is_external)
-				continue;
-
-			for (rail in region.rails) {
-				if (rail.is_external)
-					continue;
-
-				rail.flatten();
-			}
+		for (dungeon in dungeons) {
+			dungeon.flatten();
 		}
+	}
+	
+	public function get_dungeon(rail:Rail):Dungeon {
+		return rail_map[rail];
 	}
 
 	public function process(expression:Expression, scope:Scope) {
@@ -112,10 +117,11 @@ import metahub.imperative.code.Parse;
 		var tie = Parse.get_end_tie(constraint.reference);
 
 		if (tie.type == Kind.list) {
-			List.generate_constraint(constraint);
+			List.generate_constraint(constraint, this);
 		}
 		else {
-			tie.rail.concat_block(tie.tie_name + "_set_pre", Reference.constraint(constraint));
+			var dungeon = get_dungeon(tie.rail);
+			dungeon.concat_block(tie.tie_name + "_set_pre", Reference.constraint(constraint));
 		}
 	}
 

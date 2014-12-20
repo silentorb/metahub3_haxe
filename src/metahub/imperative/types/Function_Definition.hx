@@ -1,4 +1,5 @@
 package metahub.imperative.types ;
+import metahub.imperative.schema.Dungeon;
 import metahub.logic.schema.Rail;
 import metahub.schema.Kind;
 
@@ -11,9 +12,10 @@ class Function_Definition extends Expression {
 	public var parameters:Array<Parameter>;
 	public var block:Array<Expression>;
 	public var return_type:Signature;
+	public var dungeon:Dungeon;
 	public var rail:Rail;
 	
-	public function new(name:String, rail:Rail, parameters:Array<Parameter>,block:Array<Expression>,	return_type:Signature = null) {
+	public function new(name:String, dungeon:Dungeon, parameters:Array<Parameter>,block:Array<Expression>,	return_type:Signature = null) {
 		super(Expression_Type.function_definition);
 		this.name = name;
 		this.parameters = parameters;
@@ -22,8 +24,9 @@ class Function_Definition extends Expression {
 		? { type: Kind.none }
 		: return_type;
 		
-		this.rail = rail;
+		this.dungeon = dungeon;
+		this.rail = dungeon.rail;
 		if (rail != null)
-			rail.functions.push(this);
+			dungeon.functions.push(this);
 	}
 }

@@ -1,9 +1,12 @@
 package metahub.imperative.schema;
+import metahub.imperative.Imp;
 import metahub.imperative.types.*;
 import metahub.logic.schema.Rail;
 import metahub.logic.schema.Region;
 import metahub.logic.schema.Tie;
 import metahub.schema.Trellis;
+import metahub.schema.Kind;
+import metahub.imperative.code.List;
 
 /**
  * ...
@@ -19,10 +22,12 @@ class Dungeon
 	var blocks = new Map<String, Array<metahub.imperative.types.Expression>>();
 	var zones = new Array<Zone>();
 	public var functions = new Array<Function_Definition>();
+	public var imp:Imp;
 
-	public function new(rail:Rail) 
+	public function new(rail:Rail, imp:Imp) 
 	{
 		this.rail = rail;
+		this.imp = imp;
 		this.region = rail.region;
 		trellis = rail.trellis;
 		
@@ -40,7 +45,7 @@ class Dungeon
 	}
 	
 	public function generate_code1() {
-		var definition = new Class_Definition(this, []);
+		var definition = new Class_Definition(rail, []);
 		var statements = [];
 		var zone = create_zone(statements);
 		zone.divide("..pre");
@@ -61,9 +66,9 @@ class Dungeon
 		var statements = blocks["/"];
 		statements.push(generate_initialize());
 
-		for (tie in all_ties) {
+		for (tie in rail.all_ties) {
 			if (tie.type == Kind.list) {
-				List.common_functions(tie);
+				List.common_functions(tie, imp);
 			}
 			else {
 				var definition = generate_setter(tie);
@@ -118,7 +123,7 @@ class Dungeon
 		if (!tie.has_setter())
 			return null;
 
-			var result = new Function_Definition('set_' + tie.tie_name, rail, [
+			var result = new Function_Definition('set_' + tie.tie_name, this, [
 				new Parameter("value", tie.get_signature())
 			], []);
 
@@ -163,13 +168,13 @@ class Dungeon
 	public function generate_initialize():Function_Definition {
 		var block = [];
 		blocks["initialize"] = block;
-		if (parent != null) {
+		if (rail.parent != null) {
 			block.push(new Parent_Class(
 				new Function_Call("initialize")
 			));
 		}
 
-		if (hooks.exists("initialize_post")) {
+		if (rail.hooks.exists("initialize_post")) {
 			block.push(new Function_Call("initialize_post"));
 		}
 

@@ -1,17 +1,17 @@
 package metahub.meta.types;
-import metahub.schema.Property;
+import metahub.logic.schema.ITie;
 
 /**
  * ...
  * @author Christopher W. Johnson
  */
 class Property_Expression extends Expression {
-	public var property:Property;
+	public var tie:ITie;
 	
-	public function new(property:Property) 
+	public function new(tie:ITie) 
 	{
 		type = Expression_Type.property;
-		this.property = property;		
+		this.tie = tie;		
 	}
 	
 }

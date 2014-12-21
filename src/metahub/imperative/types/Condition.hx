@@ -11,5 +11,7 @@ class Condition {
 	public function new(operator:String, expressions:Dynamic) {
 		this.operator = operator;
 		this.expressions = expressions;
+		if (expressions[0].type == 7)
+		throw "";
 	}
 }

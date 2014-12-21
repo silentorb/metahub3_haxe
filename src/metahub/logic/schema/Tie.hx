@@ -1,5 +1,6 @@
 package metahub.logic.schema;
 import metahub.imperative.types.Signature;
+import metahub.meta.types.Expression;
 import metahub.schema.Property;
 import metahub.schema.Kind;
 import metahub.logic.schema.Constraint;
@@ -9,7 +10,7 @@ import metahub.logic.schema.Constraint;
  * @author Christopher W. Johnson
  */
 
-class Tie {
+class Tie implements ITie {
 
 	public var rail:Rail;
 	public var property:Property;
@@ -21,6 +22,7 @@ class Tie {
 	public var has_getter = false;
 	public var has_set_post_hook = false;
 	public var type:Kind;
+	public var range:IRange = null;
 
 	public var constraints = new Array<Constraint>();
 
@@ -82,5 +84,43 @@ class Tie {
 
 	public function is_inherited():Bool {
 		return rail.parent != null && rail.parent.all_ties.exists(name);
+	}
+	
+	public function finalize() {
+		determine_range();
+	}
+		
+	function determine_range() {
+		if (type != Kind.float)
+			return;
+			
+		var min:Constraint = null;
+		var max:Constraint = null;
+
+		for (constraint in constraints) {
+			if (constraint.operator == ">" || constraint.operator == ">=") {
+				min = constraint;
+			}
+			else if (constraint.operator == "<" || constraint.operator == "<=") {
+				max = constraint;
+			}			
+		}
+		
+		if (min != null && max != null) {
+			range = new Range_Float(get_expression_float(min.expression), get_expression_float(max.expression));
+		}
+	}
+	
+	static function get_expression_float(expression:Expression):Float{
+		var conversion:metahub.imperative.types.Literal = cast expression;
+		return conversion.value;
+	}
+	
+	public function get_abstract_rail():IRail {
+		return rail;
+	}
+	
+	public function fullname():String {
+		return rail.name + '.' + name;
 	}
 }

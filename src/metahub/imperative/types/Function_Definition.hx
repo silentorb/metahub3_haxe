@@ -7,23 +7,14 @@ import metahub.schema.Kind;
  * @author Christopher W. Johnson
  */
 
-class Function_Definition extends Expression {
+class Function_Definition extends Anonymous_Function {
 	public var name:String;
-	public var parameters:Array<Parameter>;
-	public var block:Array<Expression>;
-	public var return_type:Signature;
 	public var dungeon:Dungeon;
 	public var rail:Rail;
 	
-	public function new(name:String, dungeon:Dungeon, parameters:Array<Parameter>,block:Array<Expression>,	return_type:Signature = null) {
-		super(Expression_Type.function_definition);
+	public function new(name:String, dungeon:Dungeon, parameters:Array<Parameter>, block:Array<Expression>, return_type:Signature = null) {
+		super(parameters, block, return_type);		
 		this.name = name;
-		this.parameters = parameters;
-		this.block = block;
-		this.return_type = return_type == null
-		? { type: Kind.none }
-		: return_type;
-		
 		this.dungeon = dungeon;
 		this.rail = dungeon.rail;
 		if (rail != null)

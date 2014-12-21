@@ -125,7 +125,7 @@ typedef IProperty_Source = {
 			}
     }
   }
-
+	
 	//public function get_signature() {
 		//var result = new Type_Signature(type, other_trellis);
 //

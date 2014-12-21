@@ -1,10 +1,11 @@
 package metahub.imperative.code;
 import metahub.logic.schema.Tie;
-import metahub.imperative.types.Function_Call;
-import metahub.imperative.types.Path;
-import metahub.imperative.types.Expression;
-import metahub.imperative.types.Expression_Type;
-import metahub.imperative.types.Property_Expression;
+//import metahub.imperative.types.Function_Call;
+//import metahub.imperative.types.Path;
+//import metahub.imperative.types.Expression;
+//import metahub.imperative.types.Expression_Type;
+//import metahub.imperative.types.Property_Expression;
+import metahub.meta.types.*;
 
 /**
  * ...
@@ -43,11 +44,11 @@ class Parse
 				
 			case Expression_Type.property:
 				var property_expression:Property_Expression = cast expression;
-				return [ property_expression.tie ];
+				return [ cast property_expression.tie ];
 				
 			case Expression_Type.function_call:
 				var function_call:Function_Call = cast expression;
-				return get_path(function_call.args[0]);
+				return get_path(function_call.input);
 				
 			default:
 				throw new Exception("Unsupported path expression type: " + expression.type);

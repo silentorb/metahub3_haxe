@@ -1,23 +1,6 @@
 package metahub.logic.schema ;
 import metahub.imperative.code.List;
 import metahub.imperative.schema.*;
-//import metahub.imperative.types.Assignment;
-//import metahub.imperative.types.Block;
-//import metahub.imperative.code.Reference;
-//import metahub.imperative.types.Class_Definition;
-//import metahub.imperative.types.Condition;
-//import metahub.imperative.types.Expression;
-//import metahub.imperative.types.Flow_Control;
-//import metahub.imperative.types.Function_Call;
-//import metahub.imperative.types.Function_Definition;
-//import metahub.imperative.types.Insert;
-//import metahub.imperative.types.Namespace;
-//import metahub.imperative.types.Parameter;
-//import metahub.imperative.types.Parent_Class;
-//import metahub.imperative.types.Property_Expression;
-//import metahub.imperative.types.Self;
-//import metahub.imperative.types.Statement;
-//import metahub.imperative.types.Variable;
 import metahub.schema.Trellis;
 import metahub.schema.Kind;
 import metahub.imperative.types.Expression_Type;
@@ -35,7 +18,7 @@ typedef Rail_Additional = {
 	?inserts:Dynamic
 }
 
-class Rail {
+class Rail implements IRail {
 
 	public var trellis:Trellis;
 	public var name:String;
@@ -122,14 +105,12 @@ class Rail {
 				}
 			}
 		}
-
-		//generate_code();
 	}
 
 	public function process2() {
 		for (tie in all_ties) {
 			tie.initialize_links();
-		}
+		}		
 	}
 
 	function add_dependency(rail:Rail):Dependency {
@@ -137,6 +118,27 @@ class Rail {
 			dependencies[rail.name] = new Dependency(rail);
 
 		return dependencies[rail.name];
+	}
+
+	public function finalize() {
+		for (tie in all_ties) {
+			tie.finalize();
+		}
+	}
+	
+	public function get_tie_or_null(name:String):ITie {
+		if (!all_ties.exists(name))
+			return null;
+		
+		return all_ties[name];
+	}
+	
+	public function get_tie_or_error(name:String):ITie {
+		var tie = get_tie_or_null(name);
+		if (tie == null)
+			throw new Exception("Rail " + this.name + " does not have a tie named " + name + ".");
+		
+		return tie;
 	}
 
 }

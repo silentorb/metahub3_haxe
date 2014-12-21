@@ -14,6 +14,7 @@ abstract Expression_Type(Int) {
 	var instantiate = 5;
 	var parent_class = 6;
 	var path = 7;
+	var lambda = 8;
 
 	// Statements
 	var namespace = 100;

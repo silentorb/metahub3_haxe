@@ -23,6 +23,7 @@ class Dungeon
 	var zones = new Array<Zone>();
 	public var functions = new Array<Function_Definition>();
 	public var imp:Imp;
+	public var lairs = new Map<String, Lair>();
 
 	public function new(rail:Rail, imp:Imp) 
 	{
@@ -32,6 +33,11 @@ class Dungeon
 		trellis = rail.trellis;
 		
 		map_additional();
+		
+		for (tie in rail.all_ties) {
+			var lair = new Lair(tie, this);
+			lairs[tie.name] = lair;
+		}
 	}
 	
 	function map_additional() {
@@ -162,7 +168,6 @@ class Dungeon
 		}
 
 		return result;
-
 	}
 
 	public function generate_initialize():Function_Definition {

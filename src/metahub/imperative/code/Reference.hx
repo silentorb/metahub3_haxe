@@ -1,4 +1,5 @@
 package metahub.imperative.code ;
+import metahub.imperative.Imp;
 import metahub.logic.schema.Constraint;
 import metahub.logic.schema.Rail;
 import metahub.logic.schema.Railway;
@@ -19,7 +20,7 @@ class Reference
 		"<=": ">"
 	}
 
-	public static function constraint(constraint:Constraint):Array<Expression> {
+	public static function constraint(constraint:Constraint, imp:Imp):Array<Expression> {
 		var operator = constraint.operator;
 		var inverse = Reflect.field(inverse_operators, operator);
 		var conversion:Literal = cast constraint.expression;
@@ -40,12 +41,12 @@ class Reference
 
 		return [ new Flow_Control("if",	new Condition(inverse,
 				[
-					constraint.reference,
+					imp.translate(constraint.reference),
 					{ type: Expression_Type.literal, value: limit }
 				]
 			),
 			[
-				new Assignment(constraint.reference, "=", new Literal(value))
+				new Assignment(imp.translate(constraint.reference), "=", new Literal(value))
 			]
 		)];
 	}

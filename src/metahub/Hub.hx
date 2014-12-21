@@ -1,6 +1,7 @@
 package metahub;
 import haxe.xml.Parser;
 import metahub.imperative.Imp;
+import metahub.logic.schema.Railway;
 import metahub.meta.Coder;
 import metahub.meta.types.Expression;
 import metahub.parser.Definition;
@@ -186,36 +187,36 @@ import haxe.Json;
 		}
   }
 
-  public function run_data(source:Dynamic):Expression {
-    var coder = new Coder(this);
+  public function run_data(source:Dynamic, railway:Railway):Expression {
+    var coder = new Coder(railway);
     return coder.convert_statement(source, null);
   }
 
-  public function run_code(code:String) {
-		var result = parse_code(code);
-		if (!result.success) {
-       throw new Exception("Syntax Error at " + result.end.y + ":" + result.end.x);
-		}
-    var match:metahub.parser.Match = cast result;
-		var statement = run_data(match.get_data());
-
-		//trace(graph_expressions(statement));
-
-		//#if trace
-			//history.new_tree();
-		//#end
-
-		//var port = statement.to_port(root_scope, new Group(null), null);
-		//trace(graph_nodes(port.node));
-
-		//#if trace
-			//history.new_tree();
-		//#end
-
-		//port.get_node_value(new Empty_Context(this));
-		//history.start_finished();
-		//return port;
-  }
+  //public function run_code(code:String) {
+		//var result = parse_code(code);
+		//if (!result.success) {
+       //throw new Exception("Syntax Error at " + result.end.y + ":" + result.end.x);
+		//}
+    //var match:metahub.parser.Match = cast result;
+		//var statement = run_data(match.get_data());
+//
+		////trace(graph_expressions(statement));
+//
+		////#if trace
+			////history.new_tree();
+		////#end
+//
+		////var port = statement.to_port(root_scope, new Group(null), null);
+		////trace(graph_nodes(port.node));
+//
+		////#if trace
+			////history.new_tree();
+		////#end
+//
+		////port.get_node_value(new Empty_Context(this));
+		////history.start_finished();
+		////return port;
+  //}
 
 	public function parse_code(code:String) {
 		if (parser_definition == null) {
@@ -233,8 +234,9 @@ import haxe.Json;
     schema.load_trellises(data.trellises, new Load_Settings(metahub_namespace));
   }
 	
-	public function generate(root, target_name:String, destination:String) {
+	public function generate(source, target_name:String, destination:String) {
 		var imp = new Imp(this, target_name);
+		var root = run_data(source, imp.railway);
 		var generator = new Generator(this);
 		var target = generator.create_target(imp, target_name); 
 		imp.run(root, target);

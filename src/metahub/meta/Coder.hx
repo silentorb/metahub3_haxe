@@ -1,19 +1,21 @@
 package metahub.meta;
 import metahub.Hub;
 import metahub.imperative.types.Signature;
+import metahub.logic.schema.Railway;
+import metahub.logic.schema.Tie;
 import metahub.meta.types.Block;
 import metahub.meta.types.Constraint;
 import metahub.meta.types.Expression_Type;
 import metahub.meta.types.Expression;
 import metahub.meta.types.Function_Call;
 import metahub.meta.types.Literal;
+import metahub.meta.types.Parameter;
 import metahub.meta.types.Path;
 import metahub.meta.types.Property_Expression;
 import metahub.meta.types.Scope_Expression;
 import metahub.schema.Kind;
 import metahub.schema.Namespace;
-import metahub.schema.Property;
-import metahub.schema.Trellis;
+import metahub.logic.schema.IRail;
 
 typedef Conditions_Source = {
 	type:String,
@@ -22,10 +24,10 @@ typedef Conditions_Source = {
 }
 
 class Coder {
-  var hub:Hub;
+  var railway:Railway;
 
-  public function new(hub:Hub) {
-    this.hub = hub;
+  public function new(railway:Railway) {
+    this.railway = railway;
   }
 
   public function convert_expression(source:Dynamic, scope:Scope):Expression {
@@ -187,14 +189,14 @@ class Coder {
 
   function create_path(source:Dynamic, scope:Scope):Expression {
 		//throw new Exception("Not implemented.");
-		var trellis:Trellis = scope.trellis;
+		var rail:IRail = scope.rail;
 		var expression:Expression = null;
 		var children = new Array<Expression>();
 		var expressions:Array<Dynamic> = source.children;
 		if (expressions.length == 0)
 			throw new Exception("Empty reference path.");
 
-		if (expressions[0].type == "reference" && trellis.get_property_or_null(expressions[0].name) == null) {
+		if (expressions[0].type == "reference" && rail.get_tie_or_null(expressions[0].name) == null) {
 				return function_path(source, scope);
 		}
 
@@ -205,10 +207,10 @@ class Coder {
 				//children.push(new metahub.code.expressions.Function_Call(item.name, info, [], hub));
 			}
 			else if (item.type == "reference") {
-				var property = trellis.get_property_or_error(item.name);
-				children.push(new Property_Expression(property));
-				if (property.other_trellis != null)
-					trellis = property.other_trellis;
+				var tie:Tie = cast rail.get_tie_or_error(item.name);
+				children.push(new Property_Expression(tie));
+				if (tie.other_rail != null)
+					rail = tie.other_rail;
 			}
 			else {
 				throw new Exception("Invalid path token type: " + item.type);
@@ -284,23 +286,23 @@ class Coder {
 			//return new Scope_Expression(expression, new_scope_definition);
 		}
 
-		var namespace = hub.schema.root_namespace.get_namespace(path);
-		var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
+		var rail = railway.resolve_rail_path(path);// hub.schema.root_namespace.get_namespace(path);
+		//var trellis = hub.schema.get_trellis(path[path.length - 1], namespace);
 
-		if (trellis != null) {
-			new_scope.trellis = trellis;
+		//if (rail != null) {
+			new_scope.rail = rail;
 			expression = convert_statement(source.expression, new_scope);
 			//return new Scope_Expression(expression, new_scope_definition);
 			return new Scope_Expression(new_scope, [expression]);
-		}
-		else {
-			throw new Exception("Not implemented.");
-			//var symbol = scope.find(source.path);
-			//new_scope_definition.symbol = symbol;
-			//new_scope_definition.trellis = symbol.get_trellis();
-			//expression = convert_statement(source.expression, new_scope_definition);
-			//return new Node_Scope(expression, new_scope_definition);
-		}
+		//}
+		//else {
+			//throw new Exception("Not implemented.");
+			////var symbol = scope.find(source.path);
+			////new_scope_definition.symbol = symbol;
+			////new_scope_definition.trellis = symbol.get_trellis();
+			////expression = convert_statement(source.expression, new_scope_definition);
+			////return new Node_Scope(expression, new_scope_definition);
+		//}
 	}
 
 	//function weight(source:Dynamic, scope:Scope):Expression {
@@ -313,14 +315,19 @@ class Coder {
   }
 
   function create_lambda(source:Dynamic, scope:Scope):Expression {
+		var expressions:Array<Dynamic> = source.expressions;
 		var new_scope = new Scope(scope);
+		new_scope.rail = new Dynamic_Rail();
 		var parameters:Array<String> = source.parameters;
 		for (parameter in parameters) {
 			//throw new Exception("Not implemented.");
-			//new_scope.add_symbol(parameter, new Signature(Kind.unknown));
+			new_scope.variables[parameter] = { type: Kind.unknown };
 		}
-
-		return new Literal("stub");
+		
+		//return new Literal("stub");
+		return new metahub.meta.types.Lambda(new_scope, parameters.map(function(p) return new Parameter(p, null))
+			, expressions.map(function(e) return convert_statement(e, new_scope))
+		);
 		//return create_block(source, new_scope);
   }
 

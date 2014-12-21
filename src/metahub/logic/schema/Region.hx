@@ -22,6 +22,7 @@ class Region
 	public var class_export:String = "";
 	public var name:String;
 	public var parent:Region = null;
+	public var children = new Map<String, Region>();
 
 	public function new(namespace:Namespace, target_name:String) 
 	{

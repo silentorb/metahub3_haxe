@@ -48,7 +48,7 @@ class List
 		//var amount:Int = target.render_expression(constraint.expression, constraint.scope);
 		var expression = constraint.expression;
 
-		if (constraint.expression.type == Expression_Type.function_call) {
+		if (constraint.expression.type == metahub.meta.types.Expression_Type.function_call) {
 			var func:metahub.meta.types.Function_Call = cast constraint.expression;
 			if (func.name == "map") {
 				map(constraint, expression, imp);
@@ -59,38 +59,59 @@ class List
 		size(constraint, expression, imp);
 	}
 
-	public static function map(constraint:Constraint, expression:Expression, imp:Imp) {
+	public static function map(constraint:Constraint, expression:metahub.meta.types.Expression, imp:Imp) {
 		var start = Parse.get_start_tie(constraint.reference);
 		var end = Parse.get_end_tie(constraint.reference);
-		var func:Function_Call = cast constraint.expression;
-		var array:Create_Array = func.args[0];
+		var func:metahub.meta.types.Function_Call = cast constraint.expression;
+		var array:metahub.meta.types.Block = cast func.input;
 		var first:Tie = cast Parse.get_start_tie(array.children[0]);
 
 		var a = Parse.get_path(constraint.reference);
 		var b = Parse.get_path(array.children[0]);
 
-		link(a, b, Parse.reverse_path(b.slice(0, a.length - 1)), imp);
-		link(b, a, a.slice(0, a.length - 1), imp);
+		link(a, b, Parse.reverse_path(b.slice(0, a.length - 1)), array.children[1], imp);
+		link(b, a, a.slice(0, a.length - 1), array.children[1], imp);
 	}
 
-	public static function link(a:Array<Tie>, b:Array<Tie>, c:Array<Tie>, imp:Imp) {
+	public static function link(a:Array<Tie>, b:Array<Tie>, c:Array<Tie>, mapping:Dynamic, imp:Imp) {
 		var a_start = a[0];
 		var a_end = a[a.length - 1];
 		
 		var second_start = b[0];
 		var second_end = b[b.length - 1];
-
+			
 		var item_name = second_end.rail.name.toLowerCase() + "_item";
+	
+		var creation_block:Array<Expression> = [
+			new Declare_Variable(item_name, second_end.get_other_signature(), new Instantiate(second_end.other_rail)),
+		];
+		
+		if (mapping != null) {
+			var constraints:Array<metahub.meta.types.Constraint> = mapping.expressions;
+			for (constraint in constraints) {
+				var first:metahub.meta.types.Path = cast constraint.first;
+				var first_tie:metahub.meta.types.Property_Expression = cast first.children[0];
+				var second:metahub.meta.types.Path = cast constraint.second;
+				var second_tie:metahub.meta.types.Property_Expression = cast second.children[1];
+				creation_block.push(new Assignment(
+					new Variable(item_name, new Property_Expression(cast a_end.other_rail.get_tie_or_error(first_tie.tie.name))), 
+					"=", 
+					new Variable("item", new Property_Expression(cast second_end.other_rail.get_tie_or_error(second_tie.tie.name)))
+				));
+			}
+		}
+		
+		creation_block = creation_block.concat(cast [
+			new Variable(item_name, new Function_Call("initialize")),
+			new Property_Expression(c[0],
+				new Function_Call(second_end.tie_name + "_add",
+					[new Variable(item_name), new Self()])
+			)
+		]);
+
 		var block:Array<Expression> = [
 				new Flow_Control("if", new Condition("!=", [
-				new Variable("origin"), new Property_Expression(c[0])]), [
-					new Declare_Variable(item_name, second_end.get_other_signature(), new Instantiate(second_end.other_rail)),
-					new Variable(item_name, new Function_Call("initialize")),
-					new Property_Expression(c[0],
-						new Function_Call(second_end.tie_name + "_add",
-							[new Variable(item_name), new Self()])
-					)				
-				])
+				new Variable("origin"), new Property_Expression(c[0])]), creation_block)
 		];
 
 		if (a_start.other_tie.property.allow_null) {
@@ -104,7 +125,7 @@ class List
 		imp.get_dungeon(a_end.rail).concat_block(a_end.tie_name + "_add_post", block);
 	}
 
-	public static function size(constraint:Constraint, expression:Expression, imp:Imp) {
+	public static function size(constraint:Constraint, expression:metahub.meta.types.Expression, imp:Imp) {
 		var path:Path = cast constraint.reference;
 		var property_expression:Property_Expression = cast path.children[0];
 		var reference = property_expression.tie;
@@ -115,9 +136,9 @@ class List
 		var child = "child";
 		var flow_control = new Flow_Control("while", new Condition("<",
 			[
-				constraint.reference,
+				imp.translate(constraint.reference),
 				//{ type: "path", path: constraint.reference },
-				expression
+				imp.translate(expression)
 			]),[
 			new Declare_Variable(child, {
 					type: Kind.reference,

@@ -5,6 +5,7 @@ import metahub.imperative.schema.*;
 import metahub.logic.schema.*;
 import metahub.meta.Scope;
 import metahub.imperative.types.*;
+import metahub.meta.types.Lambda;
 import metahub.meta.types.Scope_Expression;
 import metahub.render.Target;
 import metahub.schema.Trellis;
@@ -27,7 +28,7 @@ import metahub.imperative.code.Parse;
 		railway = new Railway(hub, target_name);
 	}
 
-	public function run(root:Expression, target:Target) {
+	public function run(root:metahub.meta.types.Expression, target:Target) {
 		process(root, null);
 		generate_code(target);
 
@@ -54,10 +55,18 @@ import metahub.imperative.code.Parse;
 			}
 		}
 		
+		finalize();
+		
 		for (dungeon in dungeons) {
 			dungeon.generate_code1();
 			target.generate_rail_code(dungeon);
 			dungeon.generate_code2();
+		}
+	}
+	
+	function finalize() {
+		for (dungeon in dungeons) {
+			dungeon.rail.finalize();
 		}
 	}
 
@@ -71,7 +80,7 @@ import metahub.imperative.code.Parse;
 		return rail_map[rail];
 	}
 
-	public function process(expression:Expression, scope:Scope) {
+	public function process(expression:metahub.meta.types.Expression, scope:Scope) {
 		switch(expression.type) {
 			case metahub.meta.types.Expression_Type.scope:
 				scope_expression(cast expression, scope);
@@ -101,13 +110,24 @@ import metahub.imperative.code.Parse;
 	}
 
 	function create_constraint(expression:metahub.meta.types.Constraint, scope:Scope) {
-		var rail = get_rail(scope.trellis);
-		var constraint = new metahub.logic.schema.Constraint(expression, this, scope);
+		var rail:Rail = cast scope.rail;
+		var constraint = new metahub.logic.schema.Constraint(expression, this);
 		var tie = Parse.get_end_tie(constraint.reference);
 		trace('tie', tie.rail.name + "." + tie.name);
 		tie.constraints.push(constraint);
 		constraints.push(constraint);
 	}
+	
+	//function create_lambda_constraint(expression:metahub.meta.types.Constraint, scope:Scope):Expression {
+		//throw "";
+		//var rail = get_rail(cast scope.trellis);
+		//var constraint = new metahub.logic.schema.Constraint(expression, this);
+		//var tie = Parse.get_end_tie(constraint.reference);
+		//trace('tie', tie.rail.name + "." + tie.name);
+		//tie.constraints.push(constraint);
+		//constraints.push(constraint);
+		//return null;
+	//}
 
 	public function get_rail(trellis:Trellis):Rail {
 		return railway.get_rail(trellis);
@@ -121,11 +141,11 @@ import metahub.imperative.code.Parse;
 		}
 		else {
 			var dungeon = get_dungeon(tie.rail);
-			dungeon.concat_block(tie.tie_name + "_set_pre", Reference.constraint(constraint));
+			dungeon.concat_block(tie.tie_name + "_set_pre", Reference.constraint(constraint, this));
 		}
 	}
 
-	public function translate(expression:metahub.meta.types.Expression):Expression {
+	public function translate(expression:metahub.meta.types.Expression, scope:Scope = null):Expression {
 		switch(expression.type) {
 			case metahub.meta.types.Expression_Type.literal:
 				var literal:metahub.meta.types.Literal = cast expression;
@@ -141,7 +161,18 @@ import metahub.imperative.code.Parse;
 			case metahub.meta.types.Expression_Type.block:
 				var array:metahub.meta.types.Block = cast expression;
 				return new Create_Array(array.children.map(function(e) return translate(e)));
-
+				
+			case metahub.meta.types.Expression_Type.lambda:
+				
+				return null;
+				//var lambda:metahub.meta.types.Lambda = cast expression;
+				//return new Anonymous_Function(lambda.parameters.map(function(p) return new Parameter(p.name, p.signature)),
+					//lambda.expressions.map(function(e) return translate(e, lambda.scope))
+				//);
+//
+			//case metahub.meta.types.Expression_Type.constraint:
+				//return create_lambda_constraint(cast expression, scope);
+			
 			default:
 				throw new Exception("Cannot convert expression " + expression.type + ".");
 		}
@@ -151,13 +182,13 @@ import metahub.imperative.code.Parse;
 		var path = expression.children;
 		var result = new Array<metahub.imperative.types.Expression>();
 		var first:metahub.meta.types.Property_Expression = cast path[0];
-		var rail = railway.get_rail(first.property.trellis);
+		var rail:Rail = cast first.tie.get_abstract_rail();
 		for (token in path) {
 			if (token.type == metahub.meta.types.Expression_Type.property) {
 				var property_token:metahub.meta.types.Property_Expression = cast token;
-				var tie = rail.all_ties[property_token.property.name];
+				var tie = rail.all_ties[property_token.tie.name];
 				if (tie == null)
-					throw new Exception("tie is null: " + property_token.property.fullname());
+					throw new Exception("tie is null: " + property_token.tie.fullname());
 
 				result.push(new Property_Expression(tie));
 				rail = tie.other_rail;

@@ -1,19 +1,19 @@
 package metahub.meta;
-import metahub.schema.Trellis;
+import metahub.logic.schema.IRail;
 
 /**
  * ...
  * @author Christopher W. Johnson
  */
 class Scope {
-	public var trellis:Trellis;
+	public var rail:IRail;
 	public var parent:Scope;
 	public var variables = new Map<String, Dynamic>();
 
 	public function new(parent:Scope = null) {
 		this.parent = parent;
 		if (parent != null)
-			trellis = parent.trellis;
+			rail = parent.rail;
 	}
 
 	public function find(name:String) {

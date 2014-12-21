@@ -43,7 +43,7 @@ import metahub.schema.Namespace;
 	public static function get_namespace_path(region:Region):Array<String> {
 		var tokens = [];
 		while(region != null && region.name != 'root') {
-			tokens.unshift(region.name);
+			tokens.unshift(region.external_name != null ? region.external_name : region.name);
 			region = region.parent;
 		}
 

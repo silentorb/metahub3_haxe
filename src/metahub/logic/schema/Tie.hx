@@ -123,4 +123,11 @@ class Tie implements ITie {
 	public function fullname():String {
 		return rail.name + '.' + name;
 	}
+	
+	public function get_default_value():Dynamic {
+		if (other_rail != null && other_rail.default_value != null)
+			return other_rail.default_value;
+			
+		return property.get_default();
+	}
 }

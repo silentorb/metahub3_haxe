@@ -15,7 +15,8 @@ typedef Rail_Additional = {
 	?is_external:Bool,
 	?source_file:String,
 	?class_export:String,
-	?inserts:Dynamic
+	?inserts:Dynamic,
+	?default_value:Dynamic
 }
 
 class Rail implements IRail {
@@ -35,6 +36,7 @@ class Rail implements IRail {
 	public var stubs = new Array<String>();
 	public var property_additional = new Map<String, Property_Addition>();
 	public var class_export:String = "";
+	public var default_value:Dynamic = null;
 
 	public function new(trellis:Trellis, railway:Railway) {
 		this.trellis = trellis;
@@ -66,6 +68,9 @@ class Rail implements IRail {
 		if (Reflect.hasField(map, 'class_export'))
 			class_export = map.class_export;
 
+		if (Reflect.hasField(map, 'default_value')) // Should only be set if is_value is set to true
+			default_value = map.default_value;
+			
 		if (Reflect.hasField(map, 'hooks')) {
 			var hook_source = Reflect.field(map, 'hooks');
 			for (key in Reflect.fields(hook_source)) {

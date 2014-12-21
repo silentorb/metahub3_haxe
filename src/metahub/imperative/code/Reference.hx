@@ -46,7 +46,7 @@ class Reference
 				]
 			),
 			[
-				new Assignment(imp.translate(constraint.reference), "=", new Literal(value))
+				new Assignment(imp.translate(constraint.reference), "=", new Literal(value, { type: Kind.float }))
 			]
 		)];
 	}

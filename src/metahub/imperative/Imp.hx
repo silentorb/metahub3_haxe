@@ -149,7 +149,7 @@ import metahub.imperative.code.Parse;
 		switch(expression.type) {
 			case metahub.meta.types.Expression_Type.literal:
 				var literal:metahub.meta.types.Literal = cast expression;
-				return new Literal(literal.value);
+				return new Literal(literal.value, { type:Kind.unknown });
 
 			case metahub.meta.types.Expression_Type.function_call:
 				var func:metahub.meta.types.Function_Call = cast expression;

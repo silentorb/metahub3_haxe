@@ -9,7 +9,7 @@ import metahub.imperative.types.Insert;
 import metahub.imperative.types.Null_Value;
 import metahub.imperative.types.Path;
 import metahub.imperative.types.Variable;
-import metahub.meta.types.Literal;
+import metahub.imperative.types.Literal;
 import metahub.imperative.types.Property_Expression;
 import metahub.logic.schema.Tie;
 import metahub.Hub;
@@ -79,14 +79,20 @@ class Cpp extends Target{
 		var rail = dungeon.rail;
 		var root = dungeon.get_block("/");
 		var references = new Array<Tie>();
+		var scalars = new Array<Tie>();
 		for (tie in rail.core_ties) {
 			if (tie.type == Kind.reference && !tie.is_value)
 				references.push(tie);
+			else if (tie.type != Kind.list)
+				scalars.push(tie);
 		}
 
 		var func = new Function_Definition(rail.rail_name, dungeon, [],
 			cast references.map(function(tie) return new Assignment(
-				new Property_Expression(tie), "=", new Null_Value())
+				new Property_Expression(tie), "=", new Null_Value())				
+			)
+			.concat(cast scalars.map(function(tie) return new Assignment(
+				new Property_Expression(tie), "=", new Literal(tie.get_default_value(), tie.get_signature())))
 			)
 		);
 		func.return_type = null;
@@ -535,8 +541,7 @@ class Cpp extends Target{
 		var result:String;
 		switch(expression.type) {
 			case Expression_Type.literal:
-				var literal:Literal = cast expression;
-				result = Std.string(literal.value);
+				return render_literal(cast expression);
 
 			case Expression_Type.path:
 				result = render_path_old(cast expression);
@@ -576,6 +581,47 @@ class Cpp extends Target{
 		}
 
 		return result;
+	}
+	
+	function render_literal(expression:Literal):String {
+		var signature = expression.signature;
+		if (signature == null)
+			return Std.string(expression.value);
+			
+			
+		switch (signature.type) {
+			case Kind.unknown:
+				return Std.string(expression.value);
+			
+			case Kind.float:
+				var result = Std.string(expression.value);
+				return result.indexOf(".") > -1
+					? result + "f"
+					: result;
+				
+			case Kind.int:
+				return Std.string(expression.value);
+			
+			case Kind.string:
+				return '"' + Std.string(expression.value) + '"';
+
+			case Kind.bool:
+				var boolean:Bool = expression.value;
+				return boolean ? "true": "false";
+
+			case Kind.reference:
+				if (!signature.rail.trellis.is_value)
+					throw new Exception("Literal expressions must be scalar values.");
+					
+				if (expression.value != null)
+					return Std.string(expression.value);
+					
+				return render_rail_name(signature.rail) + "()";
+				
+			default:
+				throw new Exception("Invalid literal '" + expression.value + "' type '" + expression.signature.type + ".");
+		}
+
 	}
 
 	function get_signature(expression:Expression):Dynamic {

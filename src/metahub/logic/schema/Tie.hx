@@ -4,6 +4,7 @@ import metahub.meta.types.Expression;
 import metahub.schema.Property;
 import metahub.schema.Kind;
 import metahub.logic.schema.Constraint;
+import metahub.imperative.code.Parse;
 
 /**
  * ...
@@ -22,7 +23,7 @@ class Tie implements ITie {
 	public var has_getter = false;
 	public var has_set_post_hook = false;
 	public var type:Kind;
-	public var range:IRange = null;
+	public var ranges = new Array<IRange>();
 
 	public var constraints = new Array<Constraint>();
 
@@ -91,23 +92,45 @@ class Tie implements ITie {
 	}
 		
 	function determine_range() {
-		if (type != Kind.float)
+		//if (type != Kind.float)
+			//return;
+		if (type == Kind.list)
 			return;
-			
-		var min:Constraint = null;
-		var max:Constraint = null;
+
+		var pairs = new Map<String, { min:{expression:Expression}, max:{expression:Expression}, path:Array<Tie> }>(); 
+		//var min:Constraint = null;
+		//var max:Constraint = null;
 
 		for (constraint in constraints) {
-			if (constraint.operator == ">" || constraint.operator == ">=") {
-				min = constraint;
+			var path = Parse.get_path(constraint.reference);
+			path.shift();
+			var path_name = path.map(function(t) return t.name).join(".");
+			if (!pairs.exists(path_name)) {
+				pairs[path_name] = {
+					min: null,
+					max: null,
+					path: path
+				};
+			}
+			
+			if (constraint.operator == "in") {
+				var args:metahub.meta.types.Block = cast constraint.expression;
+				pairs[path_name].min = { expression: args.children[0] };
+				pairs[path_name].max = { expression: args.children[1] };				
+			}
+			else if (constraint.operator == ">" || constraint.operator == ">=") {
+				pairs[path_name].min = constraint;
 			}
 			else if (constraint.operator == "<" || constraint.operator == "<=") {
-				max = constraint;
+				pairs[path_name].max = constraint;
 			}			
 		}
 		
-		if (min != null && max != null) {
-			range = new Range_Float(get_expression_float(min.expression), get_expression_float(max.expression));
+		for (pair in pairs) {
+			if (pair.min != null && pair.max != null) {
+				trace('range', fullname());			
+				ranges.push(new Range_Float(get_expression_float(pair.min.expression), get_expression_float(pair.max.expression), pair.path));
+			}			
 		}
 	}
 	

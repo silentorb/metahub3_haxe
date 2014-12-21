@@ -7,4 +7,5 @@ package metahub.logic.schema;
 interface IRange 
 {
   var type:Int;
+	var path:Array<Tie>;
 }

@@ -22,7 +22,7 @@ class List
 			new Parameter("origin", { type: Kind.reference, rail: null })
 			], []);
 
-		var zone = dungeon.create_zone(definition.block);
+		var zone = dungeon.create_zone(definition.expressions);
 		var mid = zone.divide(null, [
 			new Property_Expression(tie,
 				new Function_Call("add", [ new Variable("item") ], true)

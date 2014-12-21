@@ -37,6 +37,8 @@ import metahub.imperative.code.Parse;
 		}
 
 		flatten();
+		
+		post_analyze();
 	}
 
 	public function generate_code(target:Target) {
@@ -67,6 +69,12 @@ import metahub.imperative.code.Parse;
 	function finalize() {
 		for (dungeon in dungeons) {
 			dungeon.rail.finalize();
+		}
+	}
+	
+	function post_analyze() {
+		for (dungeon in dungeons) {
+			dungeon.post_analyze_many(dungeon.code);
 		}
 	}
 

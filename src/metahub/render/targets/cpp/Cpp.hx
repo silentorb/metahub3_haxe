@@ -36,6 +36,18 @@ import metahub.imperative.types.Expression_Type;
  * ...
  * @author Christopher W. Johnson
  */
+
+class External_Header {
+	public var name:String;
+	public var is_standard:Bool;
+	
+	public function new(name:String, is_standard:Bool = false)
+	{
+		this.name = name;
+		this.is_standard = is_standard;
+	}
+}
+
 class Cpp extends Target{
 
 	var current_region:Region;
@@ -118,12 +130,12 @@ class Cpp extends Target{
 
 	function create_header_file(dungeon:Dungeon, namespace, dir) {
 		var rail = dungeon.rail;
-		var headers = [ "stdafx" ];
+		var headers:Array<External_Header> = [ new External_Header("stdafx") ];
 
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
 			if (!d.allow_ambient)
-				headers.push(dependency.source_file);
+				headers.push(new External_Header(dependency.source_file));
 		}
 
 		render = new Renderer();
@@ -139,16 +151,24 @@ class Cpp extends Target{
 	function create_class_file(dungeon:Dungeon, namespace, dir) {
 		var rail = dungeon.rail;
 		scopes = [];
-		var headers = [ "stdafx", rail.source_file ];
+		var headers:Array<External_Header> = [ new External_Header("stdafx"), new External_Header(rail.source_file) ];
 		for (d in rail.dependencies) {
 			var dependency = d.rail;
 			if (dependency != rail.parent && dependency.source_file != null) {
-				headers.push(dependency.source_file);
+				headers.push(new External_Header(dependency.source_file));
 			}
 		}
+		
+		for (func in dungeon.used_functions) {
+			if (func.name == "rand" && func.is_platform_specific) {
+				if (!has_header(headers, "stdlib"))
+					headers.push(new External_Header("stdlib", true));
+			}
+		}
+		
 		render = new Renderer();
 		var result = render_includes(headers) + newline()
-		+ render_statements(dungeon.code.statements);
+		+ render_statements(dungeon.code);
 
 		Utility.create_file(dir + "/" + rail.name + ".cpp", result);
 	}
@@ -343,7 +363,7 @@ class Cpp extends Target{
 				current_scope[parameter.name] = parameter.signature;
 			}
 
-		  return render_statements(definition.block);
+		  return render_statements(definition.expressions);
 		});
 	}
 
@@ -406,6 +426,14 @@ class Cpp extends Target{
 
 		return name;
 	}
+	
+	static function has_header(list:Array < External_Header > , name:String):Bool {
+		for (header in list) {
+			if (header.name == name)
+				return true;
+		}
+		return false;
+	}
 
 	function get_property_type_string(tie:Tie, is_parameter = false) {
 		var other_rail = tie.other_rail;
@@ -427,8 +455,13 @@ class Cpp extends Target{
 		return line(get_property_type_string(tie) + " " +	tie.tie_name + ";");
 	}
 
-	function render_includes(headers:Array<String>):String {
-		return headers.map(function(h) return line('#include "' + h + '.h"')).join('');
+	function render_includes(headers:Array<External_Header>):String {
+		return headers.map(function(h) { 
+			return line(h.is_standard
+				? '#include <' + h.name + '.h>'
+				: '#include "' + h.name + '.h"'
+				); 
+		} ).join('');
 	}
 
 	function render_signature_old(name, tie:Tie):String {
@@ -621,7 +654,6 @@ class Cpp extends Target{
 			default:
 				throw new Exception("Invalid literal '" + expression.value + "' type '" + expression.signature.type + ".");
 		}
-
 	}
 
 	function get_signature(expression:Expression):Dynamic {
@@ -679,6 +711,11 @@ class Cpp extends Target{
 					var dereference = is_pointer(find_variable(first)) ? "*" : "";
 					return "push_back(" + dereference + first + ")";
 
+				case "rand":
+					var min:Float = cast (expression.args[0], Literal).value;
+					var max:Float = cast (expression.args[1], Literal).value;
+					return "rand() % " + (max - min) + (min < 0 ? " - " + -min : " + " + min);						
+					
 				default:
 					throw new Exception("Unsupported platform-specific function: " + expression.name + ".");
 			}

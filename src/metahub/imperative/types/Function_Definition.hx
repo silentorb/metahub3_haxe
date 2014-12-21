@@ -12,8 +12,8 @@ class Function_Definition extends Anonymous_Function {
 	public var dungeon:Dungeon;
 	public var rail:Rail;
 	
-	public function new(name:String, dungeon:Dungeon, parameters:Array<Parameter>, block:Array<Expression>, return_type:Signature = null) {
-		super(parameters, block, return_type);		
+	public function new(name:String, dungeon:Dungeon, parameters:Array<Parameter>, expressions:Array<Expression>, return_type:Signature = null) {
+		super(parameters, expressions, return_type);		
 		this.name = name;
 		this.dungeon = dungeon;
 		this.rail = dungeon.rail;

@@ -15,7 +15,7 @@ import metahub.imperative.code.List;
 class Dungeon
 {
 	public var rail:Rail;
-	public var code:Block;
+	public var code:Array<Expression>;
 	public var region:Region;
 	public var trellis:Trellis;
 	var inserts:Dynamic;
@@ -24,6 +24,7 @@ class Dungeon
 	public var functions = new Array<Function_Definition>();
 	public var imp:Imp;
 	public var lairs = new Map<String, Lair>();
+	public var used_functions = new Map<String, Used_Function>();
 
 	public function new(rail:Rail, imp:Imp) 
 	{
@@ -52,18 +53,13 @@ class Dungeon
 	
 	public function generate_code1() {
 		var definition = new Class_Definition(rail, []);
-		var statements = [];
-		var zone = create_zone(statements);
+		code = [];
+		var zone = create_zone(code);
 		zone.divide("..pre");
 		var mid = zone.divide(null, [
 			new Namespace(region, [ definition ])
 		]);
 		zone.divide("..post");
-
-		code = {
-			type: "block",
-			statements: statements
-		};
 
 		blocks["/"] = definition.expressions;
 	}
@@ -133,7 +129,7 @@ class Dungeon
 				new Parameter("value", tie.get_signature())
 			], []);
 
-		var zone = create_zone(result.block);
+		var zone = create_zone(result.expressions);
 		var pre = zone.divide(tie.tie_name + "_set_pre");
 
 		var mid = zone.divide(null, [
@@ -178,11 +174,71 @@ class Dungeon
 				new Function_Call("initialize")
 			));
 		}
+		
+		for (lair in lairs) {
+			lair.customize_initialize(block);
+		}
 
 		if (rail.hooks.exists("initialize_post")) {
 			block.push(new Function_Call("initialize_post"));
 		}
 
 		return new Function_Definition("initialize", this, [], block);
+	}
+	
+	public function post_analyze(expression:Expression) {
+		switch(expression.type) {
+			
+			case Expression_Type.namespace:
+				var ns:Namespace = cast expression;
+				post_analyze_many(ns.expressions);
+
+			case Expression_Type.class_definition:
+				var definition:Class_Definition = cast expression;
+				post_analyze_many(definition.expressions);
+
+			case Expression_Type.function_definition:
+				var definition:Function_Definition = cast expression;
+				post_analyze_many(definition.expressions);
+
+			case Expression_Type.flow_control:
+				var definition:Flow_Control = cast expression;
+				post_analyze_many(definition.condition.expressions);
+				post_analyze_many(definition.children);
+
+			case Expression_Type.function_call:
+				var definition:Function_Call = cast expression;
+				trace('func', definition.name);
+				if (definition.is_platform_specific && !used_functions.exists(definition.name))
+					used_functions[definition.name] = new Used_Function(definition.name, definition.is_platform_specific);
+				
+				for (arg in definition.args) {
+					if (Reflect.hasField(arg, 'type'))
+						post_analyze(arg);
+				}
+
+			case Expression_Type.assignment:
+				var definition:Assignment = cast expression;
+				post_analyze(definition.expression);
+
+			case Expression_Type.declare_variable:
+				var definition:Declare_Variable = cast expression;
+				post_analyze(definition.expression);
+				
+			//case Expression_Type.property:
+				//var property_expression:Property_Expression = cast expression;
+				//result = property_expression.tie.tie_name;
+
+			//case Expression_Type.instantiate:
+
+			default:
+				// Do nothing.  This is a gentler function than most MetaHub expression processors.
+		}
+	}
+	
+	public function post_analyze_many(expressions:Array<Expression>) {
+		for (expression in expressions) {
+			post_analyze(expression);
+		}
 	}
 }

@@ -48,6 +48,9 @@ class Parse
 				
 			case Expression_Type.function_call:
 				var function_call:Function_Call = cast expression;
+				if (function_call.input == null)
+					throw new Exception("Not supported.");
+					
 				return get_path(function_call.input);
 				
 			default:

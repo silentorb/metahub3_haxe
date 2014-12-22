@@ -4,6 +4,7 @@ import metahub.logic.schema.Constraint;
 import metahub.logic.schema.Rail;
 import metahub.logic.schema.Tie;
 import metahub.imperative.types.*;
+import metahub.meta.types.Lambda;
 import metahub.schema.Kind;
 
 /**
@@ -48,32 +49,36 @@ class List
 		//var amount:Int = target.render_expression(constraint.expression, constraint.scope);
 		var expression = constraint.expression;
 
-		if (constraint.expression.type == metahub.meta.types.Expression_Type.function_call) {
-			var func:metahub.meta.types.Function_Call = cast constraint.expression;
-			if (func.name == "map") {
-				map(constraint, expression, imp);
-				return;
-			}
+		//if (constraint.expression.type == metahub.meta.types.Expression_Type.function_call) {
+			//var func:metahub.meta.types.Function_Call = cast constraint.expression;
+			//if (func.name == "map") {
+				//map(constraint, expression, imp);
+				//return;
+			//}
+		//}
+		
+		var other_path = Parse.get_path(expression);
+		if (other_path.length > 0 && other_path[other_path.length - 1].type == Kind.list) {
+			map(constraint, expression, imp);
 		}
-
-		size(constraint, expression, imp);
+		else {
+			size(constraint, expression, imp);			
+		}
 	}
 
 	public static function map(constraint:Constraint, expression:metahub.meta.types.Expression, imp:Imp) {
 		var start = Parse.get_start_tie(constraint.reference);
 		var end = Parse.get_end_tie(constraint.reference);
-		var func:metahub.meta.types.Function_Call = cast constraint.expression;
-		var array:metahub.meta.types.Block = cast func.input;
-		var first:Tie = cast Parse.get_start_tie(array.children[0]);
+		var path:metahub.meta.types.Path = cast constraint.expression;
 
 		var a = Parse.get_path(constraint.reference);
-		var b = Parse.get_path(array.children[0]);
+		var b = Parse.get_path(path);
 
-		link(a, b, Parse.reverse_path(b.slice(0, a.length - 1)), array.children[1], imp);
-		link(b, a, a.slice(0, a.length - 1), array.children[1], imp);
+		link(a, b, Parse.reverse_path(b.slice(0, a.length - 1)), constraint.lambda, imp);
+		link(b, a, a.slice(0, a.length - 1), constraint.lambda, imp);
 	}
 
-	public static function link(a:Array<Tie>, b:Array<Tie>, c:Array<Tie>, mapping:Dynamic, imp:Imp) {
+	public static function link(a:Array<Tie>, b:Array<Tie>, c:Array<Tie>, mapping:Lambda, imp:Imp) {
 		var a_start = a[0];
 		var a_end = a[a.length - 1];
 		
@@ -87,15 +92,15 @@ class List
 		];
 		
 		if (mapping != null) {
-			var constraints:Array<metahub.meta.types.Constraint> = mapping.expressions;
+			var constraints:Array<metahub.meta.types.Constraint> = cast mapping.expressions;
 			for (constraint in constraints) {
 				var first:metahub.meta.types.Path = cast constraint.first;
-				var first_tie:metahub.meta.types.Property_Expression = cast first.children[0];
+				var first_tie:metahub.meta.types.Property_Expression = cast first.children[1];
 				var second:metahub.meta.types.Path = cast constraint.second;
 				var second_tie:metahub.meta.types.Property_Expression = cast second.children[1];
 				creation_block.push(new Assignment(
 					new Variable(item_name, new Property_Expression(cast a_end.other_rail.get_tie_or_error(first_tie.tie.name))), 
-					"=", 
+					"=",
 					new Variable("item", new Property_Expression(cast second_end.other_rail.get_tie_or_error(second_tie.tie.name)))
 				));
 			}

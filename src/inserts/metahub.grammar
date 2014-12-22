@@ -35,8 +35,7 @@ expression =
 operation_separator = trim operator trim
 
 expression_part =
-		lambda
-	|	value
+		value
   | create_node
   | reference
 	| long_block
@@ -61,7 +60,7 @@ long_block = "{" trim @(statement, comma_or_newline, 0, 0) trim "}"
 
 new_scope = path_or_id trim long_block
 
-constraint = reference trim constraint_operator trim expression
+constraint = reference trim constraint_operator trim expression @(lambda, dummy, 0, 1)
 
 condition = expression trim constraint_operator trim expression
 
@@ -79,4 +78,6 @@ set_weight = /[\d\.]+/ trim "$" ws statement
 
 array = "[" trim @(expression, comma_or_newline, 0, 0) trim "]"
 
-lambda = id trim "=>" trim long_block
+lambda = trim parameters trim long_block
+
+parameters = "[" trim @(id, comma_or_newline, 0, 0) trim "]"

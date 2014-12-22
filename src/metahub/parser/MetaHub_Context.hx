@@ -123,6 +123,9 @@ typedef Reference_Or_Function = {
 
 			case "lambda":
         return lambda_expression(data);
+				
+			case "parameters":
+				return parameters(data);
 
 //      default:
 //        throw new Exception("Invalid parser method: " + name + ".");
@@ -152,17 +155,6 @@ typedef Reference_Or_Function = {
 
     var rep_match:Repetition_Match = cast match;
     var operator:String = cast rep_match.dividers[0].matches[1].get_data();
-
-    //var operators = {
-			//'+': 'add',
-			//'-': 'subtract',
-			//'*': 'multiply',
-			//'/': 'divide',
-			//'+=': 'add_equals',
-			//'-=': 'subtract_equals',
-			//'*=': 'multiply_equals',
-			//'/=': 'divide_equals'
-    //};
 
 		if (operator == '|') {
 			var function_name = data.pop();
@@ -356,7 +348,8 @@ typedef Reference_Or_Function = {
 			reference: data[0],
 			//operator: Std.string(function_map[data[2]]),
 			operator: data[2],
-			expression: data[4]
+			expression: data[4],
+			lambda: data[5][0]
     };
   }
 
@@ -370,8 +363,12 @@ typedef Reference_Or_Function = {
 	static function lambda_expression(data:Dynamic):Dynamic {
     return {
 			type: "lambda",
-			parameters: [ data[0] ],
-			expressions: data[4].expressions
+			parameters: [ data[1] ],
+			expressions: data[3].expressions
     };
+  }
+	
+	static function parameters(data:Dynamic):Dynamic {
+    return data[2];
   }
 }

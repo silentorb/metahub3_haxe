@@ -54,7 +54,8 @@ class Parse
 				return get_path(function_call.input);
 				
 			default:
-				throw new Exception("Unsupported path expression type: " + expression.type);
+				return [];
+				//throw new Exception("Unsupported path expression type: " + expression.type);
 		}
 	}
 		

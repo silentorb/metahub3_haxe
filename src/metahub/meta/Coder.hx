@@ -93,7 +93,11 @@ class Coder {
 		var expression = convert_expression(source.expression, scope);
 		//var expression = function_expression(source.expression, scope, name, back_reference);
 		//return new metahub.code.expressions.Create_Constraint(reference, expression, operator_name, back_reference != null);
-		return new Constraint(reference, expression, operator_name);
+		//if (source.lambda) 			throw "";
+
+		return new Constraint(reference, expression, operator_name,
+			source.lambda != null ? cast create_lambda(source.lambda, scope) : null
+		);
   }
 
   function create_block(source:Dynamic, scope:Scope):Expression {

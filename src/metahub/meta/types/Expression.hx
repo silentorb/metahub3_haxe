@@ -6,4 +6,8 @@ package metahub.meta.types;
 
 class Expression {
 	public var type:Expression_Type;
+	
+	function new(type:Expression_Type) {
+		this.type = type;
+	}
 }

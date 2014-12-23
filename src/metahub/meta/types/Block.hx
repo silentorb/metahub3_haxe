@@ -11,6 +11,6 @@ class Block extends Expression{
 		if (statements != null)
 			this.children = statements;
 
-		this.type = Expression_Type.block;
+		super(Expression_Type.block);
 	}
 }

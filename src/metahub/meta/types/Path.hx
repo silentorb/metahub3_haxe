@@ -9,7 +9,7 @@ class Path extends Expression {
 	
 	public function new(children:Array<Expression>) 
 	{
-		type = Expression_Type.path;
+		super(Expression_Type.path);
 		this.children = children;		
 	}
 	

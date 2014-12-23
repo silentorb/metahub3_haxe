@@ -9,7 +9,7 @@ class Function_Call extends Expression {
 	public var input:Expression;
 
 	public function new(name:String, input:Expression) {
-		type = Expression_Type.function_call;
+		super(Expression_Type.function_call);
 		this.name = name;
 		this.input = input;
 	}

@@ -15,6 +15,8 @@ abstract Expression_Type(Int) {
 	var parent_class = 6;
 	var path = 7;
 	var lambda = 8;
+	
+	var array = 12;
 
 	// Statements
 	var namespace = 100;
@@ -26,5 +28,6 @@ abstract Expression_Type(Int) {
 	var scope = 106;
 	var block = 107;
 	var constraint = 108;
+	var function_scope = 109;
 
 }

@@ -1,21 +1,25 @@
 package metahub.meta;
 import metahub.Hub;
+import metahub.imperative.code.Parse;
 import metahub.imperative.types.Signature;
 import metahub.logic.schema.Railway;
 import metahub.logic.schema.Tie;
+import metahub.meta.types.Array_Expression;
 import metahub.meta.types.Block;
 import metahub.meta.types.Constraint;
 import metahub.meta.types.Expression_Type;
 import metahub.meta.types.Expression;
 import metahub.meta.types.Function_Call;
+import metahub.meta.types.Function_Scope;
 import metahub.meta.types.Literal;
 import metahub.meta.types.Parameter;
 import metahub.meta.types.Path;
 import metahub.meta.types.Property_Expression;
 import metahub.meta.types.Scope_Expression;
+import metahub.meta.types.Variable;
 import metahub.schema.Kind;
 import metahub.schema.Namespace;
-import metahub.logic.schema.IRail;
+import metahub.logic.schema.Rail;
 
 typedef Conditions_Source = {
 	type:String,
@@ -51,8 +55,8 @@ class Coder {
         //return condition(source, scope);
 			case 'array':
         return create_array(source, scope);
-			case 'lambda':
-        return create_lambda(source, scope);
+			//case 'lambda':
+        //return create_lambda(source, scope);
     }
 
     throw new Exception("Invalid block: " + source.type);
@@ -73,6 +77,8 @@ class Coder {
         //return if_statement(source, scope);
       case 'constraint':
         return constraint(source, scope);
+      case 'function_scope':
+        return function_scope(source, scope);
 			//case 'weight':
         //return weight(source, scope);
 		}
@@ -96,7 +102,7 @@ class Coder {
 		//if (source.lambda) 			throw "";
 
 		return new Constraint(reference, expression, operator_name,
-			source.lambda != null ? cast create_lambda(source.lambda, scope) : null
+			source.lambda != null ? cast create_lambda(source.lambda, scope, [ reference, expression ]) : null
 		);
   }
 
@@ -192,69 +198,48 @@ class Coder {
 	}
 
   function create_path(source:Dynamic, scope:Scope):Expression {
-		//throw new Exception("Not implemented.");
-		var rail:IRail = scope.rail;
+		var rail:Rail = scope.rail;
 		var expression:Expression = null;
 		var children = new Array<Expression>();
 		var expressions:Array<Dynamic> = source.children;
 		if (expressions.length == 0)
 			throw new Exception("Empty reference path.");
-
-		if (expressions[0].type == "reference" && rail.get_tie_or_null(expressions[0].name) == null) {
-				return function_path(source, scope);
+			
+		if (expressions[0].type == "reference" && rail.get_tie_or_null(expressions[0].name) == null
+			&& scope.find(expressions[0].name) == null) {
+				throw new Exception("Not supported.");
 		}
 
 		for (item in expressions) {
-			if (item.type == "function") {
-				children.push(new Function_Call(item.name, null));
-				//var info = Function_Call.get_function_info(item.name, hub);
-				//children.push(new metahub.code.expressions.Function_Call(item.name, info, [], hub));
-			}
-			else if (item.type == "reference") {
-				var tie:Tie = cast rail.get_tie_or_error(item.name);
-				children.push(new Property_Expression(tie));
-				if (tie.other_rail != null)
-					rail = tie.other_rail;
-			}
-			else {
-				throw new Exception("Invalid path token type: " + item.type);
+			switch (item.type) {
+				case "function":
+					children.push(new Function_Call(item.name, null));
+					//var info = Function_Call.get_function_info(item.name, hub);
+					//children.push(new metahub.code.expressions.Function_Call(item.name, info, [], hub));			
+				case "reference":
+					var variable = scope.find(item.name);
+					if (variable != null) {
+						children.push(new Variable(item.name));
+						if (variable.rail == null)
+							throw "";
+						rail = variable.rail;
+					}
+					else {
+						var tie:Tie = cast rail.get_tie_or_error(item.name);
+						children.push(new Property_Expression(tie));
+						if (tie.other_rail != null)
+							rail = tie.other_rail;
+					}			
+				case "array":
+					var items:Array<Dynamic> = cast item.expressions;
+					children.push(new Array_Expression(items.map(function(i) return convert_expression(i, scope))));
+					
+				default:
+					throw new Exception("Invalid path token type: " + item.type);		
 			}
 		}
 		return new Path(children);
   }
-
-	function function_path(source:Dynamic, scope:Scope):Expression {
-		throw new Exception("Not implemented.");
-		//var path = new Array<String>();
-		//var expressions:Array<Dynamic> = source.children;
-		//for (expression in expressions) {
-			//path.push(expression.name);
-		//}
-//
-		//var fullname = path.join(".");
-		//var namespace = hub.metahub_namespace.get_namespace(path);
-		//if (namespace == null)
-			//throw new Exception("Could not find " +	fullname);
-//
-		//var name = path[path.length - 1];
-		//if (!namespace.function_library.exists(name))
-			//throw new Exception("Could not find function " +	fullname);
-//
-			//var info = {
-				//library: namespace.function_library,
-				//index: namespace.function_library.get_function_id(name)
-			//};
-		//return new Function_Call(fullname, info, [], hub);
-	}
-  //function create_general_reference(source:Dynamic, scope:Scope, trellis:Trellis):Expression_Reference {
-		//return new Property_Reference();
-  //}
-
-  //function create_symbol(source:Dynamic, scope:Scope):Expression {
-    //var expression = convert_expression(source.expression, scope);
-    //var symbol = scope.add_symbol(source.name, expression.get_type()[0]);
-    //return new metahub.code.expressions.Create_Symbol(symbol, expression);
-  //}
 
   static function get_type(value:Dynamic):Signature {
     if (Std.is(value, Int)) {
@@ -318,21 +303,27 @@ class Coder {
 		return new Block(expressions.map(function(e) return convert_expression(e, scope)));
   }
 
-  function create_lambda(source:Dynamic, scope:Scope):Expression {
+  function create_lambda(source:Dynamic, scope:Scope, constraint_expressions:Array<Expression>):Expression {
 		var expressions:Array<Dynamic> = source.expressions;
 		var new_scope = new Scope(scope);
-		new_scope.rail = new Dynamic_Rail();
 		var parameters:Array<String> = source.parameters;
+		var i = 0;
 		for (parameter in parameters) {
-			//throw new Exception("Not implemented.");
-			new_scope.variables[parameter] = { type: Kind.unknown };
+			var expression = constraint_expressions[i];
+			new_scope.variables[parameter] = Parse.get_end_tie(expression).get_signature();
+			++i;
 		}
 		
-		//return new Literal("stub");
 		return new metahub.meta.types.Lambda(new_scope, parameters.map(function(p) return new Parameter(p, null))
 			, expressions.map(function(e) return convert_statement(e, new_scope))
+		);		
+  }
+
+  function function_scope(source:Dynamic, scope:Scope):Expression {
+		var expression = convert_expression(source.expression, scope);
+		return new Function_Scope(expression,
+			cast create_lambda(source.lambda, scope, [ expression])
 		);
-		//return create_block(source, new_scope);
   }
 
 }

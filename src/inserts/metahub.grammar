@@ -15,7 +15,9 @@ path = @(id, dot, 2, 0)
 
 path_or_id = @(id, dot, 1, 0)
 
-reference = @(id, path_function_separator, 1, 0)
+id_or_array = id | array
+
+reference = @(id_or_array, path_function_separator, 1, 0)
 
 method = "|" id
 
@@ -26,6 +28,7 @@ statement =
 	| set_weight
   | new_scope
 	| create_node
+	| function_scope
 
 create_symbol = "let" ws id trim "=" trim expression
 
@@ -81,3 +84,5 @@ array = "[" trim @(expression, comma_or_newline, 0, 0) trim "]"
 lambda = trim parameters trim long_block
 
 parameters = "[" trim @(id, comma_or_newline, 0, 0) trim "]"
+
+function_scope = expression lambda

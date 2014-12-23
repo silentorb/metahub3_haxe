@@ -11,7 +11,7 @@ import metahub.imperative.code.Parse;
  * @author Christopher W. Johnson
  */
 
-class Tie implements ITie {
+class Tie {
 
 	public var rail:Rail;
 	public var property:Property;
@@ -139,7 +139,7 @@ class Tie implements ITie {
 		return conversion.value;
 	}
 	
-	public function get_abstract_rail():IRail {
+	public function get_abstract_rail():Rail {
 		return rail;
 	}
 	

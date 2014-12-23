@@ -12,7 +12,7 @@ class Constraint extends Expression
 	public var lambda:Lambda;
 	
 	public function new(first, second, operator = "=", lambda:Lambda = null) {
-		this.type = Expression_Type.constraint;
+		super(Expression_Type.constraint);
 		this.first = first;
 		this.second = second;
 		this.operator = operator;

@@ -126,6 +126,9 @@ typedef Reference_Or_Function = {
 				
 			case "parameters":
 				return parameters(data);
+				
+			case "function_scope":
+				return function_scope(data);
 
 //      default:
 //        throw new Exception("Invalid parser method: " + name + ".");
@@ -260,11 +263,13 @@ typedef Reference_Or_Function = {
 			//}
 		//}
 
-		var tokens:Array<Reference_Or_Function> = [
-			{
+		var tokens:Array < Reference_Or_Function > = [
+			data[0].type == "array"
+			? data[0]
+			: {
 				type: "reference",
 				name: data[0]
-			}
+			}			
 		];
 
 		for (i in 1...data.length) {
@@ -363,7 +368,7 @@ typedef Reference_Or_Function = {
 	static function lambda_expression(data:Dynamic):Dynamic {
     return {
 			type: "lambda",
-			parameters: [ data[1] ],
+			parameters: data[1],
 			expressions: data[3].expressions
     };
   }
@@ -371,4 +376,13 @@ typedef Reference_Or_Function = {
 	static function parameters(data:Dynamic):Dynamic {
     return data[2];
   }
+	
+	static function function_scope(data:Dynamic):Dynamic {
+    return {
+			type: "function_scope",
+			expression: data[0],
+			lambda: data[0]
+    };
+  }
+	
 }

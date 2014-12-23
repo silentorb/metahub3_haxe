@@ -13,7 +13,7 @@ class Lambda extends Expression
 
 	public function new(scope:Scope, parameters:Array<Parameter>, expressions:Array<Expression>) 
 	{
-		type = Expression_Type.lambda;
+		super(Expression_Type.lambda);
 		this.scope = scope;
 		this.parameters = parameters;
 		this.expressions = expressions;		

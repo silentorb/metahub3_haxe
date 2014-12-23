@@ -19,7 +19,7 @@ typedef Rail_Additional = {
 	?default_value:Dynamic
 }
 
-class Rail implements IRail {
+class Rail {
 
 	public var trellis:Trellis;
 	public var name:String;
@@ -131,14 +131,14 @@ class Rail implements IRail {
 		}
 	}
 	
-	public function get_tie_or_null(name:String):ITie {
+	public function get_tie_or_null(name:String):Tie {
 		if (!all_ties.exists(name))
 			return null;
 		
 		return all_ties[name];
 	}
 	
-	public function get_tie_or_error(name:String):ITie {
+	public function get_tie_or_error(name:String):Tie {
 		var tie = get_tie_or_null(name);
 		if (tie == null)
 			throw new Exception("Rail " + this.name + " does not have a tie named " + name + ".");

@@ -9,6 +9,6 @@ class Literal extends Expression {
 
 	public function new(value:Dynamic) {
 		this.value = value;
-		type = Expression_Type.literal;
+		super(Expression_Type.literal);
 	}
 }

@@ -52,6 +52,9 @@ class Parse
 					throw new Exception("Not supported.");
 					
 				return get_path(function_call.input);
+
+			case Expression_Type.variable:
+				return null;
 				
 			default:
 				return [];

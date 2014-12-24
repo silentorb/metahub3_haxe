@@ -1,4 +1,5 @@
 package metahub.imperative.types;
+import metahub.logic.schema.Signature;
 
 /**
  * ...

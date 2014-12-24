@@ -8,7 +8,7 @@ import metahub.logic.schema.Rail;
 class Scope {
 	public var rail:Rail;
 	public var parent:Scope;
-	public var variables = new Map<String, metahub.imperative.types.Signature>();
+	public var variables = new Map<String, metahub.logic.schema.Signature>();
 
 	public function new(parent:Scope = null) {
 		this.parent = parent;

@@ -2,6 +2,7 @@ package metahub.imperative.types ;
 import metahub.imperative.schema.Dungeon;
 import metahub.logic.schema.Rail;
 import metahub.schema.Kind;
+import metahub.logic.schema.Signature;
 
 /**
  * @author Christopher W. Johnson

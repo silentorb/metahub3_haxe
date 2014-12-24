@@ -1,4 +1,5 @@
 package metahub.meta.types;
+import metahub.logic.schema.Signature;
 
 /**
  * ...
@@ -13,4 +14,11 @@ class Path extends Expression {
 		this.children = children;		
 	}
 	
+	override public function get_signature():Signature 
+	{
+		if (children.length == 0)
+			throw new Exception("Cannot find signature of empty array.");
+		
+		return children[children.length - 1].get_signature();
+	}
 }

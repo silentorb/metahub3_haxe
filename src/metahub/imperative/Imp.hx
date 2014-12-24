@@ -99,6 +99,9 @@ import metahub.imperative.code.Parse;
 			case metahub.meta.types.Expression_Type.constraint:
 				create_constraint(cast expression, scope);
 
+			case metahub.meta.types.Expression_Type.function_scope:
+				
+
 			default:
 				throw new Exception("Cannot process expression of type :" + expression.type + ".");
 		}
@@ -161,7 +164,8 @@ import metahub.imperative.code.Parse;
 
 			case metahub.meta.types.Expression_Type.function_call:
 				var func:metahub.meta.types.Function_Call = cast expression;
-				return new Function_Call(func.name, [translate(func.input)]);
+				//return new Function_Call(func.name, [translate(func.input)]);
+				throw new Exception("Not implemented.");
 
 			case metahub.meta.types.Expression_Type.path:
 				return convert_path(cast expression);

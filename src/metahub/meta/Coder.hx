@@ -1,7 +1,7 @@
 package metahub.meta;
 import metahub.Hub;
 import metahub.imperative.code.Parse;
-import metahub.imperative.types.Signature;
+import metahub.logic.schema.Signature;
 import metahub.logic.schema.Railway;
 import metahub.logic.schema.Tie;
 import metahub.meta.types.Array_Expression;
@@ -34,7 +34,7 @@ class Coder {
     this.railway = railway;
   }
 
-  public function convert_expression(source:Dynamic, scope:Scope):Expression {
+  public function convert_expression(source:Dynamic, previous:Expression, scope:Scope):Expression {
 
     switch(source.type) {
 			case 'block':
@@ -42,11 +42,13 @@ class Coder {
       case 'literal':
         return create_literal(source, scope);
       case 'path':
-        return create_path(source, scope);
+        return create_path(source, previous, scope);
 			//case 'reference':
         //return create_general_reference(source, scope);
       case 'function':
-        return function_expression(source, scope, source.name);
+				throw new Exception("Not supported.");
+        return function_expression(source, scope, source.name, previous);
+				
 			//case 'create_node':
         //return create_node(source, scope);
 			//case 'conditions':
@@ -88,7 +90,7 @@ class Coder {
 
   function constraint(source:Dynamic, scope:Scope):Expression {
 		//var reference = Reference.from_scope(source.path, scope);
-		var reference = convert_expression(source.reference, scope);
+		var reference = convert_expression(source.reference, null, scope);
 		var back_reference:Expression = null;
 		var operator_name = source.operator;
 		if (['+=', '-=', '*=', '/='].indexOf(operator_name) > -1) {
@@ -96,7 +98,7 @@ class Coder {
 			back_reference = reference;
 		}
 		//var operator = Type.createEnum(Functions, operator_name);
-		var expression = convert_expression(source.expression, scope);
+		var expression = convert_expression(source.expression, null, scope);
 		//var expression = function_expression(source.expression, scope, name, back_reference);
 		//return new metahub.code.expressions.Create_Constraint(reference, expression, operator_name, back_reference != null);
 		//if (source.lambda) 			throw "";
@@ -133,60 +135,17 @@ class Coder {
 		return new Literal(source.value);
   }
 
-  function function_expression(source:Dynamic, scope:Scope, name:String, reference:Expression = null):Expression {
+  function function_expression(source:Dynamic, scope:Scope, name:String, previous:Expression):Expression {
     var expressions:Array<Dynamic> = source.inputs;
-    var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope)));
+		if (source.inputs.length > 0)
+			throw new Exception("Not supported.");
+			
+    //var inputs = Lambda.array(Lambda.map(expressions, function(e) return convert_expression(e, scope)));
 
-			// Equavelent to += in other languages
-		if (reference != null) {
-			//name = name.substring(0, 1);
-			inputs.unshift(reference);
-		}
-		return new Function_Call(name, inputs[0]);
+		return new Function_Call(name, previous, railway);
 		//var info = Function_Call.get_function_info(name, hub);
     //return new metahub.code.expressions.Function_Call(name, info, inputs, hub);
   }
-
-  //function if_statement(source:Dynamic, scope:Scope):Expression {
-		//var condition = convert_expression(source.condition, scope);
-		//var expression = convert_expression(source.action, scope);
-		//return new If_Statement(condition, expression);
-  //}
-
-  //function conditions(source:Conditions_Source, scope:Scope):Expression {
-		//var expressions = new Array<Expression>();
-		//for (i in source.conditions) {
-			//expressions.push(convert_expression(i, scope));
-		//}
-		//return new Condition_Group(expressions,
-			//expressions.length > 1 ? Condition_Join.createByName(source.mode) : Condition_Join.and
-		//);
-  //}
-//
-  //function condition(source:Dynamic, scope:Scope):Expression {
-		//return new Condition(
-			//convert_expression(source.first, scope),
-			//convert_expression(source.second, scope),
-			//Functions.createByName(source.operator));
-  //}
-
-  //function create_node(source:Dynamic, scope:Scope):Expression {
-		//var path:Array<String> = source.trellis;
-		//if (path.length == 0)
-			//throw new Exception("Trellis path is empty for node creation.");
-//
-		//var namespace = hub.schema.root_namespace.get_namespace(path);
-    //var trellis = hub.schema.get_trellis(path[path.length - 1], namespace, true);
-		//var new_scope = new Scope(scope);
-		//new_scope.is_particular_node = true;
-		//new_scope.trellis = trellis;
-//
-		//var block = source.block != null
-			//? create_block(source.block, new_scope)
-			//: null;
-//
-		//return new metahub.code.expressions.Create_Node(trellis, new_scope, block);
-  //}
 
 	function extract_path(path:Dynamic):Array<String> {
 		var result = new Array<String>();
@@ -197,7 +156,7 @@ class Coder {
 		return result;
 	}
 
-  function create_path(source:Dynamic, scope:Scope):Expression {
+  function create_path(source:Dynamic, previous:Expression, scope:Scope):Expression {
 		var rail:Rail = scope.rail;
 		var expression:Expression = null;
 		var children = new Array<Expression>();
@@ -213,30 +172,38 @@ class Coder {
 		for (item in expressions) {
 			switch (item.type) {
 				case "function":
-					children.push(new Function_Call(item.name, null));
+					previous = new Function_Call(item.name, previous, railway);
 					//var info = Function_Call.get_function_info(item.name, hub);
 					//children.push(new metahub.code.expressions.Function_Call(item.name, info, [], hub));			
 				case "reference":
 					var variable = scope.find(item.name);
 					if (variable != null) {
-						children.push(new Variable(item.name));
+						previous = new Variable(item.name);
 						if (variable.rail == null)
 							throw "";
 						rail = variable.rail;
 					}
 					else {
 						var tie:Tie = cast rail.get_tie_or_error(item.name);
-						children.push(new Property_Expression(tie));
+						previous = new Property_Expression(tie);
 						if (tie.other_rail != null)
 							rail = tie.other_rail;
-					}			
+					}
 				case "array":
 					var items:Array<Dynamic> = cast item.expressions;
-					children.push(new Array_Expression(items.map(function(i) return convert_expression(i, scope))));
+					var token:Expression = null;
+					var sub_array = [];
+					for (item in items) {
+						var token = convert_expression(item, token, scope);
+						sub_array.push(token);
+					}
+					previous = new Array_Expression(sub_array);
 					
 				default:
 					throw new Exception("Invalid path token type: " + item.type);		
 			}
+			
+			children.push(previous);
 		}
 		return new Path(children);
   }
@@ -300,7 +267,7 @@ class Coder {
 
   function create_array(source:Dynamic, scope:Scope):Expression {
 		var expressions:Array<Dynamic> = source.expressions;
-		return new Block(expressions.map(function(e) return convert_expression(e, scope)));
+		return new Block(expressions.map(function(e) return convert_expression(e, null, scope)));
   }
 
   function create_lambda(source:Dynamic, scope:Scope, constraint_expressions:Array<Expression>):Expression {
@@ -310,7 +277,8 @@ class Coder {
 		var i = 0;
 		for (parameter in parameters) {
 			var expression = constraint_expressions[i];
-			new_scope.variables[parameter] = Parse.get_end_tie(expression).get_signature();
+			var path = Parse.normalize_path(expression);
+			new_scope.variables[parameter] = path[path.length - 1].get_signature();
 			++i;
 		}
 		
@@ -320,9 +288,11 @@ class Coder {
   }
 
   function function_scope(source:Dynamic, scope:Scope):Expression {
-		var expression = convert_expression(source.expression, scope);
+		var expression = convert_expression(source.expression, null, scope);
+		var path:Path = cast expression;
+		var token = path.children[path.children.length - 2];
 		return new Function_Scope(expression,
-			cast create_lambda(source.lambda, scope, [ expression])
+			cast create_lambda(source.lambda, scope, [ token, token ])
 		);
   }
 

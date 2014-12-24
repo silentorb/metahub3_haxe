@@ -48,10 +48,12 @@ class Parse
 				
 			case Expression_Type.function_call:
 				var function_call:Function_Call = cast expression;
-				if (function_call.input == null)
-					throw new Exception("Not supported.");
+				throw new Exception("Not supported.");
+				//if (function_call.input == null)
+					//return null;
+					//throw new Exception("Not supported.");
 					
-				return get_path(function_call.input);
+				//return get_path(function_call.input);
 
 			case Expression_Type.variable:
 				return null;
@@ -59,6 +61,29 @@ class Parse
 			default:
 				return [];
 				//throw new Exception("Unsupported path expression type: " + expression.type);
+		}
+	}
+	
+		public static function normalize_path(expression:Expression):Array<Expression> {
+		switch (expression.type) {
+			
+			case Expression_Type.path:
+				var path:Path = cast expression;
+				var result = [];
+				for (token in path.children) {
+					result = result.concat(normalize_path(token));
+				}
+				return result;
+
+			case Expression_Type.function_call:
+				var function_call:Function_Call = cast expression;
+				//if (function_call.input != null)
+					//return normalize_path(function_call.input);
+
+				return [ expression ];
+					
+			default:
+				return [ expression ];
 		}
 	}
 		

@@ -1,4 +1,4 @@
-package metahub.imperative.types ;
+package metahub.logic.schema;
 import metahub.schema.Kind;
 import metahub.logic.schema.Rail;
 

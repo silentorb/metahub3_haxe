@@ -381,7 +381,7 @@ typedef Reference_Or_Function = {
     return {
 			type: "function_scope",
 			expression: data[0],
-			lambda: data[0]
+			lambda: data[1]
     };
   }
 	

@@ -23,6 +23,7 @@ class Region
 	public var name:String;
 	public var parent:Region = null;
 	public var children = new Map<String, Region>();
+	public var functions = new Map<String, Function_Info>();
 
 	public function new(namespace:Namespace, target_name:String) 
 	{
@@ -53,4 +54,11 @@ class Region
 			}
 		}
 	}
+	
+	public function add_functions(new_functions:Array < Function_Info > ) {
+		for (func in new_functions) {
+			functions[func.name] = func;
+		}
+	}
+	
 }

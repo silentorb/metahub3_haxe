@@ -1,4 +1,5 @@
 package metahub.meta.types;
+import metahub.logic.schema.Signature;
 import metahub.logic.schema.Tie;
 
 /**
@@ -12,6 +13,11 @@ class Property_Expression extends Expression {
 	{
 		super(Expression_Type.property);
 		this.tie = tie;		
+	}
+	
+	override public function get_signature():Signature 
+	{
+		return tie.get_signature();
 	}
 	
 }

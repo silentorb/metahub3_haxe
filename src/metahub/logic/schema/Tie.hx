@@ -1,5 +1,5 @@
 package metahub.logic.schema;
-import metahub.imperative.types.Signature;
+import metahub.logic.schema.Signature;
 import metahub.meta.types.Expression;
 import metahub.schema.Property;
 import metahub.schema.Kind;

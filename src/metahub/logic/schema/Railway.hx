@@ -24,6 +24,7 @@ class Railway {
 		this.target_name = target_name;
 		
 		root_region = new Region(hub.schema.root_namespace, "/");
+		initialize_root_functions();
 
 		for (namespace in hub.schema.root_namespace.children) {
 			if (namespace.name == 'metahub')
@@ -120,5 +121,22 @@ class Railway {
 			throw new Exception("Region " + region.name + " does not have a rail named " + rail_name + ".");
 			
 		return region.rails[rail_name];
+	}
+	
+	function initialize_root_functions() {
+		root_region.add_functions([
+		
+			new Function_Info("count", [
+				new Function_Version({ type: Kind.list, rail:null }, { type:Kind.int })
+			]),
+			
+			new Function_Info("cross", [
+				new Function_Version({ type: Kind.list, rail:null }, { type:Kind.none })
+			]),
+			
+			new Function_Info("dist", [
+				new Function_Version({ type: Kind.list, rail:null }, { type:Kind.none })
+			]),
+		]);
 	}
 }

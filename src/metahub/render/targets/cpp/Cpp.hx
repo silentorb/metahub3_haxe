@@ -24,7 +24,7 @@ import metahub.imperative.types.Flow_Control;
 import metahub.imperative.types.Instantiate;
 import metahub.imperative.types.Parameter;
 import metahub.imperative.types.Scope;
-import metahub.imperative.types.Signature;
+import metahub.logic.schema.Signature;
 import metahub.imperative.types.Statement;
 import metahub.schema.Namespace;
 import metahub.schema.Property;

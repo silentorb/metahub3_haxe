@@ -1,5 +1,5 @@
 package metahub.meta.types ;
-import metahub.imperative.types.Signature;
+import metahub.logic.schema.Signature;
 
 /**
  * @author Christopher W. Johnson

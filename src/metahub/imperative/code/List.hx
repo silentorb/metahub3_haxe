@@ -16,7 +16,7 @@ class List
 	public static function common_functions(tie:Tie, imp:Imp) {
 		var rail = tie.rail;
 		var dungeon = imp.get_dungeon(tie.rail);
-		
+
 		var function_name = tie.tie_name + "_add";
 		var definition = new Function_Definition(function_name, dungeon, [
 			new Parameter("item", tie.get_other_signature()),
@@ -56,13 +56,13 @@ class List
 				//return;
 			//}
 		//}
-		
+
 		var other_path = Parse.get_path(expression);
 		if (other_path.length > 0 && other_path[other_path.length - 1].type == Kind.list) {
 			map(constraint, expression, imp);
 		}
 		else {
-			size(constraint, expression, imp);			
+			size(constraint, expression, imp);
 		}
 	}
 
@@ -81,31 +81,31 @@ class List
 	public static function link(a:Array<Tie>, b:Array<Tie>, c:Array<Tie>, mapping:Lambda, imp:Imp) {
 		var a_start = a[0];
 		var a_end = a[a.length - 1];
-		
+
 		var second_start = b[0];
 		var second_end = b[b.length - 1];
-			
+
 		var item_name = second_end.rail.name.toLowerCase() + "_item";
-	
+
 		var creation_block:Array<Expression> = [
 			new Declare_Variable(item_name, second_end.get_other_signature(), new Instantiate(second_end.other_rail)),
 		];
-		
+
 		if (mapping != null) {
 			var constraints:Array<metahub.meta.types.Constraint> = cast mapping.expressions;
 			for (constraint in constraints) {
 				var first:metahub.meta.types.Path = cast constraint.first;
 				var first_tie:metahub.meta.types.Property_Expression = cast first.children[1];
 				var second:metahub.meta.types.Path = cast constraint.second;
-				var second_tie:metahub.meta.types.Property_Expression = cast second.children[1];
+				var second_tie:metahub.meta.types.Property_Expression = cast second;
 				creation_block.push(new Assignment(
-					new Variable(item_name, new Property_Expression(cast a_end.other_rail.get_tie_or_error(first_tie.tie.name))), 
+					new Variable(item_name, new Property_Expression(cast a_end.other_rail.get_tie_or_error(first_tie.tie.name))),
 					"=",
 					new Variable("item", new Property_Expression(cast second_end.other_rail.get_tie_or_error(second_tie.tie.name)))
 				));
 			}
 		}
-		
+
 		creation_block = creation_block.concat(cast [
 			new Variable(item_name, new Function_Call("initialize")),
 			new Property_Expression(c[0],

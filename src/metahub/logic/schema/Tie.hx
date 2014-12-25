@@ -86,18 +86,18 @@ class Tie {
 	public function is_inherited():Bool {
 		return rail.parent != null && rail.parent.all_ties.exists(name);
 	}
-	
+
 	public function finalize() {
 		determine_range();
 	}
-		
+
 	function determine_range() {
 		//if (type != Kind.float)
 			//return;
 		if (type == Kind.list)
 			return;
 
-		var pairs = new Map<String, { min:{expression:Expression}, max:{expression:Expression}, path:Array<Tie> }>(); 
+		var pairs = new Map<String, { min:{expression:Expression}, max:{expression:Expression}, path:Array<Tie> }>();
 		//var min:Constraint = null;
 		//var max:Constraint = null;
 
@@ -112,45 +112,47 @@ class Tie {
 					path: path
 				};
 			}
-			
+
 			if (constraint.operator == "in") {
 				var args:metahub.meta.types.Block = cast constraint.expression;
 				pairs[path_name].min = { expression: args.children[0] };
-				pairs[path_name].max = { expression: args.children[1] };				
+				pairs[path_name].max = { expression: args.children[1] };
 			}
 			else if (constraint.operator == ">" || constraint.operator == ">=") {
 				pairs[path_name].min = constraint;
 			}
 			else if (constraint.operator == "<" || constraint.operator == "<=") {
 				pairs[path_name].max = constraint;
-			}			
+			}
 		}
-		
+
 		for (pair in pairs) {
 			if (pair.min != null && pair.max != null) {
-				trace('range', fullname());			
-				ranges.push(new Range_Float(get_expression_float(pair.min.expression), get_expression_float(pair.max.expression), pair.path));
-			}			
+				trace('range', fullname());
+				ranges.push(new Range_Float(
+					get_expression_float(pair.min.expression),
+					get_expression_float(pair.max.expression), pair.path));
+			}
 		}
 	}
-	
+
 	static function get_expression_float(expression:Expression):Float{
 		var conversion:metahub.imperative.types.Literal = cast expression;
 		return conversion.value;
 	}
-	
+
 	public function get_abstract_rail():Rail {
 		return rail;
 	}
-	
+
 	public function fullname():String {
 		return rail.name + '.' + name;
 	}
-	
+
 	public function get_default_value():Dynamic {
 		if (other_rail != null && other_rail.default_value != null)
 			return other_rail.default_value;
-			
+
 		return property.get_default();
 	}
 }

@@ -128,7 +128,7 @@ class Tie {
 
 		for (pair in pairs) {
 			if (pair.min != null && pair.max != null) {
-				trace('range', fullname());
+				//trace('range', fullname());
 				ranges.push(new Range_Float(
 					get_expression_float(pair.min.expression),
 					get_expression_float(pair.max.expression), pair.path));

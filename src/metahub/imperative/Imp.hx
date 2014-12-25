@@ -5,6 +5,7 @@ import metahub.imperative.schema.*;
 import metahub.logic.schema.*;
 import metahub.meta.Scope;
 import metahub.imperative.types.*;
+import metahub.meta.types.Function_Scope;
 import metahub.meta.types.Lambda;
 import metahub.meta.types.Scope_Expression;
 import metahub.render.Target;
@@ -100,8 +101,14 @@ import metahub.imperative.code.Parse;
 				create_constraint(cast expression, scope);
 
 			case metahub.meta.types.Expression_Type.function_scope:
-				
+				function_scope(cast expression, scope);
 
+			case metahub.meta.types.Expression_Type.path:
+				block_expression(cast expression, scope);
+				
+			case metahub.meta.types.Expression_Type.property:
+			case metahub.meta.types.Expression_Type.function_call:
+				
 			default:
 				throw new Exception("Cannot process expression of type :" + expression.type + ".");
 		}
@@ -120,13 +127,21 @@ import metahub.imperative.code.Parse;
 		}
 	}
 
+	function function_scope(expression:Function_Scope, scope:Scope) {
+		process(expression.expression, scope);
+		for (child in expression.lambda.expressions) {
+			process(child, expression.lambda.scope);
+		}
+	}
+	
 	function create_constraint(expression:metahub.meta.types.Constraint, scope:Scope) {
 		var rail:Rail = cast scope.rail;
 		var constraint = new metahub.logic.schema.Constraint(expression, this);
 		var tie = Parse.get_end_tie(constraint.reference);
-		trace('tie', tie.rail.name + "." + tie.name);
+		//trace('tie', tie.rail.name + "." + tie.name);
 		tie.constraints.push(constraint);
 		constraints.push(constraint);
+		trace('constraint', constraint.operator, tie.fullname());
 	}
 	
 	//function create_lambda_constraint(expression:metahub.meta.types.Constraint, scope:Scope):Expression {

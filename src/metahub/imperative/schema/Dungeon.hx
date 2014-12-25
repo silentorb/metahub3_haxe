@@ -208,7 +208,7 @@ class Dungeon
 
 			case Expression_Type.function_call:
 				var definition:Function_Call = cast expression;
-				trace('func', definition.name);
+				//trace('func', definition.name);
 				if (definition.is_platform_specific && !used_functions.exists(definition.name))
 					used_functions[definition.name] = new Used_Function(definition.name, definition.is_platform_specific);
 				

@@ -21,26 +21,40 @@ class Parse
 	}
 
 	public static function get_end_tie(expression:Expression):Tie {
-		var path:Path = cast expression;
-		var i = path.children.length;
+		var path = get_path(expression);
+		var i = path.length;
 		while (--i >= 0) {
-			if (path.children[i].type == Expression_Type.property) {
-				var property_expression:metahub.imperative.types.Property_Expression = cast path.children[i];
-				if (property_expression.tie.rail.trellis.is_value)
-					continue;
-
-				return property_expression.tie;
-			}
+			if (!path[i].rail.trellis.is_value)
+				return path[i];
 		}
-
+		
 		throw new Exception("Could not find property inside expression path.");
 	}
+	
+	//public static function get_end_tie(expression:Expression):Tie {
+		//var path:Path = cast expression;
+		//var i = path.children.length;
+		//while (--i >= 0) {
+			//if (path.children[i].type == Expression_Type.property) {
+				//var property_expression:metahub.imperative.types.Property_Expression = cast path.children[i];
+				//if (property_expression.tie.rail.trellis.is_value)
+					//continue;
+//
+				//return property_expression.tie;
+			//}
+		//}
+//
+		//throw new Exception("Could not find property inside expression path.");
+	//}
 
 	public static function get_path(expression:Expression):Array<Tie> {
 		switch (expression.type) {
 
 			case Expression_Type.path:
-				return simplify_property_path(cast expression);
+				return get_path_from_array(cast (expression, Path).children);
+				
+			case Expression_Type.array:
+				return get_path_from_array(cast (expression, Array_Expression).children);
 
 			case Expression_Type.property:
 				var property_expression:Property_Expression = cast expression;
@@ -48,7 +62,8 @@ class Parse
 
 			case Expression_Type.function_call:
 				var function_call:Function_Call = cast expression;
-				throw new Exception("Not supported.");
+				return [];
+				//throw new Exception("Not supported.");
 				//if (function_call.input == null)
 					//return null;
 					//throw new Exception("Not supported.");
@@ -62,6 +77,15 @@ class Parse
 				return [];
 				//throw new Exception("Unsupported path expression type: " + expression.type);
 		}
+	}
+	
+	public static function get_path_from_array(expressions:Array<Expression>):Array<Tie> {
+		var result = new Array<Tie>();
+		for (token in expressions) {
+			result = result.concat(get_path(token));
+		}
+
+		return result;
 	}
 
 	public static function normalize_path(expression:Expression):Array<Expression> {
@@ -103,14 +127,14 @@ class Parse
 		}
 	}
 
-	static function simplify_property_path(path:Path) {
-		var result = new Array<Tie>();
-		for (token in path.children) {
-			result = result.concat(get_path(token));
-		}
-
-		return result;
-	}
+	//static function simplify_property_path(path:Path) {
+		//var result = new Array<Tie>();
+		//for (token in path.children) {
+			//result = result.concat(get_path(token));
+		//}
+//
+		//return result;
+	//}
 
 	public static function reverse_path(path:Array<Tie>):Array<Tie> {
 		var result = path.map(function(t) {

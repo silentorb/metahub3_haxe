@@ -102,6 +102,8 @@ class Coder {
 		return new Constraint(reference, expression, operator_name,
 			source.lambda != null ? cast create_lambda(source.lambda, scope, [ reference, expression ]) : null
 		);
+		
+		
   }
 
   function create_block(source:Dynamic, scope:Scope):Expression {
